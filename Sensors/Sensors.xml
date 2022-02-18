@@ -20,22 +20,6 @@
         <struct name="Gas_Sensor" baseType="Sensors::Sensor">
           <member name="concentration" type="nonBasic" nonBasicTypeName="Common::ConcentrationInMolesPerCubicMetre_t"/>
         </struct>
-        <union name="SensorReading">
-          <discriminator type="uint8"/>
-          <case>
-            <caseDiscriminator value="default"/>
-            <member name="stringTemp" type="string" stringMaxLength="20"/>
-          </case>
-          <case>
-            <caseDiscriminator value="2"/>
-            <member name="intTemp" type="int8"/>
-          </case>
-          <case>
-            <caseDiscriminator value="3"/>
-            <caseDiscriminator value="4"/>
-            <member name="floatTemp" type="float32"/>
-          </case>
-        </union>
       </module>
     </types>
 
