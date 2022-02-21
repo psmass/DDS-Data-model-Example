@@ -6,7 +6,7 @@ THIS DIRECTORY CONTAINS:
 
 Data Model for Command/Response Command/Status Patterns
 
-Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best application which fits the problem space.  
+Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
 
 The data model example in this directory will show a one-to-one Command/Status Request with a directed response (see examples below)
 
