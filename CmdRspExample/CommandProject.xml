@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+    <types>
+      <!-- Commands below are 'short-lived' meaning they are responded to immediately and 
+	     don't require state. Commands could be 'long living' example move to a waypoint
+	     or someother command that could take minutes/hours/days to execute.  These
+	     type commands would require state of the command itself (e.g. accepted, executing,
+	     completed-success, error, cancelled) -->
+      <module name="ExCmdRsp">
+        <const name="TOPIC_DEVICE_ANNOUNCEMENT" type="string" value="DeviceAnnouncement"/>
+        <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
+        <const name="TOPIC_DEVICE_CONFIGURATION" type="string" value="DeviceConfiguration"/>
+        <const name="TOPIC_REQUEST_DEVICE_STATUS" type="string" value="&quot;RequestDeviceStatus&quot;"/>
+        <const name="TOPIC_MEMBERSHIP_REQUEST" type="string" value="MembershipRequest"/>
+        <const name="TOPIC_MEMBERSHIP_RESULT" type="string" value="&quot;MembershipResult"/>
+        <const name="TOPIC_DEVICE_STATUS" type="string" value="DeviceStatus"/>
+        <const name="LEN_DEVICE_ID" type="int32" value="32"/>
+        <const name="MAXLEN_MFR_NAME" type="uint32" value="32"/>
+        <const name="MAXLEN_MODEL_NAME" type="uint32" value="32"/>
+        <const name="MAXLEN_MODEL_NUM" type="uint32" value="32"/>
+        <const name="MAXLEN_SN" type="uint32" value="32"/>
+        <const name="MAXLEN_SW_VER_NUM" type="uint32" value="32"/>
+        <const name="LEN_STR_FOO" type="uint32" value="10"/>
+        <const name="LEN_STR_BAR" type="uint32" value="16"/>
+        <enum name="DeviceRole">
+          <enumerator name="ROLE_CONTROLLER"/>
+          <enumerator name="ROLE_FUNC_FOO"/>
+          <enumerator name="ROLE_FUNC_BAR"/>
+        </enum>
+        <enum name="DeviceState">
+          <enumerator name="UNINITIALIZED"/>
+          <enumerator name="OK"/>
+          <enumerator name="ERROR"/>
+        </enum>
+        <typedef name="DeviceID" type="byte" arrayDimensions="ExCmdRsp::LEN_DEVICE_ID"/>
+        <enum name="MembershipKind">
+          <enumerator name="UNINITIALIZED"/>
+          <enumerator name="JOIN"/>
+          <enumerator name="LEAVE"/>
+        </enum>
+        <enum name="MembershipResultKind">
+          <enumerator name="UNINITIALIZED"/>
+          <enumerator name="DENIED"/>
+          <enumerator name="GRANTED"/>
+        </enum>
+        <struct name="DeviceConfigStuct" nested="true">
+          <member name="fooName" type="string" stringMaxLength="LEN_STR_FOO"/>
+          <member name="fooValue" type="int32"/>
+          <member name="barName" type="string" stringMaxLength="LEN_STR_BAR"/>
+          <member name="barValue" type="uint32"/>
+        </struct>
+        <typedef name="DeviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfigStuct"/>
+        <struct name="DeviceAnnouncement">
+          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
+          <member name="role" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceRole"/>
+          <member name="mfrName" type="string" stringMaxLength="ExCmdRsp::MAXLEN_MFR_NAME"/>
+          <member name="modelName" type="string" stringMaxLength="ExCmdRsp::MAXLEN_MODEL_NAME"/>
+          <member name="modelNum" type="string" stringMaxLength="ExCmdRsp::MAXLEN_MODEL_NUM"/>
+          <member name="serialNum" type="string" stringMaxLength="ExCmdRsp::MAXLEN_SN"/>
+          <member name="swVersionNum" type="string" stringMaxLength="ExCmdRsp::MAXLEN_SW_VER_NUM"/>
+        </struct>
+        <struct name="MembershipRequest">
+          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
+          <member name="membership" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipKind"/>
+        </struct>
+        <struct name="MembershipResult">
+          <member name="targetDevID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
+          <member name="membership" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipKind"/>
+          <member name="result" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipResult"/>
+        </struct>
+        <struct name="ConfigureDevice">
+          <member name="targetDevID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
+          <member name="deviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
+        </struct>
+        <struct name="DeviceConfiguratoin">
+          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
+          <member name="deviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
+        </struct>
+        <struct name="DeviceStatus">
+          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
+          <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
+        </struct>
+        <struct name="RequestDeviceStatus">
+          <member name="targetDeviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
+          <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
+        </struct>
+      </module>
+    </types>
+
+</dds>
