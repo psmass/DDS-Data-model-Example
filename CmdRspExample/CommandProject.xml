@@ -11,10 +11,10 @@
         <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
         <const name="TOPIC_DEVICE_CONFIGURATION" type="string" value="DeviceConfiguration"/>
         <const name="TOPIC_REQUEST_DEVICE_STATUS" type="string" value="&quot;RequestDeviceStatus&quot;"/>
+        <const name="TOPIC_DEVICE_STATUS" type="string" value="DeviceStatus"/>
         <const name="TOPIC_MEMBERSHIP_REQUEST" type="string" value="MembershipRequest"/>
         <const name="TOPIC_MEMBERSHIP_RESULT" type="string" value="&quot;MembershipResult"/>
-        <const name="TOPIC_DEVICE_STATUS" type="string" value="DeviceStatus"/>
-        <const name="LEN_DEVICE_ID" type="int32" value="32"/>
+        <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
         <const name="MAXLEN_MFR_NAME" type="uint32" value="32"/>
         <const name="MAXLEN_MODEL_NAME" type="uint32" value="32"/>
         <const name="MAXLEN_MODEL_NUM" type="uint32" value="32"/>
@@ -76,12 +76,12 @@
           <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
           <member name="deviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
         </struct>
-        <struct name="DeviceStatus">
-          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
-          <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
-        </struct>
         <struct name="RequestDeviceStatus">
           <member name="targetDeviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
+          <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
+        </struct>
+        <struct name="DeviceStatus">
+          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
           <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
         </struct>
       </module>
