@@ -2,7 +2,8 @@
 ![](https://github.com/psmass/DDSexamples/blob/master/RtiAsOne.png)
 
 
-*** THIS DIRECTORY CONTAINS: ***
+THIS DIRECTORY CONTAINS:
+
 Data Model for Command/Status Patterns
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best application which fits the problem space.  
@@ -19,7 +20,7 @@ Here are a few examples:
 
 Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
-	  Requesting Controller				 |				Responding Device
+	           Requesting Controller 		 |		  Responding Device
 	Foo Comnmand Issued (Key'd targetDevID) ------>	 |      (content filter on target(my)DevId)
 							 |
 				         <-------------  | Foo Response(cmdReq Key'd targetDevID, Result / Status)
@@ -35,7 +36,7 @@ Here the Command key'd targetDeviceID allows many requests to different devices 
 Use-case for this example may be within the same system above but where the multiple devices are each, individually requesting something of the controller (e.g., approval to be accepted on the system).
 
 
-	  			Requesting Device 	 |				Responding Controller
+	            Requesting Device            	 |		Responding Controller
 	 Foo Command Issued (Key'd req(my)DevID) ------> |
 							 |
 			                  <------------- | Foo Response(cmdReq Key'd reqDevID, Result / Status)
@@ -58,7 +59,7 @@ This pattern also handles the case where a command is not necessarily immediate 
 As well, if a command is running, it must be cancelled before antoher command is issued by any consumer to the service (care must be taken to allow any consumer to cancel a currently running command). The consumer must subscribe to bothe the command_state response (how the command itself executing - e.g. accepted, executing, error, cancelled, completed) and how the service is responding to the commmand - e.g. gps position and speed as a result of an e.g. global_pos command/way point command).
 
 
-	        Foo Consumer 		 			  |				Foo Service
+	                      Foo Consumer 		 	  |	             Foo Service
 	Foo Service Comnmand Issued (Key'd requestorDevID) -----> |
 	 	       		 	  	    	  	  |
 					           <------------- | Foo command_state (cmdReq Key'd requestDevID, cmd state)
