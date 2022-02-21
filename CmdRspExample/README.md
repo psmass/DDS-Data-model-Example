@@ -21,12 +21,12 @@ Here are a few examples:
 Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
 	           Requesting Controller 		 |		  Responding Device
-	Foo Comnmand Issued (Key'd targetDevID) ------>	 |      (content filter on target(my)DevId)
+	      Foo Comnmand Issued (targetDevID) ------>	 |      (content filter on target(my)DevId)
 							 |
-				         <-------------  | Foo Response(cmdReq Key'd targetDevID, Result / Status)
+				         <-------------  | Foo Response(cmdReq @key'd (my)deviceID, Result / Status)
 					 		 | 
 
-Here the Command key'd targetDeviceID allows many requests to different devices while allowing a given device to set a content filter for command FOO directed to it alone. As well the response holds the targetDevID allowing the requestor to both correlate outstanding requests as well as receive request 'samples' from multiple devices.
+Here the Command key'd targetDeviceID allows many requests to different devices while allowing a given device to set a content filter for command FOO directed to it alone. As well the response holds the key'd deviceID allowing the requestor to both correlate outstanding requests as well as receive request instances and sample from multiple devices.
 
 
 **Many Devices Requesting Command to one Controller** (two or more if redundant)
@@ -37,12 +37,12 @@ Use-case for this example may be within the same system above but where the mult
 
 
 	            Requesting Device            	 |		Responding Controller
-	 Foo Command Issued (Key'd req(my)DevID) ------> |
+      Foo Command Issued (Key'd (my)deviceDevID) ------> |
 							 |
-			                  <------------- | Foo Response(cmdReq Key'd reqDevID, Result / Status)
+			                  <------------- | Foo Response(cmdReq reqDevID, Result / Status)
 	(content filter on target(my)DevId)		 | 
 
-Here the Command key'd reqDeviceID allows many requests from different devices to be handled as separate instances by the controller. Again, the Requesting device may set a content filter on it's deviceID to filter out responses exclusively to it's requests. 
+Here the Command key'd reqDeviceID allows many requests from different devices to be handled as separate instances by the controller. The controller copies the device from the request to the response. The Requesting device may set a content filter on it's deviceID to filter out only instances directed exclusively to it's requests. 
 
 A variant of this used with Tactical Micro-grid, is that a response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
 
@@ -60,9 +60,9 @@ As well, if a command is running, it must be cancelled before antoher command is
 
 
 	                      Foo Consumer 		 	  |	             Foo Service
-	Foo Service Comnmand Issued (Key'd requestorDevID) -----> |
+	      Foo Service Comnmand Issued (Key'd deviceID) -----> |
 	 	       		 	  	    	  	  |
-					           <------------- | Foo command_state (cmdReq Key'd requestDevID, cmd state)
+					           <------------- | Foo command_state (cmdReq reqDevID, cmd state)
 							  	  | (content filter on myDevId)
 
 Foo Consumer Subscribes to Foo service reports allowing the it to monitor the state of the Foo Service and how it is performing it's service relative to any commands issued.
