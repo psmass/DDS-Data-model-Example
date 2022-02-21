@@ -72,7 +72,7 @@
           <member name="targetDevID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
           <member name="deviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
         </struct>
-        <struct name="DeviceConfiguratoin">
+        <struct name="DeviceConfiguration">
           <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
           <member name="deviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
         </struct>
