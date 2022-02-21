@@ -20,7 +20,7 @@ Use-case Single or redundant Controller to many devices (but one at a time), e.g
 	  Requesting Controller				 |				Responding Device
 	Foo Comnmand Issued (Key'd targetDevID) ------>	 |      (content filter on target(my)DevId)
 							 |
-				 <------------- 	 | Foo Response(cmdReq Key'd targetDevID, Result / Status)
+				         <-------------  | Foo Response(cmdReq Key'd targetDevID, Result / Status)
 					 		 | 
 
 Here the Command key'd targetDeviceID allows many requests to different devices while allowing a given device to set a content filter for command FOO directed to it alone. As well the response holds the targetDevID allowing the requestor to both correlate outstanding requests as well as receive request 'samples' from multiple devices.
@@ -56,7 +56,7 @@ As well, if a command is running, it must be cancelled before antoher command is
 	        Foo Consumer 		 			  |				Foo Service
 	Foo Service Comnmand Issued (Key'd requestorDevID) -----> |
 	 	       		 	  	    	  	  |
-					         <-------------   | Foo command_state (cmdReq Key'd requestDevID, cmd state)
+					           <------------- | Foo command_state (cmdReq Key'd requestDevID, cmd state)
 							  	  | (content filter on myDevId)
 
 Foo Consumer Subscribes to Foo service reports allowing the it to monitor the state of the Foo Service and how it is performing it's service relative to any commands issued.
