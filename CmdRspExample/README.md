@@ -14,7 +14,9 @@ Here are a few examples:
 **Command/Status request / w/immediate Response**
 
 **One Controller requesting Command/Status/ request to one of many Devices**
+
 (note this is still one-to-one relationship, but a given command instance can be sent to many controllers, one at a time.)
+
 Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
 	  Requesting Controller				 |				Responding Device
@@ -27,7 +29,9 @@ Here the Command key'd targetDeviceID allows many requests to different devices 
 
 
 **Many Devices Requesting Command to one Controller** (two or more if redundant)
+
 (note this is still a one-to-one relationship, where each device, sends an instance of the same command to one controller.)
+
 Use-case for this example may be within the same system above but where the multiple devices are each, individually requesting something of the controller (e.g., approval to be accepted on the system).
 
 
@@ -46,6 +50,7 @@ The differences in the above two use-cases is whether the device puts the Conten
 **Consumer/Service, short-lived(immediate) and long-lived commands**
 
 (e.g. Unmanned Maritime Architecture (UMAA)
+
 Generally there is a one-to-one relationship between consumer of a service and the service provider (the service).  The service will positively perform any requested command(1)) so long as a current commmand is not in progress. If more than one consumer is directing the same service, its within the context of the service to understand the situation and recognized if it is permitted or not. For UMAA, services such as steerage, thrust, anchor control, it makes no sense to have mulitiple controllers issuing commands except in the case of redundancy (here one controllers commands are recognized at a time dependent upon Active or Standby role.)  Where a service, is status only - not commanded, for example, providing sensor data - e.g., temperature, a many-to-one relationship is a possible use-case. Here the service application is unaware of the number of subscribers as this is handled by DDS. 
 Notes: (1) DDS Secure can be  used to authenticate permissions of a specific command from a specific consumer.
 
