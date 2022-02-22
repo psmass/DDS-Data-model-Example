@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+    <types>
+      <module name="AlarmModule">
+        <struct name="GenericAlarm">
+          <member name="DeviceID" type="uint8" key="true"/>
+          <member name="DeviceName" type="string" stringMaxLength="100"/>
+          <member name="AlarmCriticality" type="nonBasic" nonBasicTypeName="AlarmModule::Criticality"/>
+        </struct>
+        <struct name="AlarmType">
+          <member name="Type" type="nonBasic" nonBasicTypeName="AlarmModule::AlarmTypeDefinition"/>
+        </struct>
+        <enum name="AlarmTypeDefinition">
+          <enumerator name="Humidity"/>
+          <enumerator name="Motion"/>
+          <enumerator name="Fire"/>
+          <enumerator name="Intrusion"/>
+        </enum>
+        <enum name="Criticality">
+          <enumerator name="Critical"/>
+          <enumerator name="Major"/>
+          <enumerator name="Minor"/>
+          <enumerator name="Informative"/>
+        </enum>
+        <enum name="State">
+          <enumerator name="Open"/>
+          <enumerator name="Close"/>
+        </enum>
+        <struct name="AlarmDescription">
+          <member name="Type" type="nonBasic" nonBasicTypeName="AlarmModule::AlarmType"/>
+          <member name="State" type="nonBasic" nonBasicTypeName="AlarmModule::State" optional="true"/>
+        </struct>
+        <struct name="ValueDefinition">
+          <member name="Numeric" type="float32" optional="true"/>
+          <member name="Units" type="nonBasic" nonBasicTypeName="AlarmModule::UnitType" optional="true"/>
+        </struct>
+        <enum name="UnitType">
+          <enumerator name="Farenheit"/>
+          <enumerator name="Celcius"/>
+          <enumerator name="HumidityPercent"/>
+        </enum>
+      </module>
+    </types>
+
+</dds>
