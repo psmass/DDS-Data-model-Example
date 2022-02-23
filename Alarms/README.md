@@ -1,6 +1,6 @@
 
 ![](https://github.com/psmass/DDSexamples/blob/master/RtiAsOne.png)
-
+![](https://github.com/psmass/DDS-Data-model_Example/Alarms/struct.png)
 
 THIS DIRECTORY CONTAINS:
 
