@@ -4,7 +4,7 @@
 
 THIS DIRECTORY CONTAINS:
 
-Data Model for Command/Response Command/Status Patterns
+Data Model for Command/Response Command/Status Patterns :
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
 
