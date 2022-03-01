@@ -3,7 +3,7 @@
 
 THIS DIRECTORY CONTAINS:
 
-add my own stuff here
+
 
 ```  put code snipets in vs image directly by using ```
 
