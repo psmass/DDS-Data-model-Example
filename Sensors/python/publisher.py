@@ -23,5 +23,13 @@ def signal_handler(sig, frame):
     
 signal.signal(signal.SIGINT, signal_handler)
 
-connector = rti.Connector("ShapesParticipantLibrary::ShapesPubParticipant", filepath + "/../xml/Shapes_Project.xml")
-outputDDS = connector.getOutput("ShapesPublisher::SquareWriter")
+connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../SensorInfo.xml")
+outputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
+
+for i in range(1, 500):
+    percent = 53.75
+    outputDDS.instance.setNumber("relativeHumidity", percent)
+	
+    print("Writing Humidity, count: " + repr(i) + ", relativeHumidity: " + repr(percent))
+    outputDDS.write()
+    sleep(1)
