@@ -33,7 +33,7 @@
         <struct name="MetaData_t" extensibility="mutable" nested="true">
           <member name="timeOfGeneration" type="nonBasic" nonBasicTypeName="Common::DateTime_t"/>
         </struct>
-        <typedef name="BinaryData_t" type="int16" arrayDimensions="Common::MAX_LEN" external="true"/>
+        <typedef name="BinaryData_t" type="int16" arrayDimensions="Common::MAX_LEN"/>
       </module>
     </types>
 
