@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
     <types>
-      <directive kind="copy">// Common Data Types</directive>
       <module name="Common">
         <!--constants-->
         <const name="MIN_LEN" type="uint16" value="100"/>
@@ -15,7 +14,7 @@
         <typedef name="PressureInPascal_t" type="float32" default="0.0"/>
         <typedef name="TemperatureInDegreesKelvin_t" type="float32" default="0.0"/>
         <typedef name="ConcentrationInMolesPerCubicMetre_t" type="float32" min="0.0"/>
-        <directive kind="copy">// Identifies a resource</directive>
+        <!-- Identifies a resource</directive -->
         <struct name="IdentifierType_t" nested="true">
           <member name="resourceId" type="uint32"/>
           <member name="id" type="int32"/>
@@ -27,7 +26,6 @@
           <enumerator name="Pending"/>
           <enumerator name="Error"/>
         </enum>
-        <directive kind="copy">// Time</directive>
         <struct name="DateTime_t" nested="true">
           <member name="secs" type="int64"/>
           <member name="nsecs" type="int64"/>
@@ -38,15 +36,5 @@
         <typedef name="BinaryData_t" type="int16" arrayDimensions="Common::MAX_LEN" external="true"/>
       </module>
     </types>
-
-    <qos_library name="NewQosLibrary1">
-      <qos_profile name="Reliable">
-        <datawriter_qos>
-          <history>
-            <depth>100</depth>
-          </history>
-        </datawriter_qos>
-      </qos_profile>
-    </qos_library>
 
 </dds>
