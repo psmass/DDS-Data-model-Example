@@ -1,5 +1,5 @@
 """
- (c) 2020 Copyright, Real-Time Innovations, Inc.  All rights reserved.
+ (c) 2022 Copyright, Real-Time Innovations, Inc.  All rights reserved.
  RTI grants Licensee a license to use, modify, compile, and create derivative
  works of the Software.  Licensee has the right to distribute object form only
  for use with RTI products.  The Software is provided "as is", with no warranty
@@ -11,6 +11,7 @@
 
 import sys
 import signal
+import time 
 
 from os import path as osPath
 from time import sleep
@@ -24,12 +25,25 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../SensorInfo.xml")
-outputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
+humidityOutputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
 
+sourceId_resourceId = 1
+sourceId_id = 10
+sensorTypeName = "Humidity"
 for i in range(1, 500):
     percent = 53.75
-    outputDDS.instance.setNumber("relativeHumidity", percent)
-	
-    print("Writing Humidity, count: " + repr(i) + ", relativeHumidity: " + repr(percent))
-    outputDDS.write()
+    time_nanosec = time.time_ns()
+    metaData_timeOfGeneration_secs = time_nanosec // 1000000000
+    metaData_timeOfGeneration_nsecs= time_nanosec % 1000000000
+
+    humidityOutputDDS.instance.set_dictionary({
+        "sourceId.resourceId":sourceId_resourceId, 
+        "sourceId.id":sourceId_id, 
+        "sensorTypeName":sensorTypeName,
+        "metaData.timeOfGeneration.secs":metaData_timeOfGeneration_secs,
+        "metaData.timeOfGeneration.nsecs":metaData_timeOfGeneration_nsecs,
+        "relativeHumidity":percent})
+        
+    print(humidityOutputDDS.instance.get_dictionary())
+    humidityOutputDDS.write()
     sleep(1)
