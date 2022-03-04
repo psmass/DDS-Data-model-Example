@@ -10,9 +10,9 @@
  """
 
 import sys
+import argparse
 import signal
 import time 
-
 from os import path as osPath
 from time import sleep
 filepath = osPath.dirname(osPath.realpath(__file__))
@@ -21,29 +21,47 @@ import rticonnextdds_connector as rti
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
     sys.exit(0)
-    
-signal.signal(signal.SIGINT, signal_handler)
 
-connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../SensorInfo.xml")
-humidityOutputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
+def publisher_main(sample_count):
+    connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../SensorInfo.xml")
+    humidityOutputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
 
-sourceId_resourceId = 1
-sourceId_id = 10
-sensorTypeName = "Humidity"
-for i in range(1, 500):
-    percent = 53.75
-    time_nanosec = time.time_ns()
-    metaData_timeOfGeneration_secs = time_nanosec // 1000000000
-    metaData_timeOfGeneration_nsecs= time_nanosec % 1000000000
+    sourceId_resourceId = 1
+    sourceId_id = 10
+    sensorTypeName = "Humidity"
 
-    humidityOutputDDS.instance.set_dictionary({
-        "sourceId.resourceId":sourceId_resourceId, 
-        "sourceId.id":sourceId_id, 
-        "sensorTypeName":sensorTypeName,
-        "metaData.timeOfGeneration.secs":metaData_timeOfGeneration_secs,
-        "metaData.timeOfGeneration.nsecs":metaData_timeOfGeneration_nsecs,
-        "relativeHumidity":percent})
-        
-    print(humidityOutputDDS.instance.get_dictionary())
-    humidityOutputDDS.write()
-    sleep(1)
+    count = 0
+    while (sample_count == 0) or (count < sample_count):
+        percent = 53.75
+        time_nanosec = time.time_ns()
+        metaData_timeOfGeneration_secs = time_nanosec // 1000000000
+        metaData_timeOfGeneration_nsecs= time_nanosec % 1000000000
+
+        humidityOutputDDS.instance.set_dictionary({
+            "sourceId.resourceId":sourceId_resourceId, 
+            "sourceId.id":sourceId_id, 
+            "sensorTypeName":sensorTypeName,
+            "metaData.timeOfGeneration.secs":metaData_timeOfGeneration_secs,
+            "metaData.timeOfGeneration.nsecs":metaData_timeOfGeneration_nsecs,
+            "relativeHumidity":percent})
+       
+        print(humidityOutputDDS.instance.get_dictionary())
+        humidityOutputDDS.write()
+
+        count += 1
+        sleep(1)
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+
+    parser = argparse.ArgumentParser(
+        description="RTI Connext DDS Example: Sensor (Publisher)"
+    )
+    parser.add_argument(
+        "-c", "--count", type=int, default=0, help="Number of samples to send"
+    )
+
+    args = parser.parse_args()
+    assert args.count >= 0
+
+    publisher_main(args.count)
