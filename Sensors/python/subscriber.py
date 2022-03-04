@@ -30,7 +30,6 @@ humidityInputDDS = connector.getInput("SensorsSubscriber::HumidityReader")
 while (1):
     try:
         humidityInputDDS.wait(4000)  # wait 4 seconds or until data arrives
-        # humidityInputDDS.wait()
         humidityInputDDS.take()
         for sample in humidityInputDDS.samples.valid_data_iter:
             print(sample.get_dictionary())
