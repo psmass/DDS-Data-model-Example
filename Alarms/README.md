@@ -12,7 +12,7 @@ typedef octet DeviceID[LEN_DEV_ID]
 
 struct GenericAlarm {
    DeviceID deviceId; //@Key
-   char deviceName[MAX_DEVICE_NAME_LEN];
+   string<MAX_DEVICE_NAME_LEN> deviceName;
    AlarmCriticalityEnum alarmCriticality; // Critical, Major, Minor
    AlarmTypeEnum alarmType;               // Humidity, Motion, Fire, Intrusion
    AlarmStateEnum alarmState;             // Open, Closed
