@@ -41,6 +41,10 @@
           <enumerator name="Celcius"/>
           <enumerator name="Percent"/>
         </enum>
+        <struct name="MeasurementCoordinate_t" nested="true">
+          <member name="latitude" type="float64"/>
+          <member name="longitude" type="float64"/>
+        </struct>
       </module>
     </types>
 
