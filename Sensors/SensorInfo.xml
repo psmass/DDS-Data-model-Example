@@ -16,7 +16,7 @@
         <typedef name="ConcentrationInMolesPerCubicMetre_t" type="float32" min="0.0"/>
         <!-- Identifies a resource</directive -->
         <struct name="IdentifierType_t" nested="true">
-          <member name="resourceId" type="uint32"/>
+          <member name="resourceId" type="int32"/>
           <member name="id" type="int32"/>
         </struct>
         <typedef name="IdentifierList_t" type="nonBasic" nonBasicTypeName="Common::IdentifierType_t" sequenceMaxLength="Common::MAX_LEN"/>
