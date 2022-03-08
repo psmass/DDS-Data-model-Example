@@ -75,8 +75,6 @@ Foo Consumer subscribes to Foo Service command_state (with optional content filt
 
 Because Request/Reply is a common pub/sub data-centric pattern, Connext DDS Provides native support for it, with both the standard synchronous (blocking) call as well as an asynchronous (non-blocking) calls.
 
-Other than the one publisher to many subcribers for a given 'Service'/Sensor (e.g. temperature), and the general Request/Reply pattern I've not personally found the remaining patterns described very useful in practice.
-
 	Patterns include:
 	  1) Single Request / Single Reply 
 	  2) Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
