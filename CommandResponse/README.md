@@ -8,8 +8,7 @@ Data Model for Command/Response Command/Status Patterns :
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
 
-The data model example in this directory will show a one-to-one Command/Status Request with an immediate directed response (see examples below). Importantly, it will show both the device initiating a (membership) request and getting a response as well as the controller sending command and status requests and getting corresponding responses. 
-
+The data model example in this directory will show a one-to-one Command/Status Request with immediate directed response (see examples below) between a device (consumer/client) and a controller (service/server). Importantly, the example will show command/responses in each direction, the device to controller and controller to the device, as the patterns are similar, but each has its own nuance. Specifically, the example will show the device initiating a (membership) request with a response and the controller sending command and status requests with corresponding replies.  
 
 
 **Command/Status request / w/immediate Response**
