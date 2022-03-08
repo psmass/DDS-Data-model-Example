@@ -77,11 +77,11 @@ Because Request/Reply is a common pub/sub data-centric pattern, Connext DDS Prov
 
 Other than the one publisher to many subcribers for a given 'Service'/Sensor (e.g. temperature), and the general Request/Reply pattern I've not personally found the remaining patterns described very useful in practice.
 
-Patterns include:
-	1) Single Request / Single Reply 
-	2) Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
-        3) Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
-        4) Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
+	Patterns include:
+	  1) Single Request / Single Reply 
+	  2) Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
+	  3) Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
+	  4) Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
 
 **Status / Command Response**
 From the above patterns there are three ways in which to get status:
