@@ -8,9 +8,9 @@ Data Model for Command/Response Command/Status Patterns :
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
 
-The data model example in this directory will show a one-to-one Command/Status Request with a directed response (see examples below)
+The data model example in this directory will show a one-to-one Command/Status Request with an immediate directed response (see examples below). Importantly, it will show both the device initiating a (membership) request and getting a response as well as the controller sending command and status requests and getting corresponding responses. 
 
-Here are a few examples:
+
 
 **Command/Status request / w/immediate Response**
 
@@ -71,14 +71,14 @@ Foo Consumer Subscribes to Foo service reports allowing the it to monitor the st
 Foo Consumer subscribes to Foo Service command_state (with optional content filter on requestDevID==myDevID) on command_state to monitor the command.  It may cancel a command by a DDS dispose operation and then monitor the command_state for cancel (or complete/error etc if the command terminated prior to cancel processing).
 
 **Connext Request / Reply patterns**
-(refer to Chapter 26 of teh Connext Core Libraries manual)
+(refer to Chapter 26 of the Connext Core Libraries manual)
 
-Other the one publisher to many subcribers for a given 'Service'/Sensor (e.g. temperature), and the general Request/Reply pattern I've not personally found the remaining patterns described very useful in practice.
+Other than the one publisher to many subcribers for a given 'Service'/Sensor (e.g. temperature), and the general Request/Reply pattern I've not personally found the remaining patterns described very useful in practice.
 
 These include:
-	1) Single request / Mulitple replies - An example of this might be a command to move to new waypoint. However, the way UMAA for example does this is to only directly reply with command_report to the command issued. The resultant status is continually sent to all subscribers independently. It's in the context of the command requestor to recognize the vehicle is positively actually moving as commanded.
 
-	2) Single Request / Multiple repliers. While interesting, I've not in practice come across the use-case shown.  This may look similar to where a similar request can come from many devices (i.e., authorization to join a system). Here though, each reply is directed to each requester (1:1) with different data. The requestersID is placed in the reply message and requester uses a Content filter to filter out only replies with it's own ID in it.
+        1) Single request / Mulitple replies - An example of this might be a command to move to new waypoint. However, the way UMAA for example does this is to only directly reply with command_report to the command issued. The resultant status is continually sent to all subscribers independently. It's in the context of the command requestor to recognize the vehicle is positively actually moving as commanded.
+        2) Single Request / Multiple repliers. While interesting, I've not in practice come across the use-case shown.  This may look similar to where a similar request can come from many devices (i.e., authorization to join a system). Here though, each reply is directed to each requester (1:1) with different data. The requestersID is placed in the reply message and requester uses a Content filter to filter out only replies with it's own ID in it.
 
 **Status / Command Response**
 From the above patterns there are three ways in which to get status:
