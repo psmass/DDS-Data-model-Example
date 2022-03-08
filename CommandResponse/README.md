@@ -73,12 +73,15 @@ Foo Consumer subscribes to Foo Service command_state (with optional content filt
 **Connext Request / Reply patterns**
 (refer to Chapter 26 of the Connext Core Libraries manual)
 
+Because Request/Reply is a common pub/sub data-centric pattern, Connext DDS Provides native support for it, with both the standard synchronous (blocking) call as well as an asynchronous (non-blocking) calls.
+
 Other than the one publisher to many subcribers for a given 'Service'/Sensor (e.g. temperature), and the general Request/Reply pattern I've not personally found the remaining patterns described very useful in practice.
 
-These include:
-
-        1) Single request / Mulitple replies - An example of this might be a command to move to new waypoint. However, the way UMAA for example does this is to only directly reply with command_report to the command issued. The resultant status is continually sent to all subscribers independently. It's in the context of the command requestor to recognize the vehicle is positively actually moving as commanded.
-        2) Single Request / Multiple repliers. While interesting, I've not in practice come across the use-case shown.  This may look similar to where a similar request can come from many devices (i.e., authorization to join a system). Here though, each reply is directed to each requester (1:1) with different data. The requestersID is placed in the reply message and requester uses a Content filter to filter out only replies with it's own ID in it.
+Patterns include:
+	1) Single Request / Single Reply 
+	2) Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
+        3) Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
+        4) Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
 
 **Status / Command Response**
 From the above patterns there are three ways in which to get status:
