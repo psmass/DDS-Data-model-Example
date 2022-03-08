@@ -70,20 +70,20 @@ As well, if a command is running, it must be cancelled before antoher command is
 Foo Consumer Subscribes to Foo service reports allowing the it to monitor the state of the Foo Service and how it is performing it's service relative to any commands issued.
 Foo Consumer subscribes to Foo Service command_state (with optional content filter on requestDevID==myDevID) on command_state to monitor the command.  It may cancel a command by a DDS dispose operation and then monitor the command_state for cancel (or complete/error etc if the command terminated prior to cancel processing).
 
+**Status / Command Response**
+From the above patterns there are three ways in which to get status:
+ * Consumer Requests Status to service, service responds w/explict directed status report
+ * Consumer sends command to service while monitoring subscribed aperiodic status topic published by service upon change (TMS)
+ * Consumer sends command to service while monitoring subscribed periodic status topic published by service (UMAA)
+ 
 **Connext Request / Reply patterns**
 (refer to Chapter 26 of the Connext Core Libraries manual)
 
 Because Request/Reply is a common pub/sub data-centric pattern, Connext DDS Provides native support for it, with both the standard synchronous (blocking) call as well as an asynchronous (non-blocking) calls.
 
 Patterns include:
-
  * Single Request / Single Reply 
  * Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
  * Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
  * Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
 
-**Status / Command Response**
-From the above patterns there are three ways in which to get status:
- * Consumer Requests Status to service, service responds w/explict directed status report
- * Consumer sends command to service while monitoring subscribed aperiodic status topic published by service upon change (TMS)
- * Consumer sends command to service while monitoring subscribed periodic status topic published by service (UMAA) 
