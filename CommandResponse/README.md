@@ -75,14 +75,15 @@ Foo Consumer subscribes to Foo Service command_state (with optional content filt
 
 Because Request/Reply is a common pub/sub data-centric pattern, Connext DDS Provides native support for it, with both the standard synchronous (blocking) call as well as an asynchronous (non-blocking) calls.
 
-	Patterns include:
-	  1) Single Request / Single Reply 
-	  2) Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
-	  3) Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
-	  4) Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
+Patterns include:
+
+ * Single Request / Single Reply 
+ * Multiple requests from a given requester (Consumer) w/multiple replies (w/Correlation requests to replies) [Use case?]
+ * Single request / Multiple replies - Use-cases include:  getting multiple sets of data back from a application level wild-card query, getting command state back for a command non-immediate command (e.g. UMAA command state such as {accepted, exectuing, complete, error, cancelled})
+ * Single Request / Multiple repliers. Use-case includes - one command to many drones or devices, where each will reply with it's instance data. The latter could be a "best shooter" where the application is looking for prospective shooters and thier probability of hitting a target vs. weapon expense.
 
 **Status / Command Response**
 From the above patterns there are three ways in which to get status:
-1) Consumer Requests Status to service, service responds w/explict directed status report
-2) Consumer sends command to service while monitoring subscribed aperiodic status topic published by service upon change (TMS)
-3) Consumer sends command to service while monitoring subscribed periodic status topic published by service (UMAA) 
+ * Consumer Requests Status to service, service responds w/explict directed status report
+ * Consumer sends command to service while monitoring subscribed aperiodic status topic published by service upon change (TMS)
+ * Consumer sends command to service while monitoring subscribed periodic status topic published by service (UMAA) 
