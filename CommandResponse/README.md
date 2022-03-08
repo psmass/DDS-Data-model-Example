@@ -16,7 +16,9 @@ Here are a few examples:
 
 **One Controller requesting Command/Status/ request to one of many Devices**
 
-(note this is still one-to-one relationship, but a given command instance can be sent to many controllers, one at a time.)
+ 	Notes:
+		1. This is still one-to-one relationship, but a given command instance can be sent to many controllers, one at a time.
+		2. The device must first announce itself (and potentially be accepted/handshake) for the controller to recognize a new device to control
 
 Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
@@ -36,15 +38,15 @@ Here the Command key'd targetDeviceID allows many requests to different devices 
 Use-case for this example may be within the same system above but where the multiple devices are each, individually requesting something of the controller (e.g., approval to be accepted on the system).
 
 
-	            Requesting Device            	 |		Responding Controller
-      Foo Command Issued (Key'd (my)deviceDevID) ------> |
-							 |
-			                  <------------- | Foo Response(cmdReq reqDevID, Result / Status)
-	(content filter on target(my)DevId)		 | 
+	              Requesting Device              	   |		Responding Controller
+    Foo Command Issued (Key'd (my)deviceDevID) ------> |
+							   |
+			                    <------------- | Foo Response(cmdReq reqDevID, Result / Status)
+	  (content filter on target(my)DevId)		   | 
 
 Here the Command key'd reqDeviceID allows many requests from different devices to be handled as separate instances by the controller. The controller copies the device from the request to the response. The Requesting device may set a content filter on it's deviceID to filter out only instances directed exclusively to it's requests. 
 
-A variant of this used with Tactical Micro-grid, is that a response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
+A variant of the two above pattern, One-controller/many devices, is used with the Tactical Micro-grid standard(TMS).  A response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
 
 The differences in the above two use-cases is whether the device puts the Content Filter on the command or the response, and how the devices Key'd ID (the one of many Identifier) is placed in the command dependent upon who is sending the command.
 
