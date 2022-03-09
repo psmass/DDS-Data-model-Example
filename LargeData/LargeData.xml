@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+    <types>
+      <!--Data Type definitions for a large data example. Copied from github neil-rti video streaming project-->
+      <module name="LargeData">
+        <!--18.8MB == 100K MPEG-TS 188 byte packets-->
+        <const name="MAX_SEQUENCE_LEN" type="uint32" value="18800000"/>
+        <const name="LEN_PUB_ID" type="uint32" value="8"/>
+        <typedef name="PubId" type="byte" arrayDimensions="LargeData::LEN_PUB_ID"/>
+        <struct name="ccBulk">
+          <member name="pub_id" type="nonBasic" nonBasicTypeName="LargeData::PubId" key="true"/>
+          <member name="data" type="byte" sequenceMaxLength="LargeData::MAX_SEQUENCE_LEN"/>
+        </struct>
+      </module>
+    </types>
+
+</dds>
