@@ -36,10 +36,6 @@
         <struct name="IntrusionAlarm" baseType="Alarms::Alarm">
           <member name="coordinate" type="nonBasic" nonBasicTypeName="Common::MeasurementCoordinate_t"/>
         </struct>
-        <struct name="ValueDefinition">
-          <member name="number" type="int8" optional="true"/>
-          <member name="Units" type="nonBasic" nonBasicTypeName="Reference::UnitType"/>
-        </struct>
       </module>
     </types>
 
