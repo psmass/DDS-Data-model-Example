@@ -27,18 +27,19 @@
           <member name="State" type="nonBasic" nonBasicTypeName="Reference::State"/>
           <member name="DescriptionOfAlarm" type="string" stringMaxLength="100"/>
         </struct>
+        <struct name="ValueDefinition">
+          <member name="number" type="int8" optional="true"/>
+          <member name="Units" type="nonBasic" nonBasicTypeName="Reference::UnitType"/>
+        </struct>
       </module>
-      <struct name="ValueDefinition">
-        <member name="number" type="float32"/>
-        <member name="Units" type="nonBasic" nonBasicTypeName="Reference::UnitType"/>
-      </struct>
       <struct name="Alarm">
         <member name="DeviceID" type="int8" key="true"/>
         <member name="DeviceName" type="string" stringMaxLength="100"/>
         <member name="TypeOfAlarm" type="nonBasic" nonBasicTypeName="Reference::AlarmTypeDef"/>
         <member name="Severity" type="nonBasic" nonBasicTypeName="Reference::Criticality"/>
         <member name="Description" type="nonBasic" nonBasicTypeName="Reference::AlarmDescription"/>
-        <member name="NumericValue" type="nonBasic" nonBasicTypeName="ValueDefinition" optional="true"/>
+        <member name="NumericValue" type="nonBasic" nonBasicTypeName="Reference::ValueDefinition"/>
+        <member name="test_NumericValue" type="int8" optional="true"/>
       </struct>
     </types>
 
