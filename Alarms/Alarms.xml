@@ -46,6 +46,42 @@
           <member name="longitude" type="float64"/>
         </struct>
       </module>
+      <module name="Alarms">
+        <enum name="Severities">
+          <enumerator name="Critical"/>
+          <enumerator name="Major"/>
+          <enumerator name="Minor"/>
+          <enumerator name="Informational"/>
+        </enum>
+        <enum name="State">
+          <enumerator name="Open"/>
+          <enumerator name="Closed"/>
+        </enum>
+        <struct name="ValueDefinition" nested="true">
+          <member name="number" type="float32"/>
+          <member name="Units" type="nonBasic" nonBasicTypeName="Common::UnitType"/>
+        </struct>
+        <struct name="Alarm">
+          <member name="sourceId" type="nonBasic" nonBasicTypeName="Common::IdentifierType_t" key="true"/>
+          <member name="alarmTypeName" type="nonBasic" nonBasicTypeName="Common::Descriptor_t"/>
+          <member name="severity" type="nonBasic" nonBasicTypeName="Alarms::Severities"/>
+          <member name="null" type="nonBasic" nonBasicTypeName="Alarms::State"/>
+          <member name="numericValue" type="nonBasic" nonBasicTypeName="Alarms::ValueDefinition" optional="true"/>
+        </struct>
+        <struct name="HumidityAlarm" baseType="Alarms::Alarm">
+          <member name="relativeHumidity" type="nonBasic" nonBasicTypeName="Common::Percentage_t"/>
+        </struct>
+        <struct name="MotionAlarm" baseType="Alarms::Alarm">
+          <member name="coordinate" type="nonBasic" nonBasicTypeName="Common::MeasurementCoordinate_t"/>
+        </struct>
+        <struct name="FireAlarm" baseType="Alarms::Alarm">
+          <member name="temperature" type="float32"/>
+          <member name="units" type="nonBasic" nonBasicTypeName="Common::UnitType"/>
+        </struct>
+        <struct name="IntrusionAlarm" baseType="Alarms::Alarm">
+          <member name="coordinate" type="nonBasic" nonBasicTypeName="Common::MeasurementCoordinate_t"/>
+        </struct>
+      </module>
     </types>
 
     <qos_library name="NewQosLibrary1">
