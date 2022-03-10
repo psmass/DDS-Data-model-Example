@@ -2,14 +2,31 @@
 ![](https://github.com/psmass/DDSexamples/blob/master/RtiAsOne.png)
 
 
-THIS DIRECTORY CONTAINS:
+# THIS DIRECTORY CONTAINS:
 
-Data Model for Command/Response Command/Status Patterns :
+1. A simple data model showing 'short-lived' (non-Objective state) between a Controller and one of 
+potentially many Devices. 
+
+2. A discussion, below in this README.md file, regarding more complex Request/Reply patterns that can exist 
+along with the criteria that necessitates them.
+
+## Data Model for fairly simple Command(Request) w/ Replys :
+
+This example will have a Controller and a Device (where there could be many devices).
+
+The Device will announce itself with a Device Announcement (DA) topic.  This provides the Controller with a deviceID in which to address the specific device. The DA will use a QoS of Durable, then the Device will wait to be commanded.  
+
+The Controller will recognize the device and issue a command to TURN_ON.  Controller will then periodically request status.  
+
+In this simple example, there is a one-to-one correspondence between Controller Commands and Device Replies. That is, for these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS, the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
+
+The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller does not filter since it may expect key'd responses from many deviceIDs.
+
+To keep things simple the device will not issue Alarms or any other non-requested topics except the intial DA.  
+
+# Request (Command) / Reply Discussion 
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
-
-The data model example in this directory will show a one-to-one Command/Status Request with immediate directed response (see examples below) between a device (consumer/client)(potentially one of many) and a single logical controller (service/server). Importantly, the example will show command/responses in each direction, both device to controller and controller to the device, as the patterns are similar, but each has its own nuance. Specifically, the example will show the device initiating a (membership) request with a response and the controller sending command and status requests with corresponding replies.  
-
 
 **Command/Status request / w/immediate Response**
 

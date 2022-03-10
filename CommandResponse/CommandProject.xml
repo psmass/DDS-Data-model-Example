@@ -2,18 +2,30 @@
 <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
     <types>
       <!-- Commands below are 'short-lived' meaning they are responded to immediately and 
-	     don't require state. Commands could be 'long living' example move to a waypoint
-	     or someother command that could take minutes/hours/days to execute.  These
-	     type commands would require state of the command itself (e.g. accepted, executing,
-	     completed-success, error, cancelled) -->
+	     don't require Objective State. 
+
+         This example will have a Controller and a Device (where there could be many devices).
+	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
+	     a QoS of Durable, then wait to be commanded.
+	     The Controller will recognize the device and issue a command to TURN_ON. 
+	     Controller will then periodically request status.  There is a one-to-one
+	     correspondence between Controller Commands and Device Responses. That is for 
+	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
+	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
+
+         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
+	     does not filter since it may expect key'd responses from many deviceIDs.
+
+         To keep things simple the device
+	     will not issue Alarms or any other non-requested topics except the intial DA.
+
+      -->
       <module name="ExCmdRsp">
         <const name="TOPIC_DEVICE_ANNOUNCEMENT" type="string" value="DeviceAnnouncement"/>
-        <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
-        <const name="TOPIC_DEVICE_CONFIGURATION" type="string" value="DeviceConfiguration"/>
+        <const name="TOPIC_REQUEST_CONFIGURE_DEVICE" type="string" value="RequestConfigureDevice"/>
+        <const name="TOPIC_DEVICE_CONFIGURATION_REPLY" type="string" value="DeviceConfigurationReply"/>
         <const name="TOPIC_REQUEST_DEVICE_STATUS" type="string" value="&quot;RequestDeviceStatus&quot;"/>
-        <const name="TOPIC_DEVICE_STATUS" type="string" value="DeviceStatus"/>
-        <const name="TOPIC_MEMBERSHIP_REQUEST" type="string" value="MembershipRequest"/>
-        <const name="TOPIC_MEMBERSHIP_RESULT" type="string" value="&quot;MembershipResult"/>
+        <const name="TOPIC_DEVICE_STATUS_REPLY" type="string" value="DeviceStatusReply"/>
         <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
         <const name="MAXLEN_MFR_NAME" type="uint32" value="32"/>
         <const name="MAXLEN_MODEL_NAME" type="uint32" value="32"/>
@@ -33,16 +45,6 @@
           <enumerator name="ERROR"/>
         </enum>
         <typedef name="DeviceID" type="byte" arrayDimensions="ExCmdRsp::LEN_DEVICE_ID"/>
-        <enum name="MembershipKind">
-          <enumerator name="UNINITIALIZED"/>
-          <enumerator name="JOIN"/>
-          <enumerator name="LEAVE"/>
-        </enum>
-        <enum name="MembershipResultKind">
-          <enumerator name="UNINITIALIZED"/>
-          <enumerator name="DENIED"/>
-          <enumerator name="GRANTED"/>
-        </enum>
         <struct name="DeviceConfigStuct" nested="true">
           <member name="fooName" type="string" stringMaxLength="LEN_STR_FOO"/>
           <member name="fooValue" type="int32"/>
@@ -59,28 +61,18 @@
           <member name="serialNum" type="string" stringMaxLength="ExCmdRsp::MAXLEN_SN"/>
           <member name="swVersionNum" type="string" stringMaxLength="ExCmdRsp::MAXLEN_SW_VER_NUM"/>
         </struct>
-        <struct name="MembershipRequest">
-          <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
-          <member name="membership" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipKind"/>
-        </struct>
-        <struct name="MembershipResult">
-          <member name="targetDevID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
-          <member name="membership" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipKind"/>
-          <member name="result" type="nonBasic" nonBasicTypeName="ExCmdRsp::MembershipResult"/>
-        </struct>
-        <struct name="ConfigureDevice">
+        <struct name="RequestConfigureDevice">
           <member name="targetDevID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
           <member name="deviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
         </struct>
-        <struct name="DeviceConfiguration">
+        <struct name="DeviceConfigurationReply">
           <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
           <member name="deviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfig"/>
         </struct>
         <struct name="RequestDeviceStatus">
           <member name="targetDeviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID"/>
-          <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
         </struct>
-        <struct name="DeviceStatus">
+        <struct name="DeviceStatusReply">
           <member name="deviceID" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceID" key="true"/>
           <member name="status" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceState"/>
         </struct>
