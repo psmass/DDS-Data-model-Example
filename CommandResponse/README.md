@@ -16,21 +16,22 @@ along with the criteria that necessitates them.
 
 This model will have a Controller and a Slave Device (where there could be many devices).
 
-The Device will announce itself with a Device Announcement (DA) topic.  This provides the Controller with a deviceID in which to address the specific device. The DA will use a QoS of Durable, then the Device will wait to be commanded.  
+The Device will announce itself with a Device Announcement (DA) topic. This provides the Controller with a deviceID in which to address the specific device. The DA will use a QoS of Durable, then the Device will wait to be commanded.
 
-The Controller will recognize the device and issue a command to TURN_ON.  Controller will then periodically request status (of course if the status is periodic, this 'request' could be implicitly done via subscribing to the Status topic alone)  
+The Controller will recognize the device and issue a command to TURN_ON. Controller will then periodically request status (of course if the status is periodic, this 'request' could be implicitly done via subscribing to the Status topic alone)
 
 In this simple example, there is a one-to-one correspondence between Controller Commands and Device Replies. That is, for these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS, the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
 
 The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller does not filter since it may expect key'd responses from many deviceIDs.
 
-To keep things simple the device will not issue Alarms or any other non-requested topics except the intial DA.  
+To keep things simple the device will not issue Alarms or any other non-requested topics except the initial DA.
 
 ### Model 2) Client (Consumer) / Server (Service)
 
-This model has a well known service and may have multiple clients or consumers. The service, if Objective State, would need some protocol to both update the state of the Objective Command and provide deterministic behaviour in the event of multiple clients issue conflicting commands. Choices such as implicit or explicit locks to prevent a superceding command, or perhaps canceling and override of the current command running by the superceding command.  Another thought might be to use Ownership Strength QoS.
+This model has a well known service and may have multiple clients or consumers. The service, if Objective State, would need some protocol to both update the state of the Objective Command and provide deterministic behavior in the event of multiple clients issue conflicting commands. Choices such as implicit or explicit locks to prevent a super-ceding command, or perhaps canceling and override of the current command running by the super-ceding command. Another thought might be to use Ownership Strength QoS.
 
-To keep the model simple, in this example, the Service won't use Objective State, and therefore commands will process immediatly and in the order received.  Here we'll provide one consumer periodically requesting status (TOPIC_REQUEST_DEVICE_STATUS) of one service. The Service will send back a status reply (TOPIC_DEVICE_STATUS_REPLY). Again, this status request could be done implicitly via subscribing to a  periodic a topic periodically emited by the service (e.g., TOPIC_SERVICE_FOO_STATUS)
+To keep the model simple, in this example, the Service won't use Objective State, and therefore commands will process immediately and in the order received. Here we'll provide one consumer periodically requesting status (TOPIC_REQUEST_DEVICE_STATUS) of one service. The Service will send back a status reply (TOPIC_DEVICE_STATUS_REPLY). Again, this status request could be done implicitly via subscribing to a periodic a topic periodically emitted by the service (e.g., TOPIC_SERVICE_FOO_STATUS)
+
 # Request (Command) / Reply Discussion 
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
