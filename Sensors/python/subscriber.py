@@ -24,7 +24,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 print("Enter Ctrl+C to quit")
 
-connector = rti.Connector("EnvironmentParticipantLibrary::SubParticipant", filepath + "/../SensorInfo.xml")
+connector = rti.Connector("EnvironmentParticipantLibrary::SubParticipant", filepath + "/../model/SensorInfo.xml")
 humidityInputDDS = connector.getInput("SensorsSubscriber::HumidityReader")
 
 while (1):

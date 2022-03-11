@@ -1,1 +1,1 @@
-# Placeholder for Sensor Data Model
+# Placeholder for Sensor Example

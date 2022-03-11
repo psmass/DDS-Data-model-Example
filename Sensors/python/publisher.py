@@ -25,12 +25,12 @@ signal.signal(signal.SIGINT, signal_handler)
 
 print("Enter Ctrl+C to quit")
 
-connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../SensorInfo.xml")
+connector = rti.Connector("EnvironmentParticipantLibrary::PubParticipant", filepath + "/../model/SensorInfo.xml")
 humidityOutputDDS = connector.getOutput("SensorsPublisher::HumidityWriter")
 
 sourceId_resourceId = 1
 sourceId_id = 10
-sensorTypeName = "Humidity"
+sensorTypeName = "ACME Humidity Sensor Model x123a"
 while (1):
     percent = 53.75
     time_nanosec = time.time_ns()

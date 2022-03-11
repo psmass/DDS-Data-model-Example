@@ -14,18 +14,13 @@
         <typedef name="PressureInPascal_t" type="float32" default="0.0"/>
         <typedef name="TemperatureInDegreesKelvin_t" type="float32" default="0.0"/>
         <typedef name="ConcentrationInMolesPerCubicMetre_t" type="float32" min="0.0"/>
+        <typedef name="BinaryData_t" type="int16" arrayDimensions="Common::MAX_LEN"/>
         <!-- Identifies a resource</directive -->
         <struct name="IdentifierType_t" nested="true">
           <member name="resourceId" type="int32"/>
           <member name="id" type="int32"/>
         </struct>
         <typedef name="IdentifierList_t" type="nonBasic" nonBasicTypeName="Common::IdentifierType_t" sequenceMaxLength="Common::MAX_LEN"/>
-        <enum name="ResponseCode_t" extensibility="appendable">
-          <enumerator name="Invalid" defaultLiteral="true"/>
-          <enumerator name="Success"/>
-          <enumerator name="Pending"/>
-          <enumerator name="Error"/>
-        </enum>
         <struct name="DateTime_t" nested="true">
           <member name="secs" type="int64"/>
           <member name="nsecs" type="int64"/>
@@ -33,22 +28,21 @@
         <struct name="MetaData_t" extensibility="mutable" nested="true">
           <member name="timeOfGeneration" type="nonBasic" nonBasicTypeName="Common::DateTime_t"/>
         </struct>
-        <typedef name="BinaryData_t" type="int16" arrayDimensions="Common::MAX_LEN"/>
       </module>
       <!-- Sensors -->
       <module name="Sensor">
         <module name="Constants">
           <!-- Topic Names -->
-          <const name="HUMIDITY_TOPIC" type="string" value="Humidity"/>
-          <const name="PRESSURE_TOPIC" type="string" value="Pressure"/>
-          <const name="TEMPERATURE_TOPIC" type="string" value="Temperature"/>
-          <const name="GAS_TOPIC" type="string" value="Gas"/>
+          <const name="HUMIDITY_TOPIC" type="string" value="&quot;Humidity&quot;"/>
+          <const name="PRESSURE_TOPIC" type="string" value="&quot;Pressure&quot;"/>
+          <const name="TEMPERATURE_TOPIC" type="string" value="&quot;Temperature&quot;"/>
+          <const name="GAS_TOPIC" type="string" value="&quot;Gas&quot;"/>
           <!-- QoS Profiles -->
-          <const name="RELIABLE_QOS_PROFILE" type="string" value="SensorQosLibrary::ReliableQosProfile"/>
-          <const name="BEST_EFFORT_QOS_PROFILE" type="string" value="SensorQosLibrary::BestEffortQosProfile"/>
+          <const name="RELIABLE_QOS_PROFILE" type="string" value="&quot;SensorQosLibrary::ReliableQosProfile&quot;"/>
+          <const name="BEST_EFFORT_QOS_PROFILE" type="string" value="&quot;SensorQosLibrary::BestEffortQosProfile&quot;"/>
         </module>
         <!-- Sensor Types -->
-        <struct name="BaseSensor">
+        <struct name="BaseSensor" nested="true">
           <member name="sourceId" type="nonBasic" nonBasicTypeName="Common::IdentifierType_t" key="true"/>
           <member name="sensorTypeName" type="nonBasic" nonBasicTypeName="Common::Descriptor_t"/>
           <member name="metaData" type="nonBasic" nonBasicTypeName="Common::MetaData_t"/>

@@ -16,7 +16,7 @@
 #include <rti/util/util.hpp> // for sleep()
 #include "application.hpp"   // for ctrl-c
 
-const std::string QOS_FILE = "../../SensorInfo.xml";
+const std::string QOS_FILE = "../../model/SensorInfo.xml";
 const std::string PARTICIPANT_NAME = "EnvironmentParticipantLibrary::PubParticipant";
 const std::string WRITER_NAME = "SensorsPublisher::HumidityWriter";
 const std::string SENSOR_TYPE_NAME = "Sensor::HumiditySensor";
@@ -53,7 +53,7 @@ void run_publisher_application()
 
     sample.value<int32_t>("sourceId.resourceId", 2);
     sample.value<int32_t>("sourceId.id", 20);
-    sample.value<std::string>("sensorTypeName", "Humidity");
+    sample.value<std::string>("sensorTypeName", "ACME Humidity Sensor Model x123a");
     while (!application::shutdown_requested)
     {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();

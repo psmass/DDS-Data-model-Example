@@ -15,7 +15,7 @@
 #include <dds/dds.hpp>
 #include "application.hpp" // for ctrl-c
 
-const std::string QOS_FILE = "../../SensorInfo.xml";
+const std::string QOS_FILE = "../../model/SensorInfo.xml";
 const std::string PARTICIPANT_NAME = "EnvironmentParticipantLibrary::SubParticipant";
 const std::string READER_NAME = "SensorsSubscriber::HumidityReader";
 const std::string SENSOR_TYPE_NAME = "Sensor::HumiditySensor";

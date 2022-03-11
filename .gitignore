@@ -1,0 +1,10 @@
+
+Sensors/c++/src/objs
+Sensors/c++/src/.vs
+Sensors/c++/src/*.txt
+Sensors/.vs
+
+*.vcxproj
+*.filters
+*.user
+*.sln
