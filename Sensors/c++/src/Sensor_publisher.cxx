@@ -44,9 +44,7 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
      * need to run the example like this:
      * ./objs/<architecture>/Sensor_publisher.exe
      */
-    factory_qos.profile.url_profile[0] =
-        DDS_String_dup("../xml/SensorQoS.xml");
-
+    factory_qos.profile.url_profile[0] = DDS_String_dup("../xml/SensorQoS.xml");
     TheParticipantFactory->set_qos(factory_qos);
 
     // Start communicating in a domain, usually one participant per application
@@ -125,7 +123,7 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
 
     data->sourceId.resourceId = 3;
     data->sourceId.id = 30;
-    sprintf(data->sensorTypeName, "Initech Humidity Sensor Model sr7928");
+    snprintf(data->sensorTypeName, Common::MIN_LEN, "Initech Humidity Sensor Model sr7928");
     // Main loop, write data
     for (unsigned int samples_written = 0;
          !shutdown_requested && samples_written < sample_count;
@@ -141,16 +139,16 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         data->metaData.timeOfGeneration.nsecs = nanoseconds % 1000000000;
         data->relativeHumidity = percent;
 
-        std::cout 
-            << "{'sourceId': {'resourceId': " << data->sourceId.resourceId 
+        std::cout
+            << "{'sourceId': {'resourceId': " << data->sourceId.resourceId
             << ", 'id': " << data->sourceId.id << "}"
-            << ", 'sensorTypeName': '" <<  data->sensorTypeName << "'"
+            << ", 'sensorTypeName': '" << data->sensorTypeName << "'"
             << ", 'metaData': {'timeOfGeneration': {'secs': " << data->metaData.timeOfGeneration.secs
             << ", 'nsecs': " << data->metaData.timeOfGeneration.nsecs << "}}"
             << ", 'relativeHumidity': " << data->relativeHumidity << "}"
             << std::endl;
 
-        //retcode = typed_writer->write(*data, HANDLE_NIL);
+        retcode = typed_writer->write(*data, HANDLE_NIL);
         if (retcode != RETCODE_OK)
         {
             std::cerr << "write error " << retcode << std::endl;
@@ -224,6 +222,7 @@ int main(int argc, char *argv[])
     // Sets Connext verbosity to help debugging
     NDDSConfigLogger::get_instance()->set_verbosity(arguments.verbosity);
 
+    std::cout << "*** Starting Sensor Publisher on Domain " << arguments.domain_id << ". CTRL-C to exit. ***" << std::endl;
     int status = run_publisher_application(arguments.domain_id, arguments.sample_count);
 
     // Releases the memory used by the participant factory.  Optional at

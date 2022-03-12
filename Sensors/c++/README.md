@@ -21,11 +21,15 @@ Sesnor.idl - Contains the Sesnor Module types originally defined in SensorInfo.x
 
 1. Run the following commands from the c++ directory to generate the type files, example code and a makefile.
 
-```%NDDSHOME%\bin\rtiddsgen.bat .\idl\Sensor.idl -d .\src -language C++ -namespace -create typefiles -create examplefiles -create makefiles -platform x64Win64VS2017```
+```%NDDSHOME%\bin\rtiddsgen.bat .\idl\Sensor.idl -d .\src -language C++ -namespace -create typefiles -create makefiles -platform x64Win64VS2017```
 
 ```%NDDSHOME%\bin\rtiddsgen.bat .\idl\Common.idl -d .\src -language C++ -namespace -create typefiles```
 
-2. Open Visual Studio and add the Common*cxx and Common*.h files to the Header and Source for each project.
+2. Open Visual Studio and add the Common*cxx and Common*.h files to the Header and Source for publisher and subscriber project.
+
+3. If you make changes to the IDL file run the following command from the c++ directory to update the typefiles. Then recompile.
+
+```%NDDSHOME%\bin\rtiddsgen.bat .\idl\Common.idl -d .\src -language C++ -namespace -update typefiles```
 
 ## Building Debug executable:
 
@@ -38,4 +42,8 @@ Sesnor.idl - Contains the Sesnor Module types originally defined in SensorInfo.x
 
 
 ## Running Example:
-Publisher and subscriber must be executed from the build directory.
+Publisher and subscriber must be executed from the src directory.
+
+```.\objs\x64Win64VS2017\Sensor_subscriber.exe```
+
+```.\objs\x64Win64VS2017\Sensor_publisher.exe```
