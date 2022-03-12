@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef Sensor_591118812_h
-#define Sensor_591118812_h
+#ifndef Sensor_591118834_h
+#define Sensor_591118834_h
 
 #ifndef NDDS_STANDALONE_TYPE
 #ifndef ndds_cpp_h
@@ -25,12 +25,20 @@ or consult the Code Generator User's Manual.
 #include "Common.h"
 namespace Sensor {
     namespace Constants {
+
         static const DDS_Char * const HUMIDITY_TOPIC= "Humidity";
+
         static const DDS_Char * const PRESSURE_TOPIC= "Pressure";
+
         static const DDS_Char * const TEMPERATURE_TOPIC= "Temperature";
+
         static const DDS_Char * const GAS_TOPIC= "Gas";
-        static const DDS_Char * const RELIABLE_QOS_PROFILE= "SensorQosLibrary::ReliableQosProfile";
-        static const DDS_Char * const BEST_EFFORT_QOS_PROFILE= "SensorQosLibrary::BestEffortQosProfile";
+
+        static const DDS_Char * const SENSOR_QOS_LIBRARY= "SensorQosLibrary";
+
+        static const DDS_Char * const RELIABLE_QOS_PROFILE= "ReliableQosProfile";
+
+        static const DDS_Char * const BEST_EFFORT_QOS_PROFILE= "BestEffortQosProfile";
     } /* namespace Constants  */
 
     extern const char *BaseSensorTYPENAME;

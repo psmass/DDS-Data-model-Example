@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef SensorPlugin_591118812_h
-#define SensorPlugin_591118812_h
+#ifndef SensorPlugin_591118834_h
+#define SensorPlugin_591118834_h
 
 #include "Sensor.h"
 
@@ -1082,5 +1082,5 @@ namespace Sensor {
 #define NDDSUSERDllExport
 #endif
 
-#endif /* SensorPlugin_591118812_h */
+#endif /* SensorPlugin_591118834_h */
 

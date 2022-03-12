@@ -9,8 +9,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef SensorSupport_591118812_h
-#define SensorSupport_591118812_h
+#ifndef SensorSupport_591118834_h
+#define SensorSupport_591118834_h
 
 /* Uses */
 #include "Sensor.h"
@@ -172,5 +172,5 @@ namespace Sensor {
     #endif
 } /* namespace Sensor  */
 
-#endif  /* SensorSupport_591118812_h */
+#endif  /* SensorSupport_591118834_h */
 

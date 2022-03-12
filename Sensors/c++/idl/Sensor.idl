@@ -9,8 +9,9 @@ module Sensor {
     const string PRESSURE_TOPIC = "Pressure";
     const string TEMPERATURE_TOPIC = "Temperature";
     const string GAS_TOPIC = "Gas";
-    const string RELIABLE_QOS_PROFILE = "SensorQosLibrary::ReliableQosProfile";
-    const string BEST_EFFORT_QOS_PROFILE = "SensorQosLibrary::BestEffortQosProfile";
+    const string SENSOR_QOS_LIBRARY = "SensorQosLibrary";
+    const string RELIABLE_QOS_PROFILE = "ReliableQosProfile";
+    const string BEST_EFFORT_QOS_PROFILE = "BestEffortQosProfile";
   };
 
   @nested

@@ -37,9 +37,10 @@
           <const name="PRESSURE_TOPIC" type="string" value="&quot;Pressure&quot;"/>
           <const name="TEMPERATURE_TOPIC" type="string" value="&quot;Temperature&quot;"/>
           <const name="GAS_TOPIC" type="string" value="&quot;Gas&quot;"/>
-          <!-- QoS Profiles -->
-          <const name="RELIABLE_QOS_PROFILE" type="string" value="&quot;SensorQosLibrary::ReliableQosProfile&quot;"/>
-          <const name="BEST_EFFORT_QOS_PROFILE" type="string" value="&quot;SensorQosLibrary::BestEffortQosProfile&quot;"/>
+          <!-- QoS -->
+          <const name="SENSOR_QOS_LIBRARY" type="string" value="&quot;SensorQosLibrary&quot;"/>
+          <const name="RELIABLE_QOS_PROFILE" type="string" value="&quot;ReliableQosProfile&quot;"/>
+          <const name="BEST_EFFORT_QOS_PROFILE" type="string" value="&quot;BestEffortQosProfile&quot;"/>
         </module>
         <!-- Sensor Types -->
         <struct name="BaseSensor" nested="true">
