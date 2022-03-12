@@ -10,6 +10,7 @@ The example code was built with the following environment.
 ## Directories
 
 - idl
+
 This directory contains the IDL files that were created by converting ..\model\SensorInfo.xml to SensorInfo.idl using the following command from the c++ directory.
 ```%NDDSHOME%\bin\rtiddsgen.bat -convertToIdl -d idl ..\model\SensorInfo.xml```
 
