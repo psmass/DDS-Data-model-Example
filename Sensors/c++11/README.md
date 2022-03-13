@@ -26,3 +26,7 @@ OR if you want to see the build output
 
 ## Running Example:
 Publisher and subscriber must be executed from the build directory.
+
+```.\Debug\Publisher.exe```
+
+```.\Debug\Subscriber.exe```
