@@ -53,7 +53,7 @@ void run_publisher_application()
 
     sample.value<int32_t>("sourceId.resourceId", 2);
     sample.value<int32_t>("sourceId.id", 20);
-    sample.value<std::string>("sensorTypeName", "ACME Humidity Sensor Model x123a");
+    sample.value<std::string>("sensorTypeName", "FlexSensor Humidity Sensor Model hl7c32a");
     while (!application::shutdown_requested)
     {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
