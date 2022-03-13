@@ -21,11 +21,11 @@
 
       -->
       <module name="ExCmdRsp">
-        <const name="TOPIC_DEVICE_ANNOUNCEMENT" type="string" value="DeviceAnnouncement"/>
-        <const name="TOPIC_REQUEST_CONFIGURE_DEVICE" type="string" value="RequestConfigureDevice"/>
+        <const name="TOPIC_DEVICE_ANNOUNCEMENT" type="string" value="&quot;DeviceAnnouncement&quot;"/>
+        <const name="TOPIC_REQUEST_CONFIGURE_DEVICE" type="string" value="&quot;RequestConfigureDevice&quot;"/>
         <const name="TOPIC_DEVICE_CONFIGURATION_REPLY" type="string" value="DeviceConfigurationReply"/>
         <const name="TOPIC_REQUEST_DEVICE_STATUS" type="string" value="&quot;RequestDeviceStatus&quot;"/>
-        <const name="TOPIC_DEVICE_STATUS_REPLY" type="string" value="DeviceStatusReply"/>
+        <const name="TOPIC_DEVICE_STATUS_REPLY" type="string" value="&quot;DeviceStatusReply&quot;"/>
         <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
         <const name="MAXLEN_MFR_NAME" type="uint32" value="32"/>
         <const name="MAXLEN_MODEL_NAME" type="uint32" value="32"/>
