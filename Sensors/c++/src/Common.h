@@ -23,13 +23,9 @@ or consult the Code Generator User's Manual.
 #endif
 
 namespace Common {
-
     static const DDS_UnsignedShort MIN_LEN= 100U;
-
     static const DDS_UnsignedShort MED_LEN= 200U;
-
     static const DDS_UnsignedShort MAX_LEN= 500U;
-
     typedef    DDS_Char *   LargeString_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -92,7 +88,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Char *   MediumString_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -155,7 +150,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Char *   ShortString_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -218,7 +212,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Char *   Descriptor_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -281,7 +274,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Float   Percentage_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -344,7 +336,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Float   PressureInPascal_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -407,7 +398,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Float   TemperatureInDegreesKelvin_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -470,7 +460,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Float   ConcentrationInMolesPerCubicMetre_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -533,7 +522,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef    DDS_Short   BinaryData_t [(Common::MAX_LEN)];
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.
@@ -680,7 +668,6 @@ namespace Common {
     #undef NDDSUSERDllExport
     #define NDDSUSERDllExport
     #endif
-
     typedef     Common::IdentifierType_tSeq  IdentifierList_t ;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.

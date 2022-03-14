@@ -36,7 +36,7 @@ The example code was built with the following environment.
 
 2. Open Visual Studio and add the Common*.cxx and Common*.h files to the Header and Source for publisher and subscriber project.
 
-3. If you make changes to the IDL file run the following command from the c++ directory to update the typefiles. Then recompile.
+3. If you make changes to an IDL file (i.e. Common.idl) run the following command from the c++ directory to update the typefiles. Then recompile.
 
     ```
     cd c++

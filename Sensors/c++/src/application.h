@@ -10,6 +10,8 @@
 * to use the software.
 */
 
+/* Do not delete this example file */
+
 #ifndef APPLICATION_H
 #define APPLICATION_H
 

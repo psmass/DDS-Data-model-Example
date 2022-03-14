@@ -9,6 +9,8 @@
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
  */
+ 
+/* Do not delete this example file */
 
 #include <iostream>
 #include <stdio.h>

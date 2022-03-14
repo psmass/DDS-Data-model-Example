@@ -10,6 +10,8 @@
  * to use the software.
  */
 
+/* Do not delete this example file */
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
