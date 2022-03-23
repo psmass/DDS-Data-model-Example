@@ -58,7 +58,7 @@
           <enumerator name="Closed"/>
         </enum>
         <struct name="ValueDefinition" nested="true">
-          <member name="number" type="float32"/>
+          <member name="number" type="float32" optional="true"/>
           <member name="Units" type="nonBasic" nonBasicTypeName="Common::UnitType"/>
         </struct>
         <struct name="Alarm">
@@ -66,7 +66,7 @@
           <member name="alarmTypeName" type="nonBasic" nonBasicTypeName="Common::Descriptor_t"/>
           <member name="severity" type="nonBasic" nonBasicTypeName="Alarms::Severities"/>
           <member name="null" type="nonBasic" nonBasicTypeName="Alarms::State"/>
-          <member name="numericValue" type="nonBasic" nonBasicTypeName="Alarms::ValueDefinition" optional="true"/>
+          <member name="numericValue" type="nonBasic" nonBasicTypeName="Alarms::ValueDefinition"/>
         </struct>
         <struct name="HumidityAlarm" baseType="Alarms::Alarm">
           <member name="relativeHumidity" type="nonBasic" nonBasicTypeName="Common::Percentage_t"/>
