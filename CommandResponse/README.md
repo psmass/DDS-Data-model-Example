@@ -10,28 +10,41 @@ potentially many Devices.
 2. A discussion, below in this README.md file, regarding more complex Request/Reply patterns that can exist 
 along with the criteria that necessitates them.
 
-## Data Model for fairly simple Command(Request) w/ Replys :
+## Data Model for fairly simple Command(Request) w/ Implicit Replys:
 
-### Model 1) Controller / Device 
+### **Model 1) Controller / Device** 
 
-This model will have a Controller and a Slave Device (where there could be many devices).
+This model will have a Controller and a Slave Device (where there could be many devices, but one logical controller).
 
-The Device will announce itself with a Device Announcement (DA) topic. This provides the Controller with a deviceID in which to address the specific device. The DA will use a QoS of Durable, then the Device will wait to be commanded.
+To keep things simple, there are two topics:
 
-The Controller will recognize the device and issue a command to TURN_ON. Controller will then periodically request status (of course if the status is periodic, this 'request' could be implicitly done via subscribing to the Status topic alone)
+1. **DeviceState**, issued durably from the Device upon state change. This Topic is key'd with the deviceID which identifies the device instance and allows a controller to maintain multiple devices.
+	
+	In this example, the Device State can be {UNITIALIZED, ON, OFF, ERROR}
+	The intial DeviceState is UNINITIALIZED and lets the controller know this is a new device instance.  There is no explicit request for status as the act of subscribing provides implicit interest.
+2. **RequestConfigureDevice**, issued with QoS of reliable reliability from the Controller to the Device.
+	The Request has a targeDeviceID that the device can filter on such that it only receieves requests directed to it.
+	For this example, a Request to TURN_ON will be sent, which will result in a DeviceState change (i.e., no explict acknowledegment/reply)
 
-In this simple example, there is a one-to-one correspondence between Controller Commands and Device Replies. That is, for these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS, the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
+	Note: This topic does not require a Key'd instance ID since a device only receives the one "instance" set by a filter for the targetDeviceID. 
 
-The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller does not filter since it may expect key'd responses from many deviceIDs.
+	**Controller behavior**
 
-To keep things simple the device will not issue Alarms or any other non-requested topics except the initial DA.
+	Upon initialization, the Controller will subscribe for all instances (non-filtered) of a DeviceStatus topic. The DeviceState topic is sent from any device and includes the device state along with the DeviceID which identifies the Key'd instance. Upon seeing a new Device (state unitialized), the controller will issue RequestConfigureDevice to the targetID of the device, to change it's state to ON or OFF. The controller will then monitor the DeviceState topic for change. There is no explicit RequestConfigureDevice Acknowledgement.
 
-### Model 2) Client (Consumer) / Server (Service)
+	**Device behavior**
+
+	Upon initialization, the Device will publish default device State (Unititialized) key'd with it's deviceID. This provides the Controller with a deviceID in which to address the specific device. DeviceState uses QoS of Durable so that the Device Application need not periodically state (only upon change). The Device will then wait to be commanded.
+
+	The Device will filter on the targetID using it's own ID. The results in the device listening for "myRequests".
+
+	To keep things simple the device will not issue Alarms or any other non-requested topics except the State Change.
+
+### **Model 2) Client (Consumer) / Server (Service)**
 
 This model has a well known service and may have multiple clients or consumers. The service, if Objective State, would need some protocol to both update the state of the Objective Command and provide deterministic behavior in the event of multiple clients issue conflicting commands. Choices such as implicit or explicit locks to prevent a super-ceding command, or perhaps canceling and override of the current command running by the super-ceding command. Another thought might be to use Ownership Strength QoS.
 
 To keep the model simple, in this example, the Service won't use Objective State, and therefore commands will process immediately and in the order received. Here we'll provide one consumer periodically requesting status (TOPIC_REQUEST_DEVICE_STATUS) of one service. The Service will send back a status reply (TOPIC_DEVICE_STATUS_REPLY). Again, this status request could be done implicitly via subscribing to a periodic a topic periodically emitted by the service (e.g., TOPIC_SERVICE_FOO_STATUS)
-
 # Request (Command) / Reply Discussion 
 
 Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  

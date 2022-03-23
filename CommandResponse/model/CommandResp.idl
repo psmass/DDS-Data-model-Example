@@ -1,0 +1,62 @@
+/*  Commands below are 'short-lived' meaning they are responded to immediately and 
+	     don't require Objective State. 
+
+         This example will have a Controller and a Device (where there could be many devices).
+	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
+	     a QoS of Durable, then wait to be commanded.
+	     The Controller will recognize the device and issue a command to TURN_ON. 
+	     Controller will then periodically request status.  There is a one-to-one
+	     correspondence between Controller Commands and Device Responses. That is for 
+	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
+	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
+
+         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
+	     does not filter since it may expect key'd responses from many deviceIDs.
+
+         To keep things simple the device
+	     will not issue Alarms or any other non-requested topics except the intial DA.
+
+       */
+module ExCmdRsp {
+  const string TOPIC_CONFIGURE_DEVICE = "\"ConfigureDevice\"";
+
+  const string TOPIC_DEVICE_STATE = "\"DeviceState\"";
+
+  const uint32 LEN_DEVICE_ID = 32;
+
+  const uint32 LEN_STR_FOO = 10;
+
+  const uint32 LEN_STR_BAR = 16;
+
+  enum DeviceStateEnum {
+    UNINITIALIZED,
+    OFF,
+    ON,
+    ERROR
+  };
+
+  typedef octet DeviceID[ExCmdRsp::LEN_DEVICE_ID];
+
+  @nested
+  struct DeviceConfigurationStuct {
+    ExCmdRsp::DeviceStateEnum stateReq;
+    string<LEN_STR_FOO> fooName;
+    int32 fooValue;
+    string<LEN_STR_BAR> barName;
+    uint32 barValue;
+  };
+
+  typedef ExCmdRsp::DeviceConfigurationStuct DeviceConfiguration;
+
+  struct ConfigureDevice {
+    ExCmdRsp::DeviceID targetDevID;
+    ExCmdRsp::DeviceConfiguration deviceConfig;
+  };
+
+  struct DeviceState {
+    @key
+    ExCmdRsp::DeviceID targetDeviceID;
+    ExCmdRsp::DeviceStateEnum state;
+  };
+
+};

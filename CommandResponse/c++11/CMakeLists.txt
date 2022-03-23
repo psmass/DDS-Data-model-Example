@@ -4,7 +4,7 @@
 # must display this notice unaltered.
 # This code contains trade secrets of Real-Time Innovations, Inc.
 cmake_minimum_required(VERSION 3.11)
-project(sensors-xml-application)
+project(command-response-xml-application)
 
 # Find RTI Connext dependencies
 set(CMAKE_MODULE_PATH
@@ -22,29 +22,29 @@ find_package(
 		core
 )
 
-set(PUBLISHER_CPP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/publisher.cxx"
+set(DEVICE_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/device.cxx"
 )
 
 # Main application
-add_executable(Publisher
-    ${PUBLISHER_CPP_SOURCES}
+add_executable(Device
+    ${DEVICE_CPP_SOURCES}
 )
 
-set(SUBSCRIBER_CPP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/subscriber.cxx"
+set(CONTROLLER_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
 )
 
 # Main application
-add_executable(Subscriber
-    ${SUBSCRIBER_CPP_SOURCES}
+add_executable(Controller
+    ${CONTROLLER_CPP_SOURCES}
 )
 
-target_link_libraries(Publisher
+target_link_libraries(Device
 	RTIConnextDDS::cpp2_api
 )
 
-target_link_libraries(Subscriber
+target_link_libraries(Controller
 	RTIConnextDDS::cpp2_api
 )
 
