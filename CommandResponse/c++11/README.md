@@ -12,7 +12,7 @@ The example code was built with the following environment.
 
 2. From build type the following.
 
-`cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Darwin17clang9.0 -DCMAKE_BUILD_TYPE=Debug -A x64 ..`
+`cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Darwin17clang9.0 -DCMAKE_BUILD_TYPE=Debug ..`
 
 3. The project can be built from the command line.
 
