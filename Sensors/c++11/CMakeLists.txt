@@ -12,9 +12,6 @@ set(CMAKE_MODULE_PATH
     "$ENV{NDDSHOME}/resource/cmake"
 )
 
-set(COMPILE_FLAGS_STD_C11 "-std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS_STD_C11}")
-
 find_package(
     RTIConnextDDS "6.1.0"
     REQUIRED
@@ -47,5 +44,11 @@ target_link_libraries(Publisher
 target_link_libraries(Subscriber
 	RTIConnextDDS::cpp2_api
 )
+
+# The COMPILE_FLAGS property sets additional compiler flags used to build sources within the target.
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+    set_target_properties(Publisher PROPERTIES COMPILE_FLAGS -std=c++11)
+    set_target_properties(Subscriber PROPERTIES COMPILE_FLAGS -std=c++11)
+endif()
 
 
