@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433045_hpp
-#define CommandResp_2073433045_hpp
+#ifndef CommandResp_2073433885_hpp
+#define CommandResp_2073433885_hpp
 
 #include <iosfwd>
 
@@ -59,9 +59,23 @@ or consult the Code Generator User's Manual.
 
 namespace ExCmdRsp {
 
-    static const std::string TOPIC_CONFIGURE_DEVICE = "\"ConfigureDevice\"";
+    static const std::string MODULE_NAMESPACE = "ExCmdRsp";
 
-    static const std::string TOPIC_DEVICE_STATE = "\"DeviceState\"";
+    static const std::string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
+
+    static const std::string TOPIC_DEVICE_STATE = "DeviceState";
+
+    static const std::string CONTROLLER_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant";
+
+    static const std::string DEVICE1_PARTICIPANT = "CmdRspParticipantLibrary::DeviceParticipant1";
+
+    static const std::string DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter";
+
+    static const std::string DEVICE_STATE_READER = "DeviceSubscriber::DeviceStateReader";
+
+    static const std::string CONFIGURE_DEVICE_WRITER = "DevicePublisher::ConfigureDeviceWriter";
+
+    static const std::string CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
 
     static const uint32_t LEN_DEVICE_ID = 32UL;
 
@@ -77,8 +91,8 @@ namespace ExCmdRsp {
 
     NDDSUSERDllExport std::ostream& operator << (std::ostream& o,const DeviceStateEnum& sample);
 
-    typedef ::dds::core::array< uint8_t, (ExCmdRsp::LEN_DEVICE_ID)> DeviceID;
-    struct DeviceID_AliasTag_t {};
+    typedef ::dds::core::array< uint8_t, (ExCmdRsp::LEN_DEVICE_ID)> DeviceId;
+    struct DeviceId_AliasTag_t {};
 
     class NDDSUSERDllExport DeviceConfigurationStuct {
       public:
@@ -202,7 +216,7 @@ namespace ExCmdRsp {
         ConfigureDevice();
 
         ConfigureDevice(
-            const ExCmdRsp::DeviceID& targetDevID,
+            const ExCmdRsp::DeviceId& targetDeviceId,
             const ExCmdRsp::DeviceConfigurationStuct& deviceConfig);
 
         #ifdef RTI_CXX11_RVALUE_REFERENCES
@@ -217,20 +231,20 @@ namespace ExCmdRsp {
         #endif
         #endif 
 
-        ExCmdRsp::DeviceID& targetDevID() OMG_NOEXCEPT {
-            return m_targetDevID_;
+        ExCmdRsp::DeviceId& targetDeviceId() OMG_NOEXCEPT {
+            return m_targetDeviceId_;
         }
 
-        const ExCmdRsp::DeviceID& targetDevID() const OMG_NOEXCEPT {
-            return m_targetDevID_;
+        const ExCmdRsp::DeviceId& targetDeviceId() const OMG_NOEXCEPT {
+            return m_targetDeviceId_;
         }
 
-        void targetDevID(const ExCmdRsp::DeviceID& value) {
-            m_targetDevID_ = value;
+        void targetDeviceId(const ExCmdRsp::DeviceId& value) {
+            m_targetDeviceId_ = value;
         }
 
-        void targetDevID(ExCmdRsp::DeviceID&& value) {
-            m_targetDevID_ = std::move(value);
+        void targetDeviceId(ExCmdRsp::DeviceId&& value) {
+            m_targetDeviceId_ = std::move(value);
         }
         ExCmdRsp::DeviceConfigurationStuct& deviceConfig() OMG_NOEXCEPT {
             return m_deviceConfig_;
@@ -255,7 +269,7 @@ namespace ExCmdRsp {
 
       private:
 
-        ExCmdRsp::DeviceID m_targetDevID_;
+        ExCmdRsp::DeviceId m_targetDeviceId_;
         ExCmdRsp::DeviceConfigurationStuct m_deviceConfig_;
 
     };
@@ -272,7 +286,7 @@ namespace ExCmdRsp {
         DeviceState();
 
         DeviceState(
-            const ExCmdRsp::DeviceID& targetDeviceID,
+            const ExCmdRsp::DeviceId& myDeviceId,
             const ExCmdRsp::DeviceStateEnum& state);
 
         #ifdef RTI_CXX11_RVALUE_REFERENCES
@@ -287,20 +301,20 @@ namespace ExCmdRsp {
         #endif
         #endif 
 
-        ExCmdRsp::DeviceID& targetDeviceID() OMG_NOEXCEPT {
-            return m_targetDeviceID_;
+        ExCmdRsp::DeviceId& myDeviceId() OMG_NOEXCEPT {
+            return m_myDeviceId_;
         }
 
-        const ExCmdRsp::DeviceID& targetDeviceID() const OMG_NOEXCEPT {
-            return m_targetDeviceID_;
+        const ExCmdRsp::DeviceId& myDeviceId() const OMG_NOEXCEPT {
+            return m_myDeviceId_;
         }
 
-        void targetDeviceID(const ExCmdRsp::DeviceID& value) {
-            m_targetDeviceID_ = value;
+        void myDeviceId(const ExCmdRsp::DeviceId& value) {
+            m_myDeviceId_ = value;
         }
 
-        void targetDeviceID(ExCmdRsp::DeviceID&& value) {
-            m_targetDeviceID_ = std::move(value);
+        void myDeviceId(ExCmdRsp::DeviceId&& value) {
+            m_myDeviceId_ = std::move(value);
         }
         ExCmdRsp::DeviceStateEnum& state() OMG_NOEXCEPT {
             return m_state_;
@@ -325,7 +339,7 @@ namespace ExCmdRsp {
 
       private:
 
-        ExCmdRsp::DeviceID m_targetDeviceID_;
+        ExCmdRsp::DeviceId m_myDeviceId_;
         ExCmdRsp::DeviceStateEnum m_state_;
 
     };
@@ -466,7 +480,7 @@ namespace rti {
 
         #ifndef NDDS_STANDALONE_TYPE
         template<>
-        struct dynamic_type< ExCmdRsp::DeviceID_AliasTag_t > {
+        struct dynamic_type< ExCmdRsp::DeviceId_AliasTag_t > {
             typedef ::dds::core::xtypes::AliasType type;
             NDDSUSERDllExport static const ::dds::core::xtypes::AliasType& get();
         };
@@ -532,5 +546,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // CommandResp_2073433045_hpp
+#endif // CommandResp_2073433885_hpp
 

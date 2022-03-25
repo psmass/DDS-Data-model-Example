@@ -15,15 +15,32 @@
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep()
 #include "application.hpp"   // for ctrl-c
-#include "CommandResp.hpp" // rti generated file from idl to use model const Topics
+#include "CommandResp.hpp"  // rti generated file from idl to use model const Topics
+
+#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need without Quotes
 
 const std::string QOS_FILE = "../../model/CommandProject.xml";
-const std::string PARTICIPANT_NAME = "CmdRspParticipantLibrary::DeviceParticipant1";
-const std::string DEVICE_STATE_WRITER_NAME = "DevicePublisher::DeviceStateWriter";
-const std::string CONFIGURE_DEVICE_READER_NAME = "DeviceSubscriber::ConfigureDeviceReader";
+//const std::string _PARTICIPANT = "CmdRspParticipantLibrary::DeviceParticipant1";
+//const std::string _DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter";
+//const std::string _CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
+//const std::string _TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
+
+// The idea below is to define the TOPICS, PARTICIPANTS, READERS, and WRITERS as constants
+// as part of the ids assocated with the XML Project file. Running the idl file through
+// rtiCodeGen to create a headerfile with constants defined by the data modelwith the system
+// designer file. For only two topics,  it may be inefficient, but for a larger data model
+// is quite relavent to maintain consistant naming should the data/system model change.
+const std::string _PARTICIPANT = MODULE::DEVICE1_PARTICIPANT;
+const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
+const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
+
+const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_NAMESPACE + "::" + MODULE::TOPIC_DEVICE_STATE;
+
+
 
 void run_device_application()
 {
+  
     rti::core::QosProviderParams provider_params;
     // Configure the default QosProvider to load the configuration
     // config_file == "/the/path/to/your/xml/configuration.xml"
@@ -33,30 +50,34 @@ void run_device_application()
      // Create the participant
     auto qos_provider = dds::core::QosProvider::Default();
     dds::domain::DomainParticipant deviceParticipant =
-        qos_provider->create_participant_from_config(PARTICIPANT_NAME);
+        qos_provider->create_participant_from_config(_PARTICIPANT);
 
+    std::cout<< "_TOPIC: " << _TOPIC_DEVICE_STATE << std::endl;
+
+  
     // Lookup the specific topic DeviceState as defined in the xml file.
     // This will be needed to create samples of the correct type
     const dds::core::xtypes::DynamicType &deviceStateType =
-      qos_provider->type(ExCmdRsp::TOPIC_DEVICE_STATE);
-
+      qos_provider->type(_TOPIC_DEVICE_STATE);
+    
     // Find the DataWriter defined in the xml by using the participant and the
     // publisher::writer pair as the datawriter name.
     dds::pub::DataWriter<dds::core::xtypes::DynamicData> writerDeviceState =
         rti::pub::find_datawriter_by_name<
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
             deviceParticipant,
-            DEVICE_STATE_WRITER_NAME);
-
+            _DEVICE_STATE_WRITER);
+ 
     // Create one sample from the specified type and populate the id field.
     // This sample will be used repeatedly in the loop below.
     dds::core::xtypes::DynamicData deviceState(deviceStateType);
-
+    
     //deviceStateSample.value<int32_t>("sourceId.resourceId", 2);
     //sample.value<int32_t>("sourceId.id", 20);
     //sample.value<std::string>("sensorTypeName", "Humidity");
-    auto sampleNumber = 1;
 
+    auto sampleNumber = 1;
+   
     while (!application::shutdown_requested)
     {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -67,7 +88,7 @@ void run_device_application()
         //sample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
         //sample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
         //sample.value<float_t>("relativeHumidity", percent);
-        writer.write(deviceState);
+	//        writerDeviceState.write(deviceState);
 
         std::cout
 	  << "Writing Sample: " << sampleNumber 

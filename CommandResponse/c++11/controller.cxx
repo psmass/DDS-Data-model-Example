@@ -60,14 +60,13 @@ void run_controller_application()
     // subscriber::reader pair as the datareader name.
     dds::sub::DataReader<dds::core::xtypes::DynamicData> reader =
         rti::sub::find_datareader_by_name<
-            dds::sub::DataReader<dds::core::xtypes::DynamicData>(
+	  dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
             participant,
             DEVICE_STATE_READER_NAME);
 
     // WaitSet will be woken when the attached condition is triggered
     dds::core::cond::WaitSet waitset;
 
-/**
     // Create a ReadCondition for any data on this reader, and add to WaitSet
     dds::sub::cond::ReadCondition read_condition(
         reader,
@@ -79,7 +78,7 @@ void run_controller_application()
         });
 
     waitset += read_condition;
-**/
+
     while (!application::shutdown_requested)
     {
         // Wait 4 seconds for data 
