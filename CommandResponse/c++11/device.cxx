@@ -20,16 +20,13 @@
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need without Quotes
 
 const std::string QOS_FILE = "../../model/CommandProject.xml";
-//const std::string _PARTICIPANT = "CmdRspParticipantLibrary::DeviceParticipant1";
-//const std::string _DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter";
-//const std::string _CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
-//const std::string _TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
-// The idea below is to define the TOPICS, PARTICIPANTS, READERS, and WRITERS as constants
-// as part of the ids assocated with the XML Project file. Running the idl file through
-// rtiCodeGen to create a headerfile with constants defined by the data modelwith the system
-// designer file. For only two topics,  it may be inefficient, but for a larger data model
-// is quite relavent to maintain consistant naming should the data/system model change.
+// The idea below is to encapsulate the DDS entity names assocated with  TOPICS, PARTICIPANTS,
+// READERS, // and WRITERS as constants in with the system XML project (and include in the IDL
+// file). This allows running the IDL file through rtiCodeGen to create a headerfile with
+// constants defined as part of the data/system model and not replicated in the application.
+// It may be inefficient for only two Participants each with two topics, but for a larger data
+// model it is quite relavent to maintain consistant naming should the data/system model change.
 const std::string _PARTICIPANT = MODULE::DEVICE1_PARTICIPANT;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
 const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
