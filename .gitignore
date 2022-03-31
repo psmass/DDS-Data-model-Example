@@ -5,6 +5,10 @@ Sensors/c++/src/*.txt
 Sensors/.vs
 Sensors/c++11/build
 
+CommandResponse/.DS_Store
+CommandResponse/c++11/build
+CommandResponse/c++11/.DS_Store
+
 *.vcxproj
 *.filters
 *.user
