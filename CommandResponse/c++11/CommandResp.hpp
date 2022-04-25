@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433885_hpp
-#define CommandResp_2073433885_hpp
+#ifndef CommandResp_2073433895_hpp
+#define CommandResp_2073433895_hpp
 
 #include <iosfwd>
 
@@ -59,21 +59,21 @@ or consult the Code Generator User's Manual.
 
 namespace ExCmdRsp {
 
-    static const std::string MODULE_NAMESPACE = "ExCmdRsp";
+    static const std::string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
     static const std::string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
 
     static const std::string TOPIC_DEVICE_STATE = "DeviceState";
 
-    static const std::string CONTROLLER_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant";
+    static const std::string CONTROLLER1_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant1";
 
     static const std::string DEVICE1_PARTICIPANT = "CmdRspParticipantLibrary::DeviceParticipant1";
 
     static const std::string DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter";
 
-    static const std::string DEVICE_STATE_READER = "DeviceSubscriber::DeviceStateReader";
+    static const std::string DEVICE_STATE_READER = "ControllerSubscriber::DeviceStateReader";
 
-    static const std::string CONFIGURE_DEVICE_WRITER = "DevicePublisher::ConfigureDeviceWriter";
+    static const std::string CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter";
 
     static const std::string CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
 
@@ -91,8 +91,68 @@ namespace ExCmdRsp {
 
     NDDSUSERDllExport std::ostream& operator << (std::ostream& o,const DeviceStateEnum& sample);
 
-    typedef ::dds::core::array< uint8_t, (ExCmdRsp::LEN_DEVICE_ID)> DeviceId;
-    struct DeviceId_AliasTag_t {};
+    class NDDSUSERDllExport DeviceId {
+      public:
+        DeviceId();
+
+        DeviceId(
+            int32_t resourceId,
+            int32_t id);
+
+        #ifdef RTI_CXX11_RVALUE_REFERENCES
+        #ifndef RTI_CXX11_NO_IMPLICIT_MOVE_OPERATIONS
+        DeviceId (DeviceId&&) = default;
+        DeviceId& operator=(DeviceId&&) = default;
+        DeviceId& operator=(const DeviceId&) = default;
+        DeviceId(const DeviceId&) = default;
+        #else
+        DeviceId(DeviceId&& other_) OMG_NOEXCEPT;  
+        DeviceId& operator=(DeviceId&&  other_) OMG_NOEXCEPT;
+        #endif
+        #endif 
+
+        int32_t& resourceId() OMG_NOEXCEPT {
+            return m_resourceId_;
+        }
+
+        const int32_t& resourceId() const OMG_NOEXCEPT {
+            return m_resourceId_;
+        }
+
+        void resourceId(int32_t value) {
+            m_resourceId_ = value;
+        }
+
+        int32_t& id() OMG_NOEXCEPT {
+            return m_id_;
+        }
+
+        const int32_t& id() const OMG_NOEXCEPT {
+            return m_id_;
+        }
+
+        void id(int32_t value) {
+            m_id_ = value;
+        }
+
+        bool operator == (const DeviceId& other_) const;
+        bool operator != (const DeviceId& other_) const;
+
+        void swap(DeviceId& other_) OMG_NOEXCEPT ;
+
+      private:
+
+        int32_t m_resourceId_;
+        int32_t m_id_;
+
+    };
+
+    inline void swap(DeviceId& a, DeviceId& b)  OMG_NOEXCEPT 
+    {
+        a.swap(b);
+    }
+
+    NDDSUSERDllExport std::ostream& operator<<(std::ostream& o, const DeviceId& sample);
 
     class NDDSUSERDllExport DeviceConfigurationStuct {
       public:
@@ -363,6 +423,25 @@ namespace dds {
     namespace topic {
 
         template<>
+        struct topic_type_name< ExCmdRsp::DeviceId > {
+            NDDSUSERDllExport static std::string value() {
+                return "ExCmdRsp::DeviceId";
+            }
+        };
+
+        template<>
+        struct topic_type_support< ExCmdRsp::DeviceId > {
+            NDDSUSERDllExport 
+            static void reset_sample(ExCmdRsp::DeviceId& sample);
+
+            NDDSUSERDllExport 
+            static void allocate_sample(ExCmdRsp::DeviceId& sample, int, int);
+
+            static const ::rti::topic::TypePluginKind::type type_plugin_kind = 
+            ::rti::topic::TypePluginKind::STL;
+        };
+
+        template<>
         struct topic_type_name< ExCmdRsp::DeviceConfigurationStuct > {
             NDDSUSERDllExport static std::string value() {
                 return "ExCmdRsp::DeviceConfigurationStuct";
@@ -480,11 +559,17 @@ namespace rti {
 
         #ifndef NDDS_STANDALONE_TYPE
         template<>
-        struct dynamic_type< ExCmdRsp::DeviceId_AliasTag_t > {
-            typedef ::dds::core::xtypes::AliasType type;
-            NDDSUSERDllExport static const ::dds::core::xtypes::AliasType& get();
+        struct dynamic_type< ExCmdRsp::DeviceId > {
+            typedef ::dds::core::xtypes::StructType type;
+            NDDSUSERDllExport static const ::dds::core::xtypes::StructType& get();
         };
         #endif
+
+        template <>
+        struct extensibility< ExCmdRsp::DeviceId > {
+            static const ::dds::core::xtypes::ExtensibilityKind::type kind =
+            ::dds::core::xtypes::ExtensibilityKind::EXTENSIBLE;                
+        };
 
         #ifndef NDDS_STANDALONE_TYPE
         template<>
@@ -546,5 +631,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // CommandResp_2073433885_hpp
+#endif // CommandResp_2073433895_hpp
 

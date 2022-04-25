@@ -22,21 +22,21 @@ module ExCmdRsp {
        These Constants are defined here as part of the system model and used to generate a header file where they can be used 
        from a .cxx file. Unfortunately they cannot also be used within this XML file itself
        */
-  const string MODULE_NAMESPACE = "ExCmdRsp";
+  const string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
   const string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
 
   const string TOPIC_DEVICE_STATE = "DeviceState";
 
-  const string CONTROLLER_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant";
+  const string CONTROLLER1_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant1";
 
   const string DEVICE1_PARTICIPANT = "CmdRspParticipantLibrary::DeviceParticipant1";
 
   const string DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter";
 
-  const string DEVICE_STATE_READER = "DeviceSubscriber::DeviceStateReader";
+  const string DEVICE_STATE_READER = "ControllerSubscriber::DeviceStateReader";
 
-  const string CONFIGURE_DEVICE_WRITER = "DevicePublisher::ConfigureDeviceWriter";
+  const string CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter";
 
   const string CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
 
@@ -54,7 +54,11 @@ module ExCmdRsp {
     ERROR
   };
 
-  typedef octet DeviceId[ExCmdRsp::LEN_DEVICE_ID];
+  @nested
+  struct DeviceId {
+    int32 resourceId;
+    int32 id;
+  };
 
   @nested
   struct DeviceConfigurationStuct {
@@ -68,15 +72,14 @@ module ExCmdRsp {
   typedef ExCmdRsp::DeviceConfigurationStuct DeviceConfiguration;
 
   struct ConfigureDevice {
-    ExCmdRsp::DeviceId targetDeviceId;
+    DeviceId targetDeviceId;
     ExCmdRsp::DeviceConfiguration deviceConfig;
   };
 
   struct DeviceState {
     @key
-    ExCmdRsp::DeviceId myDeviceId;
+    DeviceId myDeviceId;
     ExCmdRsp::DeviceStateEnum state;
   };
 
 };
-

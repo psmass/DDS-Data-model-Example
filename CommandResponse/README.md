@@ -4,17 +4,14 @@
 
 # THIS DIRECTORY CONTAINS:
 
-1. Two simple data models showing 'short-lived' (non-Objective state) between a Controller and one of 
-potentially many Devices. 
+1. Discussion of two simple data models: Master/Slave and Client / Servcer. Both discussion will use non-Objective state (i.e. immediate command execution vs. long lasting command execution as it achieves it's Objective or end-goal. As an example, a command to move a vehicle to a way-point.) 
 
-2. A discussion, below in this README.md file, regarding more complex Request/Reply patterns that can exist 
-along with the criteria that necessitates them.
+2. An implementation of a the Master / Slave model.
 
-## Data Model for fairly simple Command(Request) w/ Implicit Replys:
 
-### **Model 1) Controller / Device** 
+### **Model 1) Master / Slave(s) or  Controller / Device(s)** 
 
-This model will have a Controller and a Slave Device (where there could be many devices, but one logical controller).
+This model will have a Master Controller and a Slave Device (where there could be many devices, but one logical controller).
 
 To keep things simple, there are two topics:
 
@@ -40,7 +37,7 @@ To keep things simple, there are two topics:
 
 	To keep things simple the device will not issue Alarms or any other non-requested topics except the State Change.
 
-### **Model 2) Client (Consumer) / Server (Service)**
+### **Model 2) Client(s) /  Server  or Consumer(s) / Service **
 
 This model has a well known service and may have multiple clients or consumers. The service, if Objective State, would need some protocol to both update the state of the Objective Command and provide deterministic behavior in the event of multiple clients issue conflicting commands. Choices such as implicit or explicit locks to prevent a super-ceding command, or perhaps canceling and override of the current command running by the super-ceding command. Another thought might be to use Ownership Strength QoS.
 

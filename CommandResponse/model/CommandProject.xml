@@ -25,14 +25,14 @@
        These Constants are defined here as part of the system model and used to generate a header file where they can be used 
        from a .cxx file. Unfortunately they cannot also be used within this XML file itself
       -->
-        <const name="MODULE_NAMESPACE" type="string" value="ExCmdRsp"/>
+        <const name="MODULE_EX_CMD_RSP" type="string" value="ExCmdRsp"/>
         <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
         <const name="TOPIC_DEVICE_STATE" type="string" value="DeviceState"/>
-        <const name="CONTROLLER_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant"/>
+        <const name="CONTROLLER1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant1"/>
         <const name="DEVICE1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::DeviceParticipant1"/>
         <const name="DEVICE_STATE_WRITER" type="string" value="DevicePublisher::DeviceStateWriter"/>
-        <const name="DEVICE_STATE_READER" type="string" value="DeviceSubscriber::DeviceStateReader"/>
-        <const name="CONFIGURE_DEVICE_WRITER" type="string" value="DevicePublisher::ConfigureDeviceWriter"/>
+        <const name="DEVICE_STATE_READER" type="string" value="ControllerSubscriber::DeviceStateReader"/>
+        <const name="CONFIGURE_DEVICE_WRITER" type="string" value="ControllerPublisher::ConfigureDeviceWriter"/>
         <const name="CONFIGURE_DEVICE_READER" type="string" value="DeviceSubscriber::ConfigureDeviceReader"/>
         <!--End_Header_File_Const_Block-->
         <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
@@ -44,7 +44,10 @@
           <enumerator name="ON"/>
           <enumerator name="ERROR"/>
         </enum>
-        <typedef name="DeviceId" type="byte" arrayDimensions="ExCmdRsp::LEN_DEVICE_ID"/>
+        <struct name="DeviceId" nested="true">
+          <member name="resourceId" type="int32"/>
+          <member name="id" type="int32"/>
+        </struct>
         <struct name="DeviceConfigurationStuct" nested="true">
           <member name="stateReq" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceStateEnum"/>
           <member name="fooName" type="string" stringMaxLength="LEN_STR_FOO"/>
@@ -54,11 +57,11 @@
         </struct>
         <typedef name="DeviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfigurationStuct"/>
         <struct name="ConfigureDevice">
-          <member name="targetDeviceId" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceId"/>
+          <member name="targetDeviceId" type="nonBasic" nonBasicTypeName="DeviceId"/>
           <member name="deviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfiguration"/>
         </struct>
         <struct name="DeviceState">
-          <member name="myDeviceId" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceId" key="true"/>
+          <member name="myDeviceId" type="nonBasic" nonBasicTypeName="DeviceId" key="true"/>
           <member name="state" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceStateEnum"/>
         </struct>
       </module>
@@ -104,12 +107,9 @@
         <subscriber name="DeviceSubscriber">
           <data_reader name="ConfigureDeviceReader" topic_ref="ConfigureDevice">
             <content_filter name="MyFilter" kind="builtin.sql">
-              <expression>targetDeviceId[28] = %0 and targetDeviceId[29] = %1 and  targetDeviceId[30] = %2 and targetDeviceId[31] = %3</expression>
+              <expression>targetDeviceId.id=%0</expression>
               <expression_parameters>
-                <element>48</element>
-                <element>48</element>
-                <element>48</element>
-                <element>48</element>
+                <element>20</element>
               </expression_parameters>
             </content_filter>
             <datareader_qos>
