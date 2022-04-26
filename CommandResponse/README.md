@@ -4,7 +4,7 @@
 
 # THIS DIRECTORY CONTAINS:
 
-1. Discussion of two simple data models: Master/Slave and Client / Servcer. Both discussion will use non-Objective state (i.e. immediate command execution vs. long lasting command execution as it achieves it's Objective or end-goal. As an example, a command to move a vehicle to a way-point.) 
+1. Discussion of two simple Command Response data models: Master/Slave and Client / Server. Both discussion will use non-Objective state (i.e. immediate command execution vs. long lasting command execution as it achieves it's Objective or end-goal. As an example, a command to move a vehicle to a way-point.) 
 
 2. An implementation of a the Master / Slave model.
 
