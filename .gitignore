@@ -10,6 +10,7 @@ CommandResponse/.DS_Store
 CommandResponse/c++11/build
 CommandResponse/c++11/.DS_Store
 
+*.Ds_Store
 *.vcxproj
 *.filters
 *.user
