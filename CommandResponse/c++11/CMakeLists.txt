@@ -15,6 +15,9 @@ set(CMAKE_MODULE_PATH
 set(COMPILE_FLAGS_STD_C11 "-std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS_STD_C11}")
 
+set(LINKER_FLAGS "-v")
+Set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
+
 find_package(
     RTIConnextDDS "6.1.0"
     REQUIRED
@@ -23,6 +26,7 @@ find_package(
 )
 
 set(DEVICE_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/device.cxx"
 )
 
@@ -32,6 +36,7 @@ add_executable(Device
 )
 
 set(CONTROLLER_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
 )
 

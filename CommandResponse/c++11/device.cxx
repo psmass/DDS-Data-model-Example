@@ -15,12 +15,12 @@
 #include <chrono>
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep()
-#include "application.hpp"   // for ctrl-c
 #include "CommandResp.hpp"   // rti generated file from idl to use model const Topics
+#include "topics.hpp"
+#include "application.hpp"
 
-#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
-const std::string QOS_FILE = "../../model/CommandProject.xml";
+namespace MODULE
+{
 
 // The idea below is to encapsulate the DDS entity names assocated with  TOPICS, PARTICIPANTS,
 // READERS, // and WRITERS as constants in with the system XML project (and include in the IDL
@@ -39,75 +39,18 @@ const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
 const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
 const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_CONFIGURE_DEVICE;
 
-
-void  process_cfd_data(dds::sub::DataReader<dds::core::xtypes::DynamicData> reader)
-{
-    // Take all samples
-    dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
-    for (const auto &sample : samples)
-    {
-        if (sample.info().valid())
-        {
-            std::cout << sample.data() << std::endl;
-        }
-        else
-        {
-            std::cout << "  Received metadata" << std::endl;
-        }
-    }
-} // The LoanedSamples destructor returns the loan
-
-
-void config_dev_reader (dds::domain::DomainParticipant devParticipant) {
-
-    dds::core::QosProvider qos_provider({ QOS_FILE });
-
-    // Lookup the specific Sensor type as defined in the xml file.
-    // This will be needed to read/take samples of the correct type
-    const dds::core::xtypes::DynamicType &configDeviceType =
-        qos_provider->type(_TOPIC_CONFIGURE_DEVICE);
-
-    // Find the DataReader defined in the xml by using the participant and the
-    // subscriber::reader pair as the datareader name.
-    dds::sub::DataReader<dds::core::xtypes::DynamicData> configDeviceReader =
-        rti::sub::find_datareader_by_name<
-            dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
-            devParticipant,
-            _CONFIGURE_DEVICE_READER);
-
-    // WaitSet will be woken when the attached condition is triggered
-    dds::core::cond::WaitSet waitset;
-
-    // Create a ReadCondition for any data on this reader, and add to WaitSet
-    dds::sub::cond::ReadCondition read_condition(
-        configDeviceReader,
-        dds::sub::status::DataState::any(),
-        [configDeviceReader]()
-        {
-            // If we wake up, process config device data
-            process_cfd_data(configDeviceReader);
-        });
-
-    waitset += read_condition;
-
-    while (!application::shutdown_requested)
-    {
-        // Wait 4 seconds for data 
-        waitset.dispatch(dds::core::Duration(4));
-    }
-    std::cout << "configure device reader thread shutting down" << std::endl;
-}
-
-
 void run_device_application()
 {  
     // Create the participant
-    dds::core::QosProvider qos_provider({ QOS_FILE });
+    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
     dds::domain::DomainParticipant participant =
         qos_provider->create_participant_from_config(_PARTICIPANT);
 
+    ReaderTopic config_dev_reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER);
+
     // spin up reader thread
-    std::thread cfg_dev_rd_thread (config_dev_reader, participant);
+    //std::thread cfg_dev_rd_thread (config_dev_reader, participant);
+
 
     // Lookup the specific topic DeviceState as defined in the xml file.
     // This will be needed to create samples of the correct type
@@ -115,10 +58,6 @@ void run_device_application()
       qos_provider->type(_TOPIC_DEVICE_STATE);
 
     // rti::core::xtypes::print_idl(deviceStateType);
-
-    // Downcast to StructType if needed
-    //const dds::core::xtypes::StructType& deviceStateTypeStruct = 
-    //    static_cast<const dds::core::xtypes::StructType&>(deviceStateType);
 
    // Find the DataWriter defined in the xml by using the participant and the
     // publisher::writer pair as the datawriter name.
@@ -161,9 +100,10 @@ void run_device_application()
         rti::util::sleep(dds::core::Duration(1));
 	    sampleNumber++;
     }
-    cfg_dev_rd_thread.join();
+    //cfg_dev_rd_thread.join();
     std::cout << "main thread shutting down" << std::endl;
 }
+} // namespace MODULE
 
 int main(int argc, char *argv[])
 {
@@ -174,7 +114,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        run_device_application();
+        MODULE::run_device_application();
     }
     catch (const std::exception &ex)
     {
@@ -190,3 +130,5 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
+

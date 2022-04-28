@@ -16,12 +16,12 @@
 #include <chrono>
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep
-#include "application.hpp"   // for ctrl-c
 #include "CommandResp.hpp"   // rti generated file from idl to use model const Topics
+#include "topics.hpp"
+#include "application.hpp"
 
-#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
-const std::string QOS_FILE = "../../model/CommandProject.xml";
+namespace MODULE
+{
 
 // The idea below is to encapsulate the DDS entity names assocated with  TOPICS, PARTICIPANTS,
 // READERS, // and WRITERS as constants in with the system XML project (and include in the IDL
@@ -62,9 +62,9 @@ void  process_ds_data(dds::sub::DataReader<dds::core::xtypes::DynamicData> reade
 
 void device_state_reader (dds::domain::DomainParticipant controllerParticipant) {
 
-    dds::core::QosProvider qos_provider({ QOS_FILE });
+    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
 
-    // Lookup the specific Sensor type as defined in the xml file.
+    // Lookup the specific topic as defined in the xml file.
     // This will be needed to read/take samples of the correct type
     const dds::core::xtypes::DynamicType &deviceStateType =
         qos_provider->type(_TOPIC_DEVICE_STATE);
@@ -83,7 +83,6 @@ void device_state_reader (dds::domain::DomainParticipant controllerParticipant) 
     dds::core::cond::WaitSet waitset;
 
     // Create a ReadCondition for any data on this reader, and add to WaitSet
-    
     dds::sub::cond::ReadCondition read_condition(
         deviceStateReader,
         dds::sub::status::DataState::any(),
@@ -164,6 +163,7 @@ void run_controller_application()
     std::cout << "main thread shutting down" << std::endl;
     
 }
+} // namespace MODULE
 
 int main(int argc, char *argv[])
 {
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        run_controller_application();
+        MODULE::run_controller_application();
     }
     catch (const std::exception &ex)
     {
@@ -190,3 +190,4 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+

@@ -13,71 +13,73 @@
 #ifndef TOPICS_HPP
 #define TOPICS_HPP
 
+#include <iostream>
+#include <thread>
 #include <dds/dds.hpp>
+#include <rti/domain/find.hpp>
 
-namespace topics
+#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
+
+namespace application {
+    extern bool shutdown_requested;
+}
+namespace MODULE
 {
+
+    const std::string QOS_FILE = "../../model/CommandProject.xml";
     class Topic {
         public:
-            Topic(DDSDomainParticipant * participant, enum TOPICS_E topicEnum);
-            virtual ~Topic(void) = 0; // Abstract base class
+            Topic(const std::string topic_name);       
+            virtual ~Topic(void)=0; // Abstract base class
 
-        private:
-            pthread_t tid; // thread id
-            enum TOPICS_E myTopicEnum;
-            DDSDomainParticipant * myParticipant;
+        protected:
+            std::string topicName;
     };
 
     class WriterTopic : public Topic {
         public:
-            WriterTopic(DDSDomainParticipant * participant, enum TOPICS_E topicEnum, bool prefillDevId=true);
-            virtual ~WriterTopic(void) = 0;  // Abstract base class
+            WriterTopic(
+                const std::string participant_name,
+                const std::string topic_name,
+                const std::string writer_name, 
+                int period=0, 
+                bool prefillDevId=true);
+            ~WriterTopic(void) {}; 
+
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
+            dds::core::xtypes::DynamicData * getMyDataInstance();
+            void enable();
+            void disable();
         
         private:
-            DDSDynamicDataWriter * myWriter;
-            DDS_DynamicData * myData; 
-    };
-
-    class NormalWriterTopic : public WriterTopic {
-        public:
-            NormalWriterTopic(DDSDomainParticipant * participant, enum TOPICS_E topicEnum, bool prefillDevId=true);
-            ~NormalWriterTopic();
-            DDSDynamicDataWriter * getMyWriter();  // needed for Requests to get the response writer
-            DDS_DynamicData * getMyDataInstance();
-        
-        private:
-            WriterEventsThreadInfo * myWriterEventsThreadInfo;
-
-    };
-
-    class PeriodicTopic : public WriterTopic {
-        public:
-            PeriodicTopic(dds::domain::DomainParticipant * participant, enum TOPICS_E topicEnum, dds::core::DDS_Duration_t ratePeriod);
-            ~PeriodicTopic(void);
-
-            void enable()  { topics::PeriodicTopic::enabled=true; };
-            void disable() { topics::PeriodicTopic::enabled=false; };
-        
-        private:
-            PeriodicWriterThreadInfo * myPeriodicWriterThreadInfo;
+            std::string writerName;
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
+            dds::core::xtypes::DynamicData *mySample; 
             bool enabled;
-
+            int period;
+            std::thread writerThread;
     };
 
     class ReaderTopic : public Topic {
         public:
-            ReaderTopic( DDSDomainParticipant * participant, 
-                        enum TOPICS_E topicEnum, 
-                        NormalWriterTopic * echoResponse = NULL, 
-                        bool installFilter = true );
-            ~ReaderTopic(void);
+            ReaderTopic(
+                dds::domain::DomainParticipant participant,
+                const std::string topic_name, 
+                const std::string reader_name,
+                bool filterOnId = true);
+            ~ReaderTopic(void){};
+
+            void ReaderThread(dds::domain::DomainParticipant participant);
+
         
         private:
-            ReaderThreadInfo * myReaderThreadInfo;
-            DDS_StringSeq parameters; // need unique sets of parameters for each reader Topic
+            std::string readerName;
+            std::thread readerThread;
+
+
     };
 
-};
+}
 
 
 #endif // TOPICS_HPP
