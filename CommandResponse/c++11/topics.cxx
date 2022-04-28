@@ -15,30 +15,26 @@
 namespace MODULE
 {
 
-    Topic::Topic(const std::string topic_name) {
-        topicName = topic_name;
-    }
-    Topic::~Topic() {};
 
-
-    WriterTopic::WriterTopic(
-        const std::string participant_name, 
+    Writer::Writer(
+        dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
         const std::string writer_name, 
         int period, 
         bool prefillDevId)
-    : Topic(topic_name) {
-    // by setting period non-zero the topic will be a periodic topic
+    {
+        // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic" << std::endl;
+        topicName = topic_name;
         writerName = writer_name;
 
     }
 
 
-    dds::pub::DataWriter<dds::core::xtypes::DynamicData>* WriterTopic::getMyWriter() { return topicWriter;};  // needed for Requests to get the response writer
-    dds::core::xtypes::DynamicData * WriterTopic::getMyDataInstance(){ return mySample; };       
-    void WriterTopic::enable()  { MODULE::WriterTopic::enabled=true; };
-    void WriterTopic::disable() { MODULE::WriterTopic::enabled=false; };
+    dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() { return topicWriter;};  // needed for Requests to get the response writer
+    dds::core::xtypes::DynamicData * Writer::getMyDataInstance(){ return mySample; };       
+    void Writer::enable()  { MODULE::Writer::enabled=true; };
+    void Writer::disable() { MODULE::Writer::enabled=false; };
 
     void handler (int x) {
         std::cout << "** HANDLER ***" << std::endl;
@@ -62,20 +58,21 @@ namespace MODULE
     } // The LoanedSamples destructor returns the loan
 
 
-    ReaderTopic::ReaderTopic( 
+    Reader::Reader( 
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
         const std::string reader_name,
         bool filterOnId)
-    : Topic(topic_name) {
+    {
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
+        topicName = topic_name;
         readerName = reader_name;
     
         // spin up thread for this reader
-        readerThread = std::thread(&ReaderTopic::ReaderThread, this, participant);  
+        readerThread = std::thread(&Reader::ReaderThread, this, participant);  
     }
 
-    void ReaderTopic::ReaderThread(dds::domain::DomainParticipant participant) {
+    void Reader::ReaderThread(dds::domain::DomainParticipant participant) {
 
         std::cout <<  " ReaderThread " << this->readerName << " running " << std::endl;
 

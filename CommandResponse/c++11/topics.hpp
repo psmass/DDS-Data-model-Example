@@ -27,24 +27,15 @@ namespace MODULE
 {
 
     const std::string QOS_FILE = "../../model/CommandProject.xml";
-    class Topic {
+    class Writer {
         public:
-            Topic(const std::string topic_name);       
-            virtual ~Topic(void)=0; // Abstract base class
-
-        protected:
-            std::string topicName;
-    };
-
-    class WriterTopic : public Topic {
-        public:
-            WriterTopic(
-                const std::string participant_name,
+            Writer(
+                dds::domain::DomainParticipant participant,
                 const std::string topic_name,
                 const std::string writer_name, 
                 int period=0, 
                 bool prefillDevId=true);
-            ~WriterTopic(void) {}; 
+            ~Writer(void) {}; 
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
             dds::core::xtypes::DynamicData * getMyDataInstance();
@@ -52,6 +43,7 @@ namespace MODULE
             void disable();
         
         private:
+            std::string topicName;
             std::string writerName;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
             dds::core::xtypes::DynamicData *mySample; 
@@ -60,22 +52,22 @@ namespace MODULE
             std::thread writerThread;
     };
 
-    class ReaderTopic : public Topic {
+    class Reader{
         public:
-            ReaderTopic(
+            Reader(
                 dds::domain::DomainParticipant participant,
                 const std::string topic_name, 
                 const std::string reader_name,
                 bool filterOnId = true);
-            ~ReaderTopic(void){};
+            ~Reader(void){};
 
             void ReaderThread(dds::domain::DomainParticipant participant);
 
         
         private:
+            std::string topicName;
             std::string readerName;
             std::thread readerThread;
-
 
     };
 
