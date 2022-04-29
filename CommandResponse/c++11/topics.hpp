@@ -14,64 +14,66 @@
 #define TOPICS_HPP
 
 #include <iostream>
-#include <thread>
-#include <dds/dds.hpp>
-#include <rti/domain/find.hpp>
+#include "ddsEntities.hpp"
 
-#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
-namespace application {
-    extern bool shutdown_requested;
-}
 namespace MODULE
 {
-
-    const std::string QOS_FILE = "../../model/CommandProject.xml";
-    class Writer {
-        public:
-            Writer(
-                dds::domain::DomainParticipant participant,
+class DeviceStateRdr : public Reader {
+    public:
+        DeviceStateRdr(dds::domain::DomainParticipant participant,
                 const std::string topic_name,
-                const std::string writer_name, 
-                int period=0, 
-                bool prefillDevId=true);
-            ~Writer(void) {}; 
-
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
-            dds::core::xtypes::DynamicData * getMyDataInstance();
-            void enable();
-            void disable();
-        
-        private:
-            std::string topicName;
-            std::string writerName;
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
-            dds::core::xtypes::DynamicData *mySample; 
-            bool enabled;
-            int period;
-            std::thread writerThread;
-    };
-
-    class Reader{
-        public:
-            Reader(
-                dds::domain::DomainParticipant participant,
-                const std::string topic_name, 
                 const std::string reader_name,
                 bool filterOnId = true);
-            ~Reader(void){};
+        ~DeviceStateRdr(void){};
 
-            void ReaderThread(dds::domain::DomainParticipant participant);
+        void Handler(void);
 
-        
-        private:
-            std::string topicName;
-            std::string readerName;
-            std::thread readerThread;
+    private:
+};
 
-    };
+class DeviceStateWtr : public Writer {
+    public:
+        DeviceStateWtr(dds::domain::DomainParticipant participant,
+                const std::string topic_name,
+                const std::string writer_name,
+                int period=0, 
+                bool prefillDevId=true);
+        ~DeviceStateWtr(void){};
 
-}
+        void Handler(void);
+
+    private:
+};
+
+
+class ConfigDevRdr : public Reader {
+    public:
+        ConfigDevRdr(dds::domain::DomainParticipant participant,
+                const std::string topic_name,
+                const std::string reader_name,
+                bool filterOnId = true);
+        ~ConfigDevRdr(void){};
+
+        void Handler(void);
+
+    private:
+};
+
+class ConfigDevWtr : Writer {
+    public:
+        ConfigDevWtr(dds::domain::DomainParticipant participant,
+                const std::string topic_name,
+                const std::string writer_name,
+                int period=0, 
+                bool prefillDevId=true);
+        ~ConfigDevWtr(void){};
+
+        void Handler(void);
+
+    private:
+};
+
+} // namespace MODULE
 
 
 #endif // TOPICS_HPP

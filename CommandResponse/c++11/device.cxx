@@ -16,8 +16,10 @@
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep()
 #include "CommandResp.hpp"   // rti generated file from idl to use model const Topics
+#include "ddsEntities.hpp"
 #include "topics.hpp"
 #include "application.hpp"
+
 
 namespace MODULE
 {
@@ -46,7 +48,7 @@ void run_device_application()
     dds::domain::DomainParticipant participant =
         qos_provider->create_participant_from_config(_PARTICIPANT);
 
-    Reader config_dev_reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER);
+    ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER); 
     Writer device_state_writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER);
 
     // Lookup the specific topic DeviceState as defined in the xml file.

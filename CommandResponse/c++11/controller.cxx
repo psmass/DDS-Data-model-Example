@@ -17,7 +17,7 @@
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep
 #include "CommandResp.hpp"   // rti generated file from idl to use model const Topics
-#include "topics.hpp"
+#include "ddsEntities.hpp"
 #include "application.hpp"
 
 namespace MODULE

@@ -27,6 +27,7 @@ find_package(
 
 set(DEVICE_CPP_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/device.cxx"
 )
 
@@ -37,6 +38,7 @@ add_executable(Device
 
 set(CONTROLLER_CPP_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
 )
 
