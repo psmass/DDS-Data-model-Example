@@ -26,7 +26,7 @@ namespace MODULE
         std::cout << "Writer Topic" << std::endl;
         topicName = topic_name;
         writerName = writer_name;
-        writerThread = std::thread(&Writer::WriterThread, this, participant);  
+        writerThread = std::thread(&Writer::WriterThread, this, participant);
 
     }
 
@@ -56,7 +56,11 @@ namespace MODULE
 
         this->Handler(deviceStateWriter, deviceStateSample); // call the toic specific Handler (Virtual)
 
+        std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
+
     } // end Writer::WriterThread
+
+    std::thread* Writer::getThreadHndl(void) { return &writerThread; };
 
 
     dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() 
@@ -77,7 +81,8 @@ namespace MODULE
         readerName = reader_name;
     
         // spin up thread for this reader
-        readerThread = std::thread(&Reader::ReaderThread, this, participant);  
+        readerThread = std::thread(&Reader::ReaderThread, this, participant); 
+
     }
 
 
@@ -117,6 +122,7 @@ namespace MODULE
             {
                 if (sample.info().valid())
                 {
+                    std::cout << "Read sample for topic: " << topicName << std::endl;
                     std::cout << sample.data() << std::endl;
                     // Do Generic Topic Read **Stuff** here
                     this->Handler(); // call the toic specific Handler (Virtual)
@@ -132,6 +138,9 @@ namespace MODULE
         
         std::cout << this->topicName << " Reader thread shutting down" << std::endl;   
     }
+
+    std::thread* Reader::getThreadHndl(void) { return &readerThread; };
+
 
 
 } // NAMESPACE MODULE

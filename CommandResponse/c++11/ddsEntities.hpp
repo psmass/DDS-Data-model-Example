@@ -44,12 +44,16 @@ namespace MODULE
                 dds::core::xtypes::DynamicData deviceStateSample) 
                 { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
 
+            // Add API for here for writerEventThread and a EventHandler to monitor and
+            // take action on generic or specific writer topic events.
+
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
             dds::core::xtypes::DynamicData * getMyDataInstance();
+            std::thread* getThreadHndl(void);
             void enable(void);
             void disable(void);
         
-        private:
+        protected:
             std::string topicName;
             std::string writerName;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
@@ -70,9 +74,10 @@ namespace MODULE
 
             void ReaderThread(dds::domain::DomainParticipant participant);
             virtual void Handler(void){ std::cout << "*** GENERIC READER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
+            std::thread* getThreadHndl(void);
 
         
-        private:
+        protected:
             std::string topicName;
             std::string readerName;
             std::thread readerThread;

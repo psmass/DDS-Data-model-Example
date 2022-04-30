@@ -43,6 +43,10 @@ void run_device_application()
         //Device State Machine goes here;
     }
 
+    config_dev_reader.Reader::getThreadHndl()->join();
+    device_state_writer.Writer::getThreadHndl()->join();
+    // give threads a second to shut down
+    rti::util::sleep(dds::core::Duration(1));
     std::cout << "main thread shutting down" << std::endl;
 }
 } // namespace MODULE

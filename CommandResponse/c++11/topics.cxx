@@ -73,6 +73,9 @@ namespace MODULE
             rti::util::sleep(dds::core::Duration(1));
             sampleNumber++;
         }
+
+        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
+
     }    
 
 
