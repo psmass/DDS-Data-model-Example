@@ -51,7 +51,7 @@ class ConfigDevRdr : public Reader {
     private:
 };
 
-class ConfigDevWtr : Writer {
+class ConfigDevWtr : public Writer {
     public:
         ConfigDevWtr(dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};

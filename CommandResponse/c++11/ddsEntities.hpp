@@ -34,9 +34,7 @@ namespace MODULE
             Writer(
                 dds::domain::DomainParticipant participant,
                 const std::string topic_name,
-                const std::string writer_name,
-                int period=0, 
-                bool prefillDevId=true);
+                const std::string writer_name);
             ~Writer(void) {}; 
 
             void WriterThread(dds::domain::DomainParticipant participant);
@@ -68,15 +66,13 @@ namespace MODULE
             Reader(
                 dds::domain::DomainParticipant participant,
                 const std::string topic_name, 
-                const std::string reader_name,
-                bool filterOnId = true);
+                const std::string reader_name);
             ~Reader(void){};
 
             void ReaderThread(dds::domain::DomainParticipant participant);
             virtual void Handler(void){ std::cout << "*** GENERIC READER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
             std::thread* getThreadHndl(void);
 
-        
         protected:
             std::string topicName;
             std::string readerName;

@@ -18,9 +18,7 @@ namespace MODULE
     Writer::Writer(
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
-        const std::string writer_name, 
-        int period, 
-        bool prefillDevId)
+        const std::string writer_name)
     {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic" << std::endl;
@@ -37,14 +35,14 @@ namespace MODULE
 
         dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
 
-        const dds::core::xtypes::DynamicType &deviceStateType =
+        const dds::core::xtypes::DynamicType &thisTopicType =
             qos_provider->type(this->topicName);
 
         // rti::core::xtypes::print_idl(deviceStateType);
 
         // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter =
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> thisTopicWriter =
             rti::pub::find_datawriter_by_name<
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
                 participant,
@@ -52,16 +50,15 @@ namespace MODULE
 
         // Create one sample from the specified type and populate the id field.
         // This sample will be used repeatedly in the loop below.
-        dds::core::xtypes::DynamicData deviceStateSample(deviceStateType);
+        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
 
-        this->Handler(deviceStateWriter, deviceStateSample); // call the toic specific Handler (Virtual)
+        this->Handler(thisTopicWriter, thisTopicSample); // call the toic specific Handler (Virtual)
 
         std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
 
     } // end Writer::WriterThread
 
     std::thread* Writer::getThreadHndl(void) { return &writerThread; };
-
 
     dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() 
         { return topicWriter;};  // needed for Requests to get the response writer
@@ -73,8 +70,7 @@ namespace MODULE
     Reader::Reader( 
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
-        const std::string reader_name,
-        bool filterOnId)
+        const std::string reader_name)
     {
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
         topicName = topic_name;
@@ -82,7 +78,6 @@ namespace MODULE
     
         // spin up thread for this reader
         readerThread = std::thread(&Reader::ReaderThread, this, participant); 
-
     }
 
 

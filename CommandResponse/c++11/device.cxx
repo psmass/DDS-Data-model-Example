@@ -24,9 +24,6 @@
 namespace MODULE
 {
 
-const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
-const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
-
 void run_device_application()
 {  
     // Create the participant
@@ -41,13 +38,14 @@ void run_device_application()
     while (!application::shutdown_requested)
     {
         //Device State Machine goes here;
+        rti::util::sleep(dds::core::Duration(1));
     }
 
     config_dev_reader.Reader::getThreadHndl()->join();
     device_state_writer.Writer::getThreadHndl()->join();
     // give threads a second to shut down
     rti::util::sleep(dds::core::Duration(1));
-    std::cout << "main thread shutting down" << std::endl;
+    std::cout << "Device main thread shutting down" << std::endl;
 }
 } // namespace MODULE
 

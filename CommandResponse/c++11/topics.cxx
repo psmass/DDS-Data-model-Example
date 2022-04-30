@@ -94,8 +94,39 @@ namespace MODULE
 
     void ConfigDevWtr::Handler(
         dds::pub::DataWriter<dds::core::xtypes::DynamicData> configDevWriter,
-        dds::core::xtypes::DynamicData deviceStateSample) {
-            std::cout << "Configure Device Writer Handler Executing" << std::endl; 
+        dds::core::xtypes::DynamicData configDevSample) {
+
+        // Writer Handlers run in thread and don't return until exit
+        // The handler loads up the specific data fields and writes the sample
+        // Here we can write periodically, or on change or any other condition
+        std::cout << "Configure Device Writer Handler Executing" << std::endl; 
+
+        configDevSample.value<int32_t>("targetDeviceId.resourceId", 2);
+        configDevSample.value<int32_t>("targetDeviceId.id", 20);
+
+        auto sampleNumber = 1;
+    
+        while (!application::shutdown_requested)
+        {
+            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+            auto duration = now.time_since_epoch();
+            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+
+            // Modify the data to be written here
+            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
+            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
+            configDevWriter.write(configDevSample);
+
+            std::cout
+            << "Writing Sample: " << sampleNumber 
+            //<< "{'targetDeviceId': {'resourceId': " << configDeviceSample.value<int32_t>("targetDeviceId.resourceId") 
+            //<< ", 'id': " << configDeviceSample.value<int32_t>("targetDeviceId.id") << "}"
+            << std::endl;
+
+            // Send once every second
+            rti::util::sleep(dds::core::Duration(1));
+            sampleNumber++;
+        }
     }    
 
 } // namespace
