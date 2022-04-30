@@ -39,7 +39,10 @@ namespace MODULE
                 bool prefillDevId=true);
             ~Writer(void) {}; 
 
-            virtual void Handler() { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
+            void WriterThread(dds::domain::DomainParticipant participant);
+            virtual void Handler(dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter,
+                dds::core::xtypes::DynamicData deviceStateSample) 
+                { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
             dds::core::xtypes::DynamicData * getMyDataInstance();

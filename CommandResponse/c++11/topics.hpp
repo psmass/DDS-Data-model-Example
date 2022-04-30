@@ -33,7 +33,9 @@ class DeviceStateWtr : public Writer {
         DeviceStateWtr(dds::domain::DomainParticipant participant);
         ~DeviceStateWtr(void){};
 
-        void Handler(void);
+        void Handler(
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter,
+            dds::core::xtypes::DynamicData deviceStateSample);
 
     private:
 };
@@ -54,7 +56,9 @@ class ConfigDevWtr : Writer {
         ConfigDevWtr(dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};
 
-        void Handler(void);
+        void Handler(
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData> configDevWriter,
+            dds::core::xtypes::DynamicData configDevSample);
 
     private:
 };

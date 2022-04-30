@@ -26,8 +26,38 @@ namespace MODULE
         std::cout << "Writer Topic" << std::endl;
         topicName = topic_name;
         writerName = writer_name;
+        writerThread = std::thread(&Writer::WriterThread, this, participant);  
 
     }
+
+    void Writer::WriterThread(dds::domain::DomainParticipant participant) {
+        // Lookup the specific topic DeviceState as defined in the xml file.
+        // This will be needed to create samples of the correct type
+        std::cout <<  " Writer Thread " << this->writerName << " running " << std::endl;
+
+        dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
+
+        const dds::core::xtypes::DynamicType &deviceStateType =
+            qos_provider->type(this->topicName);
+
+        // rti::core::xtypes::print_idl(deviceStateType);
+
+        // Find the DataWriter defined in the xml by using the participant and the
+        // publisher::writer pair as the datawriter name.
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter =
+            rti::pub::find_datawriter_by_name<
+                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+                participant,
+                this->writerName);
+
+        // Create one sample from the specified type and populate the id field.
+        // This sample will be used repeatedly in the loop below.
+        dds::core::xtypes::DynamicData deviceStateSample(deviceStateType);
+
+        this->Handler(deviceStateWriter, deviceStateSample); // call the toic specific Handler (Virtual)
+
+    } // end Writer::WriterThread
+
 
     dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() 
         { return topicWriter;};  // needed for Requests to get the response writer
@@ -100,7 +130,7 @@ namespace MODULE
             //std::cout << "Runing thread for Reader " << this->readerName << std::endl;
         }
         
-        std::cout << "configure device reader thread shutting down" << std::endl;   
+        std::cout << this->topicName << " Reader thread shutting down" << std::endl;   
     }
 
 

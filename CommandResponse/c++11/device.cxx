@@ -34,60 +34,19 @@ void run_device_application()
     dds::domain::DomainParticipant participant =
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
+    // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant); 
+    DeviceStateWtr device_state_writer(participant);
 
-    // Lookup the specific topic DeviceState as defined in the xml file.
-    // This will be needed to create samples of the correct type
-    const dds::core::xtypes::DynamicType &deviceStateType =
-      qos_provider->type(_TOPIC_DEVICE_STATE);
-
-    // rti::core::xtypes::print_idl(deviceStateType);
-
-   // Find the DataWriter defined in the xml by using the participant and the
-    // publisher::writer pair as the datawriter name.
-    dds::pub::DataWriter<dds::core::xtypes::DynamicData> writerDeviceState =
-        rti::pub::find_datawriter_by_name<
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
-            participant,
-            _DEVICE_STATE_WRITER);
-
-    // Create one sample from the specified type and populate the id field.
-    // This sample will be used repeatedly in the loop below.
-    dds::core::xtypes::DynamicData deviceStateSample(deviceStateType);
-    
-    deviceStateSample.value<int32_t>("myDeviceId.resourceId", 2);
-    deviceStateSample.value<int32_t>("myDeviceId.id", 20);
-    MODULE::DeviceStateEnum foo = MODULE::DeviceStateEnum::UNINITIALIZED;
-    //deviceStateSample.value<int32_t>("state", foo);
-    //deviceStateSample.value<int32_t>("state", MODULE::DeviceStateEnum::UNINITIALIZED);
-
-    auto sampleNumber = 1;
-   
     while (!application::shutdown_requested)
     {
-        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-        auto duration = now.time_since_epoch();
-        auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-       // Modify the data to be written here
-        //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-        //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-        writerDeviceState.write(deviceStateSample);
-
-        std::cout
-	    << "Writing Sample: " << sampleNumber 
-        << "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
-        << ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
-        << std::endl;
-
-        // Send once every second
-        rti::util::sleep(dds::core::Duration(1));
-	    sampleNumber++;
+        //Device State Machine goes here;
     }
-    //cfg_dev_rd_thread.join();
+
     std::cout << "main thread shutting down" << std::endl;
 }
 } // namespace MODULE
+
 
 int main(int argc, char *argv[])
 {
