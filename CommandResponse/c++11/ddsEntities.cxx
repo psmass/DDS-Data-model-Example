@@ -88,8 +88,8 @@ namespace MODULE
                 if (sample.info().valid())
                 {
                     std::cout << sample.data() << std::endl;
-                    std::cout << "****" << std::endl;
-                    this->Handler(); // call the associated Handler (Virtual)
+                    // Do Generic Topic Read **Stuff** here
+                    this->Handler(); // call the toic specific Handler (Virtual)
                 }
                 else
                 {

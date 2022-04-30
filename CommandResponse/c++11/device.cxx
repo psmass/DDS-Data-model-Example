@@ -24,32 +24,17 @@
 namespace MODULE
 {
 
-// The idea below is to encapsulate the DDS entity names assocated with  TOPICS, PARTICIPANTS,
-// READERS, // and WRITERS as constants in with the system XML project (and include in the IDL
-// file). This allows running the IDL file through rtiCodeGen to create a headerfile with
-// constants defined as part of the data/system model and not replicated in the application.
-// It may be inefficient for only two Participants each with two topics, but for a larger data
-// model it is quite relavent to maintain consistant naming should the data/system model change.
-// 
-// The Reader (readers if we had more than one) run in their own thread as they wait for available data. 
-// The writer (writers if we had more than one) run in the mainline code, but should run in their own
-// thread if we are monitoring event conditions.
-const std::string _PARTICIPANT = MODULE::DEVICE1_PARTICIPANT;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
-const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
-
 const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
-const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_CONFIGURE_DEVICE;
 
 void run_device_application()
 {  
     // Create the participant
     dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
     dds::domain::DomainParticipant participant =
-        qos_provider->create_participant_from_config(_PARTICIPANT);
+        qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
-    ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER); 
-    Writer device_state_writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER);
+    ConfigDevRdr config_dev_reader(participant); 
 
     // Lookup the specific topic DeviceState as defined in the xml file.
     // This will be needed to create samples of the correct type

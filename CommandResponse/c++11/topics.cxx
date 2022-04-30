@@ -11,27 +11,28 @@
  */
 
 #include "topics.hpp"
+#include "CommandResp.hpp"
 
+const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
+const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
+const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
+const std::string _CONFIGURE_DEVICE_WRITER = MODULE::CONFIGURE_DEVICE_WRITER;
+
+const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
+const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_CONFIGURE_DEVICE;
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string reader_name,
-                bool filterOnId )
-                 : Reader(participant, topic_name, reader_name, filterOnId) {
+    DeviceStateRdr::DeviceStateRdr(dds::domain::DomainParticipant participant )
+                 : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
     };
 
     void DeviceStateRdr::Handler() {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
     }    
 
-    DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string writer_name,
-                int period, 
-                bool prefillDevId)
-                 : Writer(participant, topic_name, writer_name, period, prefillDevId) {
+    DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant)
+                 : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
     };
 
     void DeviceStateWtr::Handler() {
@@ -39,11 +40,8 @@ namespace MODULE
     }    
 
 
-    ConfigDevRdr::ConfigDevRdr(dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string reader_name,
-                bool filterOnId)
-                 : Reader(participant, topic_name, reader_name, filterOnId) {
+    ConfigDevRdr::ConfigDevRdr(dds::domain::DomainParticipant participant)
+                 : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
     };
 
     void ConfigDevRdr::Handler() {
@@ -51,12 +49,8 @@ namespace MODULE
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string writer_name,
-                int period, 
-                bool prefillDevId)
-                 : Writer(participant, topic_name, writer_name, period, prefillDevId) {
+    ConfigDevWtr::ConfigDevWtr(dds::domain::DomainParticipant participant)
+                 : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
     };
 
     void ConfigDevWtr::Handler() {
