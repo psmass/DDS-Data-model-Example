@@ -74,7 +74,7 @@ namespace MODULE
             sampleNumber++;
         }
 
-        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
+        // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
 
     }    
 
