@@ -40,14 +40,14 @@ namespace MODULE
             void WriterThread(dds::domain::DomainParticipant participant);
             virtual void Handler(
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData> topic_writer,
-                dds::core::xtypes::DynamicData toic_sample) 
+                dds::core::xtypes::DynamicData topic_sample) 
                 { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
 
             // Add API here for writerEventThread and a EventHandler to monitor and
             // take action on generic or specific writer topic events.
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
-            dds::core::xtypes::DynamicData * getMyDataInstance();
+            dds::core::xtypes::DynamicData * getMyDataSample();
             std::thread* getThreadHndl(void);
             void enable(void);
             void disable(void);
@@ -56,7 +56,7 @@ namespace MODULE
             std::string topicName;
             std::string writerName;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
-            dds::core::xtypes::DynamicData *mySample; 
+            dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
             int period;
             std::thread writerThread;

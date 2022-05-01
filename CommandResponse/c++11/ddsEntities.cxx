@@ -52,6 +52,10 @@ namespace MODULE
         // This sample will be used repeatedly in the loop below.
         dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
 
+        this->topicWriter=&thisTopicWriter; // These pointer stay around for the duration of
+        this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
+                                            // until thread exit.
+
         this->Handler(thisTopicWriter, thisTopicSample); // call the topic specific Handler (Virtual)
 
         std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
@@ -62,8 +66,8 @@ namespace MODULE
 
     dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() 
         { return topicWriter;};  // needed for Requests to get the response writer
-    dds::core::xtypes::DynamicData * Writer::getMyDataInstance()
-        { return mySample; };       
+    dds::core::xtypes::DynamicData * Writer::getMyDataSample()
+        { return topicSample; };       
     void Writer::enable()  { MODULE::Writer::enabled=true; };
     void Writer::disable() { MODULE::Writer::enabled=false; };
 

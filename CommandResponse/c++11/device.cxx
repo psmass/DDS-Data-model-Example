@@ -35,6 +35,8 @@ void run_device_application()
     ConfigDevRdr config_dev_reader(participant); 
     DeviceStateWtr device_state_writer(participant);
 
+    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+
     while (!application::shutdown_requested)
     {
         //Device State Machine goes here;
@@ -44,6 +46,7 @@ void run_device_application()
             // then set them equal.
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
         }
+        //device_state_writer.writeData(device_state_writer.getCurrentState());
         rti::util::sleep(dds::core::Duration(1));
     }
 

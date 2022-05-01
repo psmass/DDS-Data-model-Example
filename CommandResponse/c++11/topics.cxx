@@ -52,6 +52,9 @@ namespace MODULE
 
     void DeviceStateWtr::writeData(enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> * my_dev_state_writer = this->getMyWriter();
+        dds::core::xtypes::DynamicData * my_dev_state_sample = this->getMyDataSample();
+        my_dev_state_writer->write(*my_dev_state_sample);
 
     }
 
@@ -83,7 +86,7 @@ namespace MODULE
             // Modify the data to be written here
             //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
             //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            // deviceStateWriter.write(deviceStateSample);
+            //deviceStateWriter.write(deviceStateSample);
             
             //std::cout
             //<< "Writing Sample: " << sampleNumber 
@@ -93,7 +96,7 @@ namespace MODULE
 
             // Send once every second
             rti::util::sleep(dds::core::Duration(1));
-            // sampleNumber++;
+            //sampleNumber++;
         }
 
         // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
