@@ -33,7 +33,12 @@ namespace MODULE
 
     DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
+        // Update Static Topic Data parameters, set IDs for this participant here:
     };
+
+    void DeviceStateWtr::writeData(enum MODULE::DeviceStateEnum current_state) {
+        std::cout << "Writing DeviceState Sample " << std::endl; 
+    }
 
     void DeviceStateWtr::Handler(
         dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter, 
@@ -54,24 +59,26 @@ namespace MODULE
     
         while (!application::shutdown_requested)
         {
+            // this topic is not periodic, so we'll only use this thread to monitor writer events
+            // once we figure out the API more Modern C++
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
             auto duration = now.time_since_epoch();
             auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
-        // Modify the data to be written here
+            // Modify the data to be written here
             //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
             //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            deviceStateWriter.write(deviceStateSample);
-
-            std::cout
-            << "Writing Sample: " << sampleNumber 
-            << "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
-            << ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
-            << std::endl;
+            // deviceStateWriter.write(deviceStateSample);
+            
+            //std::cout
+            //<< "Writing Sample: " << sampleNumber 
+            //<< "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
+            //<< ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
+            //<< std::endl;
 
             // Send once every second
             rti::util::sleep(dds::core::Duration(1));
-            sampleNumber++;
+            // sampleNumber++;
         }
 
         // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 

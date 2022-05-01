@@ -37,7 +37,7 @@ void run_controller_application()
 
     while (!application::shutdown_requested)
         {
-            //Device State Machine goes here;
+            //Controller State Machine goes here;
             rti::util::sleep(dds::core::Duration(1));
         }
 

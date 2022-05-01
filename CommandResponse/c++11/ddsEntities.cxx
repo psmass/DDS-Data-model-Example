@@ -52,7 +52,7 @@ namespace MODULE
         // This sample will be used repeatedly in the loop below.
         dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
 
-        this->Handler(thisTopicWriter, thisTopicSample); // call the toic specific Handler (Virtual)
+        this->Handler(thisTopicWriter, thisTopicSample); // call the topic specific Handler (Virtual)
 
         std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
 

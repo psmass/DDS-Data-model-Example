@@ -38,11 +38,12 @@ namespace MODULE
             ~Writer(void) {}; 
 
             void WriterThread(dds::domain::DomainParticipant participant);
-            virtual void Handler(dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter,
-                dds::core::xtypes::DynamicData deviceStateSample) 
+            virtual void Handler(
+                dds::pub::DataWriter<dds::core::xtypes::DynamicData> topic_writer,
+                dds::core::xtypes::DynamicData toic_sample) 
                 { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
 
-            // Add API for here for writerEventThread and a EventHandler to monitor and
+            // Add API here for writerEventThread and a EventHandler to monitor and
             // take action on generic or specific writer topic events.
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer

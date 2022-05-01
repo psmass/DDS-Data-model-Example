@@ -38,6 +38,12 @@ void run_device_application()
     while (!application::shutdown_requested)
     {
         //Device State Machine goes here;
+        // In this case, we simply publish current deviceState upon change.
+        if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
+            device_state_writer.writeData(device_state_writer.getCurrentState());
+            // then set them equal.
+            device_state_writer.setPrevState(device_state_writer.getCurrentState());
+        }
         rti::util::sleep(dds::core::Duration(1));
     }
 
