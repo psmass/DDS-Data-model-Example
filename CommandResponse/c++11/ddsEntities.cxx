@@ -113,6 +113,9 @@ namespace MODULE
             waitset.wait(dds::core::Duration(4));
             // Take all samples
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
+            this->Handler(&samples); // call the toic specific Handler (Virtual)
+            
+            /**
             for (const auto &sample : samples)
             {
                 if (sample.info().valid())
@@ -120,13 +123,14 @@ namespace MODULE
                     std::cout << "Read sample for topic: " << topicName << std::endl;
                     std::cout << sample.data() << std::endl;
                     // Do Generic Topic Read **Stuff** here
-                    this->Handler(); // call the toic specific Handler (Virtual)
+                    this->Handler(&samples); // call the toic specific Handler (Virtual)
                 }
                 else
                 {
                     std::cout << "  Received metadata" << std::endl;
                 }
             }
+            **/
 
             //std::cout << "Runing thread for Reader " << this->readerName << std::endl;
         }

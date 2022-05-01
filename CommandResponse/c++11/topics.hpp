@@ -49,7 +49,7 @@ class DeviceStateRdr : public Reader {
         DeviceStateRdr(dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
-        void Handler(void);
+        void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
 
     private:
 };
@@ -88,7 +88,7 @@ class ConfigDevRdr : public Reader {
         ConfigDevRdr(dds::domain::DomainParticipant participant);
         ~ConfigDevRdr(void){};
 
-        void Handler(void);
+        void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
 
     private:
 };

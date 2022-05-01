@@ -27,8 +27,22 @@ namespace MODULE
                  : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
     };
 
-    void DeviceStateRdr::Handler() {
+    void DeviceStateRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData>  * samples) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
+        for (const auto sample : *samples)
+            {
+                if (sample.info().valid())
+                {
+                    std::cout << "Read sample for topic: " << topicName << std::endl;
+                    std::cout << sample.data() << std::endl;
+                    // Do Generic Topic Read **Stuff** here
+                
+                }
+                else
+                {
+                    std::cout << "  Received metadata" << std::endl;
+                }
+            }
     }    
 
     DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant)
@@ -37,7 +51,8 @@ namespace MODULE
     };
 
     void DeviceStateWtr::writeData(enum MODULE::DeviceStateEnum current_state) {
-        std::cout << "Writing DeviceState Sample " << std::endl; 
+        std::cout << "Writing DeviceState Sample " << std::endl;
+
     }
 
     void DeviceStateWtr::Handler(
@@ -88,10 +103,27 @@ namespace MODULE
 
     ConfigDevRdr::ConfigDevRdr(dds::domain::DomainParticipant participant)
                  : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
+
     };
 
-    void ConfigDevRdr::Handler() {
+    void ConfigDevRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * samples) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
+         // if we get a CONFIGURE_DEVICE_TOPIC then set the devvice current state = to the sent state
+        for (const auto sample : *samples)
+        {
+            if (sample.info().valid())
+            {
+                std::cout << "Read sample for topic: " << topicName << std::endl;
+                std::cout << sample.data() << std::endl;
+                // Do Generic Topic Read **Stuff** here
+            
+            }
+            else
+            {
+                std::cout << "  Received metadata" << std::endl;
+            }
+        }
+
     }  
 
 
