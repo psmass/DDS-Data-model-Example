@@ -62,14 +62,6 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
-    std::thread* Writer::getThreadHndl(void) { return &writerThread; };
-
-    dds::pub::DataWriter<dds::core::xtypes::DynamicData>* Writer::getMyWriter() 
-        { return topicWriter;};  // needed for Requests to get the response writer
-    dds::core::xtypes::DynamicData * Writer::getMyDataSample()
-        { return topicSample; };       
-    void Writer::enable()  { MODULE::Writer::enabled=true; };
-    void Writer::disable() { MODULE::Writer::enabled=false; };
 
     Reader::Reader( 
         dds::domain::DomainParticipant participant, 

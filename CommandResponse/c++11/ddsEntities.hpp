@@ -43,14 +43,13 @@ namespace MODULE
                 dds::core::xtypes::DynamicData topic_sample) 
                 { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
 
-            // Add API here for writerEventThread and a EventHandler to monitor and
-            // take action on generic or specific writer topic events.
-
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter();  // needed for Requests to get the response writer
-            dds::core::xtypes::DynamicData * getMyDataSample();
-            std::thread* getThreadHndl(void);
-            void enable(void);
-            void disable(void);
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
+                 {return topicWriter;};  // needed for Requests to get the response writer
+            dds::core::xtypes::DynamicData * getMyDataSample(void)
+                {return topicSample;};
+            std::thread* getThreadHndl(void) { return &writerThread; };
+            void enable(void) { MODULE::Writer::enabled=true; };
+            void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
             std::string topicName;

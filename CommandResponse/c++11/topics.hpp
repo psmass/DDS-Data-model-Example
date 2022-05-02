@@ -106,7 +106,7 @@ class ConfigDevWtr : public Writer {
         // changing conditions require it). The writeData member function
         // is provided to allow the main loop of the controller reliably publish a configuration
         // change request to the evice.
-        void writeData() {}; 
+        void writeData(void) {}; 
 
     private:
 };

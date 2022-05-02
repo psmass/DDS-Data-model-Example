@@ -52,10 +52,7 @@ namespace MODULE
 
     void DeviceStateWtr::writeData(enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> * my_dev_state_writer = this->getMyWriter();
-        dds::core::xtypes::DynamicData * my_dev_state_sample = this->getMyDataSample();
-        my_dev_state_writer->write(*my_dev_state_sample);
-
+        this->getMyWriter()->write(*this->getMyDataSample());
     }
 
     void DeviceStateWtr::Handler(
