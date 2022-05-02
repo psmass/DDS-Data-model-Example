@@ -41,7 +41,7 @@ namespace MODULE
             virtual void Handler(
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData> topic_writer,
                 dds::core::xtypes::DynamicData topic_sample) 
-                { std::cout << "*** GENERIC WRITER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
+                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
@@ -71,8 +71,9 @@ namespace MODULE
 
             void ReaderThread(dds::domain::DomainParticipant participant);
             virtual void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample)
-                { std::cout << "*** GENERIC READER HNDLR " << std::endl;}; // implemented by the intantiated derived topic
-            std::thread* getThreadHndl(void);
+                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+
+            std::thread * getThreadHndl(void) { return &readerThread; };
 
         protected:
             std::string topicName;

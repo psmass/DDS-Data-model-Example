@@ -35,7 +35,7 @@ namespace MODULE
                 {
                     std::cout << "Read sample for topic: " << topicName << std::endl;
                     std::cout << sample.data() << std::endl;
-                    // Do Generic Topic Read **Stuff** here
+                    // Do specific Topic Read **Stuff** here
                 
                 }
                 else
@@ -115,12 +115,12 @@ namespace MODULE
             {
                 std::cout << "Read sample for topic: " << topicName << std::endl;
                 std::cout << sample.data() << std::endl;
-                // Do Generic Topic Read **Stuff** here
+                // Do specific Topic Read **Stuff** here
             
             }
             else
             {
-                std::cout << "  Received metadata" << std::endl;
+                std::cout << "Received metadata" << std::endl;
             }
         }
 

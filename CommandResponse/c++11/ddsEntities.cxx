@@ -21,7 +21,7 @@ namespace MODULE
         const std::string writer_name)
     {
         // by setting period non-zero the topic will be a periodic topic
-        std::cout << "Writer Topic" << std::endl;
+        std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         topicName = topic_name;
         writerName = writer_name;
         writerThread = std::thread(&Writer::WriterThread, this, participant);
@@ -31,7 +31,7 @@ namespace MODULE
     void Writer::WriterThread(dds::domain::DomainParticipant participant) {
         // Lookup the specific topic DeviceState as defined in the xml file.
         // This will be needed to create samples of the correct type
-        std::cout <<  " Writer Thread " << this->writerName << " running " << std::endl;
+        std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
         dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
 
@@ -58,7 +58,7 @@ namespace MODULE
 
         this->Handler(thisTopicWriter, thisTopicSample); // call the topic specific Handler (Virtual)
 
-        std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
+        std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
 
     } // end Writer::WriterThread
 
@@ -79,7 +79,7 @@ namespace MODULE
 
     void Reader::ReaderThread(dds::domain::DomainParticipant participant) {
 
-        std::cout <<  " ReaderThread " << this->readerName << " running " << std::endl;
+        std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
 
         // Find the DataReader defined in the xml by using the participant and the
@@ -131,11 +131,8 @@ namespace MODULE
             //std::cout << "Runing thread for Reader " << this->readerName << std::endl;
         }
         
-        std::cout << this->topicName << " Reader thread shutting down" << std::endl;   
+        std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
     }
-
-    std::thread* Reader::getThreadHndl(void) { return &readerThread; };
-
 
 
 } // NAMESPACE MODULE
