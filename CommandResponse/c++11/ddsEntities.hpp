@@ -38,9 +38,7 @@ namespace MODULE
             ~Writer(void) {}; 
 
             void WriterThread(dds::domain::DomainParticipant participant);
-            virtual void Handler(
-                dds::pub::DataWriter<dds::core::xtypes::DynamicData> topic_writer,
-                dds::core::xtypes::DynamicData topic_sample) 
+            virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)

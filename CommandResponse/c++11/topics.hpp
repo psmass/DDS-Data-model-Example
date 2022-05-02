@@ -51,7 +51,22 @@ class DeviceStateRdr : public Reader {
 
         void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
 
+        enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
+        enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
+        void setPrevState(enum MODULE::DeviceStateEnum new_state){
+            previousState=new_state; 
+        }
+        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
+            currentState=new_state; 
+        }
+        
     private:
+        // Controller will track the devices state as well, not if there were more than one
+        // device we should keep an array of state per deviceID
+        // initialize the same, but something other than UNITITIALIZED as that is the first
+        // state sent when a devie announces itself.
+        enum MODULE::DeviceStateEnum previousState {MODULE::DeviceStateEnum::ERROR}; 
+        enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::ERROR}; 
 };
 
 class DeviceStateWtr : public Writer {
@@ -59,20 +74,24 @@ class DeviceStateWtr : public Writer {
         DeviceStateWtr(dds::domain::DomainParticipant participant);
         ~DeviceStateWtr(void){};
 
-        void Handler(
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> deviceStateWriter,
-            dds::core::xtypes::DynamicData deviceStateSample);
+        void Handler(void);
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
         // state and to durably publish the updated and latest state.
-        void writeData(enum MODULE::DeviceStateEnum current_state); 
+        void writeData(const enum MODULE::DeviceStateEnum current_state); 
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
         void setPrevState(enum MODULE::DeviceStateEnum new_state){
             previousState=new_state; 
         }
+        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
+            if (new_state == MODULE::DeviceStateEnum::ON)
+                std::cout << "Controller set Device state on" << std::endl;
 
+            currentState=new_state; 
+        }
+        
     private:
         // Save previous state since we send a state update any time there is a difference
         // initialize current as UNITIALIZED and ensure previous state is something different
@@ -89,8 +108,13 @@ class ConfigDevRdr : public Reader {
         ~ConfigDevRdr(void){};
 
         void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
+        void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
+            { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 
     private:
+        // will need the associated devStateWtr when receive a new config command and have
+        // to change the state of the device
+        DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
 };
 
 class ConfigDevWtr : public Writer {
@@ -98,15 +122,13 @@ class ConfigDevWtr : public Writer {
         ConfigDevWtr(dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};
 
-        void Handler(
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> configDevWriter,
-            dds::core::xtypes::DynamicData configDevSample);
+        void Handler(void);
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
         // is provided to allow the main loop of the controller reliably publish a configuration
         // change request to the evice.
-        void writeData(void) {}; 
+        void writeData(enum MODULE::DeviceStateEnum configReq); 
 
     private:
 };

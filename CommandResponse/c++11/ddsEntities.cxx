@@ -56,7 +56,7 @@ namespace MODULE
         this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
                                             // until thread exit.
 
-        this->Handler(thisTopicWriter, thisTopicSample); // call the topic specific Handler (Virtual)
+        this->Handler(); // call the topic specific Handler (Virtual)
 
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
 
@@ -109,7 +109,7 @@ namespace MODULE
             waitset.wait(dds::core::Duration(4));
             // Take all samples
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
-            this->Handler(&samples); // call the toic specific Handler (Virtual)
+            this->Handler(&samples); // call the topic specific Handler (Virtual)
             
             /**
             for (const auto &sample : samples)

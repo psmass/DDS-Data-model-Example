@@ -35,10 +35,17 @@ void run_controller_application()
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
 
+    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+
     while (!application::shutdown_requested)
         {
-            //Controller State Machine goes here;
-            rti::util::sleep(dds::core::Duration(1));
+        //Controller State Machine goes here;
+        // If a devices device_state is UNITIALIZED then turn it on
+        if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
+            std::cout << "controller main loop write" << std::endl;
+            config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
+            }            
+        rti::util::sleep(dds::core::Duration(1));
         }
 
     config_dev_writer.Writer::getThreadHndl()->join();
