@@ -28,7 +28,6 @@ namespace MODULE
 {
     const std::string QOS_FILE = "../../model/CommandProject.xml";
 
-
     class Writer {
         public:
             Writer(

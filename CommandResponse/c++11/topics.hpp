@@ -61,7 +61,7 @@ class DeviceStateRdr : public Reader {
         }
         
     private:
-        // Controller will track the devices state as well, not if there were more than one
+        // Controller will track the devices state as well, note if there were more than one
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
         // state sent when a devie announces itself.

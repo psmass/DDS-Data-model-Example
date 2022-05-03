@@ -111,24 +111,6 @@ namespace MODULE
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
             this->Handler(&samples); // call the topic specific Handler (Virtual)
             
-            /**
-            for (const auto &sample : samples)
-            {
-                if (sample.info().valid())
-                {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
-                    // Do Generic Topic Read **Stuff** here
-                    this->Handler(&samples); // call the toic specific Handler (Virtual)
-                }
-                else
-                {
-                    std::cout << "  Received metadata" << std::endl;
-                }
-            }
-            **/
-
-            //std::cout << "Runing thread for Reader " << this->readerName << std::endl;
         }
         
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   

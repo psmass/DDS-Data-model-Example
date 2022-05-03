@@ -40,7 +40,7 @@ namespace MODULE
                     dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
                     setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
 
-                    std::cout << "Set Device Current state to: ";
+                    std::cout << "Controller Tracking Device Current state to: ";
                     switch(getCurrentState()) {
                         case MODULE::DeviceStateEnum::UNINITIALIZED:
                             std::cout << "UNITIALIZED";
