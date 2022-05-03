@@ -45,4 +45,10 @@ target_link_libraries(Subscriber
 	RTIConnextDDS::cpp2_api
 )
 
+# The COMPILE_FLAGS property sets additional compiler flags used to build sources within the target.
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+    set_target_properties(Publisher PROPERTIES COMPILE_FLAGS -std=c++11)
+    set_target_properties(Subscriber PROPERTIES COMPILE_FLAGS -std=c++11)
+endif()
+
 
