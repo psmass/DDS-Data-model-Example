@@ -87,7 +87,7 @@ class DeviceStateWtr : public Writer {
         }
         void setCurrentState(enum MODULE::DeviceStateEnum new_state){
             if (new_state == MODULE::DeviceStateEnum::ON)
-                std::cout << "Controller set Device state on" << std::endl;
+                std::cout << "Controller set Device state ON" << std::endl;
 
             currentState=new_state; 
         }

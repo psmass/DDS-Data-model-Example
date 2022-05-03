@@ -42,7 +42,6 @@ void run_controller_application()
         //Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on
         if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
-            std::cout << "controller main loop write" << std::endl;
             config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
             }            
         rti::util::sleep(dds::core::Duration(1));

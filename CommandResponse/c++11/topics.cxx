@@ -35,12 +35,29 @@ namespace MODULE
                 {
                     std::cout << "Read sample for topic: " << topicName << std::endl;
                     std::cout << sample.data() << std::endl;
-                    // Do specific Topic Read **Stuff** here
-                    // Hardwired - change to read topic field
-                    if (getCurrentState() == MODULE::DeviceStateEnum::ERROR)
-                        setCurrentState(MODULE::DeviceStateEnum::UNINITIALIZED); 
-                    else
-                        setCurrentState(MODULE::DeviceStateEnum::ON); 
+
+                    // map the sample to the specific dynamic data type
+                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
+                    setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
+
+                    std::cout << "Set Device Current state to: ";
+                    switch(getCurrentState()) {
+                        case MODULE::DeviceStateEnum::UNINITIALIZED:
+                            std::cout << "UNITIALIZED";
+                            break;
+                        case MODULE::DeviceStateEnum::OFF:
+                            std::cout << "OFF";
+                            break;
+                        case MODULE::DeviceStateEnum::ON:
+                            std::cout << "ON";
+                            break;
+                        case MODULE::DeviceStateEnum::ERROR:
+                            std::cout << "ERROR";
+                            break;
+                        default: std::cout << "OOPS - not a valid value";
+                    }
+                    std::cout << std::endl;
+
                 }
                 else
                 {
@@ -127,7 +144,12 @@ namespace MODULE
                 // read stateReq field and set current state to it. If it is different
                 // it will cause a change in state detected in the device.cxx "state machine"
                 // causing the new state to be written
-                devicesDevStateWtrPtr->setCurrentState(MODULE::DeviceStateEnum::ON); // hard coded for now
+
+                // map the sample to the specific dynamic data type
+                dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
+
+                devicesDevStateWtrPtr->setCurrentState(
+                    (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
                 
             }
             else
@@ -141,7 +163,7 @@ namespace MODULE
 
     ConfigDevWtr::ConfigDevWtr(dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
-          std::cout << "Config Device Writer C'tor" << std::endl;             
+          // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
     void ConfigDevWtr::Handler() {
@@ -181,8 +203,11 @@ namespace MODULE
         }
     }
 
+
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
-        std::cout << "Writing Config Request to device" << std::endl; 
+        std::cout << "Writing Config Request to device " << std::endl; 
+
+        Writer::getMyDataSample()->value<int32_t>("deviceConfig.stateReq", (int32_t)configReq);
         Writer::getMyWriter()->write(*Writer::getMyDataSample());
 
     }   
