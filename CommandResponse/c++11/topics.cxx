@@ -12,6 +12,10 @@
 
 #include "topics.hpp"
 #include "CommandResp.hpp"
+#include <dds/dds.hpp>
+#include <dds/topic/ContentFilteredTopic.hpp>
+#include <dds/topic/ddstopic.hpp>
+#include <dds/sub/ddssub.hpp>
 
 const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
@@ -23,7 +27,7 @@ const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + M
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(dds::domain::DomainParticipant participant )
+    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
                  : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
     };
 
@@ -66,7 +70,7 @@ namespace MODULE
             }
     }    
 
-    DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant)
+    DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
@@ -126,8 +130,28 @@ namespace MODULE
     }    
 
 
-    ConfigDevRdr::ConfigDevRdr(dds::domain::DomainParticipant participant)
+    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
                  : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
+        // std::cout << "Config Dev Reader C'tor " << std::endl; 
+        // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
+        // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
+ 
+        //rti::topic::CustomFilter<MODULE::ConfigureDevice> configDevReaderCft=rti::topic::find_content_filter (participant, filter_name);
+        /*
+        // Find the Topic
+        dds::topic::Topic<dds::topic::AnyTopic> topic = dds::topic::find(participant, _TOPIC_CONFIGURE_DEVICE);
+        // Create the parameter list
+        std::vector<std::string> cft_parameters(1);
+        cft_parameters[0] = "20"; // myDeviceID number - redefine as a const at the start of the program vs. hardcode
+
+        // Create the ContentFilteredTopic
+        dds::topic::ContentFilteredTopic<ExCmdRsp::ConfigureDevice> cft(
+            topic, // related topic
+            "MyFilter", // local name for the CFT
+            dds::topic::Filter(         // filter (constructed in-line in this example)
+                "targetDeviceId.id=%0", // expression
+                cft_parameters));       // parameter vector
+        */
 
     };
 
@@ -161,7 +185,7 @@ namespace MODULE
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(dds::domain::DomainParticipant participant)
+    ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };

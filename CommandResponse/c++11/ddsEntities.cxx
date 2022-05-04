@@ -24,7 +24,6 @@ namespace MODULE
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         topicName = topic_name;
         writerName = writer_name;
-        writerThread = std::thread(&Writer::WriterThread, this, participant);
 
     }
 
@@ -62,25 +61,25 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
+    void Writer::RunThread(dds::domain::DomainParticipant participant){
+        writerThread = std::thread(&Writer::WriterThread, this, participant);
+    }
 
     Reader::Reader( 
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
-        const std::string reader_name)
-    {
+        const std::string reader_name) {
+
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
         topicName = topic_name;
         readerName = reader_name;
-    
-        // spin up thread for this reader
-        readerThread = std::thread(&Reader::ReaderThread, this, participant); 
+ 
     }
 
 
     void Reader::ReaderThread(dds::domain::DomainParticipant participant) {
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
-
 
         // Find the DataReader defined in the xml by using the participant and the
         // subscriber::reader pair as the datareader name.
@@ -99,23 +98,23 @@ namespace MODULE
             dds::sub::status::DataState::any()
          );
 
-
         waitset += read_condition;
 
-        while (!application::shutdown_requested)
-        {
+        while (!application::shutdown_requested) {
             // Wait 4 seconds for data 
             //waitset.dispatch(dds::core::Duration(4));
             waitset.wait(dds::core::Duration(4));
             // Take all samples
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
-            this->Handler(&samples); // call the topic specific Handler (Virtual)
-            
+            this->Handler(&samples); // call the topic specific Handler (Virtual) 
         }
         
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
     }
 
+   void Reader::RunThread(dds::domain::DomainParticipant participant){
+        readerThread = std::thread(&Reader::ReaderThread, this, participant);
+    }
 
 } // NAMESPACE MODULE
 

@@ -17,6 +17,9 @@
 #include "ddsEntities.hpp"
 #include "CommandResp.hpp"
 
+
+const std::string _TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
+
 namespace MODULE
 {
 
@@ -46,7 +49,7 @@ namespace MODULE
 
 class DeviceStateRdr : public Reader {
     public:
-        DeviceStateRdr(dds::domain::DomainParticipant participant);
+        DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
         void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
@@ -71,7 +74,7 @@ class DeviceStateRdr : public Reader {
 
 class DeviceStateWtr : public Writer {
     public:
-        DeviceStateWtr(dds::domain::DomainParticipant participant);
+        DeviceStateWtr(const dds::domain::DomainParticipant participant);
         ~DeviceStateWtr(void){};
 
         void Handler(void);
@@ -104,7 +107,7 @@ class DeviceStateWtr : public Writer {
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(dds::domain::DomainParticipant participant);
+        ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
         ~ConfigDevRdr(void){};
 
         void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
@@ -119,7 +122,7 @@ class ConfigDevRdr : public Reader {
 
 class ConfigDevWtr : public Writer {
     public:
-        ConfigDevWtr(dds::domain::DomainParticipant participant);
+        ConfigDevWtr(const dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};
 
         void Handler(void);

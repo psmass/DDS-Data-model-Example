@@ -34,6 +34,8 @@ void run_controller_application()
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
+    config_dev_writer.RunThread(participant);
+    device_state_reader.RunThread(participant);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 

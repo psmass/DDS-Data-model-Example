@@ -37,6 +37,8 @@ namespace MODULE
             ~Writer(void) {}; 
 
             void WriterThread(dds::domain::DomainParticipant participant);
+            void RunThread(dds::domain::DomainParticipant participant);
+
             virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
@@ -67,6 +69,8 @@ namespace MODULE
             ~Reader(void){};
 
             void ReaderThread(dds::domain::DomainParticipant participant);
+            void RunThread(dds::domain::DomainParticipant participant);
+
             virtual void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
