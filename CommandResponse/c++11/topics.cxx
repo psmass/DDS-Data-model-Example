@@ -12,6 +12,10 @@
 
 #include "topics.hpp"
 #include "CommandResp.hpp"
+#include <dds/dds.hpp>
+#include <dds/topic/ContentFilteredTopic.hpp>
+#include <dds/topic/ddstopic.hpp>
+#include <dds/sub/ddssub.hpp>
 
 const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
@@ -23,50 +27,34 @@ const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + M
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(dds::domain::DomainParticipant participant )
+    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
                  : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
     };
 
-    void DeviceStateRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData>  * samples) {
+    void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
-        for (const auto sample : *samples)
-            {
-                if (sample.info().valid())
-                {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
+       
+        setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
 
-                    // map the sample to the specific dynamic data type
-                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-                    setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
-
-                    std::cout << "Controller Tracking Device Current state to: ";
-                    switch(getCurrentState()) {
-                        case MODULE::DeviceStateEnum::UNINITIALIZED:
-                            std::cout << "UNITIALIZED";
-                            break;
-                        case MODULE::DeviceStateEnum::OFF:
-                            std::cout << "OFF";
-                            break;
-                        case MODULE::DeviceStateEnum::ON:
-                            std::cout << "ON";
-                            break;
-                        case MODULE::DeviceStateEnum::ERROR:
-                            std::cout << "ERROR";
-                            break;
-                        default: std::cout << "OOPS - not a valid value";
-                    }
-                    std::cout << std::endl;
-
-                }
-                else
-                {
-                    std::cout << "  Received metadata" << std::endl;
-                }
-            }
+        std::cout << "Controller Tracking Device Current state to: ";
+        switch(getCurrentState()) {
+            case MODULE::DeviceStateEnum::UNINITIALIZED:
+                std::cout << "UNITIALIZED";
+                break;
+            case MODULE::DeviceStateEnum::OFF:
+                std::cout << "OFF";
+                break;
+            case MODULE::DeviceStateEnum::ON:
+                std::cout << "ON";
+                break;
+            case MODULE::DeviceStateEnum::ERROR:
+                std::cout << "ERROR";
+                break;
+            default: std::cout << "OOPS - not a valid value";
+        }
     }    
 
-    DeviceStateWtr::DeviceStateWtr(dds::domain::DomainParticipant participant)
+    DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
@@ -126,42 +114,41 @@ namespace MODULE
     }    
 
 
-    ConfigDevRdr::ConfigDevRdr(dds::domain::DomainParticipant participant)
+    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
                  : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
+        // std::cout << "Config Dev Reader C'tor " << std::endl; 
+        // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
+        // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
+ 
+        //rti::topic::CustomFilter<MODULE::ConfigureDevice> configDevReaderCft=rti::topic::find_content_filter (participant, filter_name);
+        /*
+        // Find the Topic
+        dds::topic::Topic<dds::topic::AnyTopic> topic = dds::topic::find(participant, _TOPIC_CONFIGURE_DEVICE);
+        // Create the parameter list
+        std::vector<std::string> cft_parameters(1);
+        cft_parameters[0] = "20"; // myDeviceID number - redefine as a const at the start of the program vs. hardcode
+
+        // Create the ContentFilteredTopic
+        dds::topic::ContentFilteredTopic<ExCmdRsp::ConfigureDevice> cft(
+            topic, // related topic
+            "MyFilter", // local name for the CFT
+            dds::topic::Filter(         // filter (constructed in-line in this example)
+                "targetDeviceId.id=%0", // expression
+                cft_parameters));       // parameter vector
+        */
 
     };
 
-    void ConfigDevRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * samples) {
+    void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
-         // if we get a CONFIGURE_DEVICE_TOPIC then set the devvice current state = to the sent state
-        for (const auto sample : *samples)
-        {
-            if (sample.info().valid())
-            {
-                std::cout << "Read sample for topic: " << topicName << std::endl;
-                std::cout << sample.data() << std::endl;
-                // Do specific Topic Read **Stuff** here
-                // read stateReq field and set current state to it. If it is different
-                // it will cause a change in state detected in the device.cxx "state machine"
-                // causing the new state to be written
-
-                // map the sample to the specific dynamic data type
-                dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-
+         // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
                 devicesDevStateWtrPtr->setCurrentState(
                     (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
-                
-            }
-            else
-            {
-                std::cout << "Received metadata" << std::endl;
-            }
-        }
 
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(dds::domain::DomainParticipant participant)
+    ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
                  : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };

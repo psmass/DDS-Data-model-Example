@@ -34,6 +34,8 @@ void run_controller_application()
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
+    config_dev_writer.RunThread(participant);
+    device_state_reader.RunThread(participant);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
@@ -43,7 +45,8 @@ void run_controller_application()
         // If a devices device_state is UNITIALIZED then turn it on
         if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
             config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
-            }            
+            }
+        std::cout << "." << std::flush;                 
         rti::util::sleep(dds::core::Duration(1));
         }
 
