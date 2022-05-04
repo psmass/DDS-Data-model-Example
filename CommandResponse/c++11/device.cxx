@@ -51,6 +51,7 @@ void run_device_application()
             // then set them equal.
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
         }
+        std::cout << "." << std::flush;        
         //device_state_writer.writeData(device_state_writer.getCurrentState());
         rti::util::sleep(dds::core::Duration(1));
     }

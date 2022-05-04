@@ -52,7 +52,7 @@ class DeviceStateRdr : public Reader {
         DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
-        void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
+        void Handler(dds::core::xtypes::DynamicData& data);
 
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
@@ -110,7 +110,7 @@ class ConfigDevRdr : public Reader {
         ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
         ~ConfigDevRdr(void){};
 
-        void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample);
+        void Handler(dds::core::xtypes::DynamicData& data);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 

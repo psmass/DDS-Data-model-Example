@@ -71,7 +71,7 @@ namespace MODULE
             void ReaderThread(dds::domain::DomainParticipant participant);
             void RunThread(dds::domain::DomainParticipant participant);
 
-            virtual void Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * sample)
+            virtual void Handler(dds::core::xtypes::DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             std::thread * getThreadHndl(void) { return &readerThread; };

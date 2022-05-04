@@ -31,43 +31,27 @@ namespace MODULE
                  : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
     };
 
-    void DeviceStateRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData>  * samples) {
+    void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
-        for (const auto sample : *samples)
-            {
-                if (sample.info().valid())
-                {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
+       
+        setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
 
-                    // map the sample to the specific dynamic data type
-                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-                    setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
-
-                    std::cout << "Controller Tracking Device Current state to: ";
-                    switch(getCurrentState()) {
-                        case MODULE::DeviceStateEnum::UNINITIALIZED:
-                            std::cout << "UNITIALIZED";
-                            break;
-                        case MODULE::DeviceStateEnum::OFF:
-                            std::cout << "OFF";
-                            break;
-                        case MODULE::DeviceStateEnum::ON:
-                            std::cout << "ON";
-                            break;
-                        case MODULE::DeviceStateEnum::ERROR:
-                            std::cout << "ERROR";
-                            break;
-                        default: std::cout << "OOPS - not a valid value";
-                    }
-                    std::cout << std::endl;
-
-                }
-                else
-                {
-                    std::cout << "  Received metadata" << std::endl;
-                }
-            }
+        std::cout << "Controller Tracking Device Current state to: ";
+        switch(getCurrentState()) {
+            case MODULE::DeviceStateEnum::UNINITIALIZED:
+                std::cout << "UNITIALIZED";
+                break;
+            case MODULE::DeviceStateEnum::OFF:
+                std::cout << "OFF";
+                break;
+            case MODULE::DeviceStateEnum::ON:
+                std::cout << "ON";
+                break;
+            case MODULE::DeviceStateEnum::ERROR:
+                std::cout << "ERROR";
+                break;
+            default: std::cout << "OOPS - not a valid value";
+        }
     }    
 
     DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
@@ -155,32 +139,11 @@ namespace MODULE
 
     };
 
-    void ConfigDevRdr::Handler(dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> * samples) {
+    void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
-         // if we get a CONFIGURE_DEVICE_TOPIC then set the devvice current state = to the sent state
-        for (const auto sample : *samples)
-        {
-            if (sample.info().valid())
-            {
-                std::cout << "Read sample for topic: " << topicName << std::endl;
-                std::cout << sample.data() << std::endl;
-                // Do specific Topic Read **Stuff** here
-                // read stateReq field and set current state to it. If it is different
-                // it will cause a change in state detected in the device.cxx "state machine"
-                // causing the new state to be written
-
-                // map the sample to the specific dynamic data type
-                dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-
+         // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
                 devicesDevStateWtrPtr->setCurrentState(
                     (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
-                
-            }
-            else
-            {
-                std::cout << "Received metadata" << std::endl;
-            }
-        }
 
     }  
 

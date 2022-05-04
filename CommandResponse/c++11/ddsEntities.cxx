@@ -106,7 +106,26 @@ namespace MODULE
             waitset.wait(dds::core::Duration(4));
             // Take all samples
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
-            this->Handler(&samples); // call the topic specific Handler (Virtual) 
+
+            for (const auto sample : samples)
+            {
+                if (sample.info().valid())
+                {
+                    std::cout << "Read sample for topic: " << topicName << std::endl;
+                    std::cout << sample.data() << std::endl;
+
+                    // map the sample to the specific dynamic data type
+                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
+                    this->Handler(data); // call the topic specific Handler (Virtual) 
+
+                    std::cout << std::endl;
+
+                }
+                else
+                {
+                    std::cout << "  Received metadata" << std::endl;
+                }
+            }
         }
         
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
