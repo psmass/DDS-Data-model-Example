@@ -1,0 +1,125 @@
+//@copy // Common Data Types
+module Common {
+  /* constants */
+  const uint16 MIN_LEN = 100;
+
+  const uint16 MED_LEN = 200;
+
+  const uint16 MAX_LEN = 500;
+
+  typedef string<Common::MAX_LEN> LargeString_t;
+
+  typedef string<Common::MED_LEN> MediumString_t;
+
+  typedef string<Common::MIN_LEN> ShortString_t;
+
+  typedef Common::ShortString_t Descriptor_t;
+
+  @default(0.0)
+  typedef float Percentage_t;
+
+  @default(0.0)
+  typedef float PressureInPascal_t;
+
+  @default(0.0)
+  typedef float TemperatureInDegreesKelvin_t;
+
+  @min(0.0)
+  typedef float ConcentrationInMolesPerCubicMetre_t;
+
+  //@copy // Identifies a resource
+  @nested
+  struct IdentifierType_t {
+    uint32 resourceId;
+    int32 id;
+  };
+
+  typedef sequence<Common::IdentifierType_t, Common::MAX_LEN> IdentifierList_t;
+
+  @extensibility(APPENDABLE)
+  enum ResponseCode_t {
+    @default_literal
+    Invalid,
+    Success,
+    Pending,
+    Error
+  };
+
+  //@copy // Time
+  @nested
+  struct DateTime_t {
+    int64 secs;
+    int64 nsecs;
+  };
+
+  @extensibility(MUTABLE)
+  @nested
+  struct MetaData_t {
+    Common::DateTime_t timeOfGeneration;
+  };
+
+  @external
+  typedef int16 BinaryData_t[Common::MAX_LEN];
+
+  enum UnitType {
+    Farenheit,
+    Celcius,
+    Percent
+  };
+
+  @nested
+  struct MeasurementCoordinate_t {
+    double latitude;
+    double longitude;
+  };
+
+};
+
+module Alarms {
+  enum Severities {
+    Critical,
+    Major,
+    Minor,
+    Informational
+  };
+
+  enum State {
+    Open,
+    Closed
+  };
+
+  @nested
+  struct ValueDefinition {
+    @optional
+    float number;
+    Common::UnitType Units;
+  };
+
+  struct Alarm {
+    @key
+    Common::IdentifierType_t sourceId;
+    Common::Descriptor_t alarmTypeName;
+    Alarms::Severities severity;
+    Alarms::State null;
+    Alarms::ValueDefinition numericValue;
+  };
+
+  struct HumidityAlarm : Alarms::Alarm {
+    Common::Percentage_t relativeHumidity;
+  };
+
+  struct MotionAlarm : Alarms::Alarm {
+    Common::MeasurementCoordinate_t coordinate;
+  };
+
+  struct FireAlarm : Alarms::Alarm {
+    float temperature;
+    Common::UnitType units;
+  };
+
+  struct IntrusionAlarm : Alarms::Alarm {
+    Common::MeasurementCoordinate_t coordinate;
+  };
+
+};
+
