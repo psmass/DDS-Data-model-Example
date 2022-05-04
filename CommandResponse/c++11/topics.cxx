@@ -13,9 +13,6 @@
 #include "topics.hpp"
 #include "CommandResp.hpp"
 #include <dds/dds.hpp>
-#include <dds/topic/ContentFilteredTopic.hpp>
-#include <dds/topic/ddstopic.hpp>
-#include <dds/sub/ddssub.hpp>
 
 const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
@@ -142,8 +139,8 @@ namespace MODULE
     void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
          // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
-                devicesDevStateWtrPtr->setCurrentState(
-                    (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
+        devicesDevStateWtrPtr->setCurrentState(
+            (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
 
     }  
 

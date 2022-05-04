@@ -24,8 +24,7 @@
 namespace MODULE
 {
 
-void run_device_application()
-{  
+void run_device_application() {  
     // Create the participant
     dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
     dds::domain::DomainParticipant participant =
@@ -42,8 +41,7 @@ void run_device_application()
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
-    while (!application::shutdown_requested)
-    {
+    while (!application::shutdown_requested)  {
         //Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
         if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
@@ -72,12 +70,10 @@ int main(int argc, char *argv[])
 
     setup_signal_handlers();
 
-    try
-    {
+    try  {
         MODULE::run_device_application();
     }
-    catch (const std::exception &ex)
-    {
+    catch (const std::exception &ex)  {
         // This will catch DDS exceptions
         std::cerr<< "Exception in run_device_application(): " << ex.what()
                   << std::endl;

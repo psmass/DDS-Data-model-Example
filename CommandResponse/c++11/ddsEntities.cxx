@@ -18,8 +18,7 @@ namespace MODULE
     Writer::Writer(
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
-        const std::string writer_name)
-    {
+        const std::string writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         topicName = topic_name;
@@ -107,10 +106,9 @@ namespace MODULE
             // Take all samples
             dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
 
-            for (const auto sample : samples)
-            {
-                if (sample.info().valid())
-                {
+            for (const auto sample : samples) {
+
+                if (sample.info().valid()) {
                     std::cout << "Read sample for topic: " << topicName << std::endl;
                     std::cout << sample.data() << std::endl;
 
@@ -121,8 +119,7 @@ namespace MODULE
                     std::cout << std::endl;
 
                 }
-                else
-                {
+                else {
                     std::cout << "  Received metadata" << std::endl;
                 }
             }

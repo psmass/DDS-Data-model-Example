@@ -24,8 +24,7 @@
 namespace MODULE
 {
 
-void run_controller_application()
-{
+void run_controller_application() {
    // Create the participant
     dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
     dds::domain::DomainParticipant participant =
@@ -39,16 +38,15 @@ void run_controller_application()
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
-    while (!application::shutdown_requested)
-        {
+    while (!application::shutdown_requested) {
         //Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on
         if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
             config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
-            }
+        }
         std::cout << "." << std::flush;                 
         rti::util::sleep(dds::core::Duration(1));
-        }
+    }
 
     config_dev_writer.Writer::getThreadHndl()->join();
     device_state_reader.Reader::getThreadHndl()->join();
@@ -59,19 +57,16 @@ void run_controller_application()
 }
 } // namespace MODULE
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
     using namespace application;
 
     setup_signal_handlers();
 
-    try
-    {
+    try {
         MODULE::run_controller_application();
     }
-    catch (const std::exception &ex)
-    {
+    catch (const std::exception &ex) {
         // This will catch DDS exceptions
         std::cerr << "Exception in run_controller_application(): " << ex.what()
                   << std::endl;
