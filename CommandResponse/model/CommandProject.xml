@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+    <types>
+      <!-- Commands below are 'short-lived' meaning they are responded to immediately and 
+	     don't require Objective State. 
+
+         This example will have a Controller and a Device (where there could be many devices).
+	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
+	     a QoS of Durable, then wait to be commanded.
+	     The Controller will recognize the device and issue a command to TURN_ON. 
+	     Controller will then periodically request status.  There is a one-to-one
+	     correspondence between Controller Commands and Device Responses. That is for 
+	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
+	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
+
+         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
+	     does not filter since it may expect key'd responses from many deviceIDs.
+
+         To keep things simple the device
+	     will not issue Alarms or any other non-requested topics except the intial DA.
+
+      -->
+      <module name="ExCmdRsp">
+        <!--Start_Header_File_Const-Block 
+       These Constants are defined here as part of the system model and used to generate a header file where they can be used 
+       from a .cxx file. Unfortunately they cannot also be used within this XML file itself
+      -->
+        <const name="MODULE_EX_CMD_RSP" type="string" value="ExCmdRsp"/>
+        <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
+        <const name="TOPIC_DEVICE_STATE" type="string" value="DeviceState"/>
+        <const name="CONTROLLER1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant1"/>
+        <const name="DEVICE1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::DeviceParticipant1"/>
+        <const name="DEVICE_STATE_WRITER" type="string" value="DevicePublisher::DeviceStateWriter"/>
+        <const name="DEVICE_STATE_READER" type="string" value="ControllerSubscriber::DeviceStateReader"/>
+        <const name="CONFIGURE_DEVICE_WRITER" type="string" value="ControllerPublisher::ConfigureDeviceWriter"/>
+        <const name="CONFIGURE_DEVICE_READER" type="string" value="DeviceSubscriber::ConfigureDeviceReader"/>
+        <!--End_Header_File_Const_Block-->
+        <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
+        <const name="LEN_STR_FOO" type="uint32" value="10"/>
+        <const name="LEN_STR_BAR" type="uint32" value="16"/>
+        <enum name="DeviceStateEnum">
+          <enumerator name="UNINITIALIZED"/>
+          <enumerator name="OFF"/>
+          <enumerator name="ON"/>
+          <enumerator name="ERROR"/>
+        </enum>
+        <struct name="DeviceId" nested="true">
+          <member name="resourceId" type="int32"/>
+          <member name="id" type="int32"/>
+        </struct>
+        <struct name="DeviceConfigurationStuct" nested="true">
+          <member name="stateReq" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceStateEnum"/>
+          <member name="fooName" type="string" stringMaxLength="LEN_STR_FOO"/>
+          <member name="fooValue" type="int32"/>
+          <member name="barName" type="string" stringMaxLength="LEN_STR_BAR"/>
+          <member name="barValue" type="uint32"/>
+        </struct>
+        <typedef name="DeviceConfiguration" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfigurationStuct"/>
+        <struct name="ConfigureDevice">
+          <member name="targetDeviceId" type="nonBasic" nonBasicTypeName="DeviceId"/>
+          <member name="deviceConfig" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceConfiguration"/>
+        </struct>
+        <struct name="DeviceState">
+          <member name="myDeviceId" type="nonBasic" nonBasicTypeName="DeviceId" key="true"/>
+          <member name="state" type="nonBasic" nonBasicTypeName="ExCmdRsp::DeviceStateEnum"/>
+        </struct>
+      </module>
+    </types>
+
+    <domain_library name="CmdRspDomainLibrary">
+      <domain name="SystemDomain" domain_id="0">
+        <register_type name="DeviceStateType" type_ref="ExCmdRsp::DeviceState"/>
+        <register_type name="ConfigureDeviceType" type_ref="ExCmdRsp::ConfigureDevice"/>
+        <topic name="DeviceState" register_type_ref="DeviceStateType"/>
+        <topic name="ConfigureDevice" register_type_ref="ConfigureDeviceType"/>
+      </domain>
+    </domain_library>
+
+    <domain_participant_library name="CmdRspParticipantLibrary">
+      <domain_participant name="ControllerParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
+        <publisher name="ControllerPublisher">
+          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice"/>
+        </publisher>
+        <subscriber name="ControllerSubscriber">
+          <data_reader name="DeviceStateReader" topic_ref="DeviceState">
+            <datareader_qos>
+              <durability>
+                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+              </durability>
+              <reliability>
+                <kind>RELIABLE_RELIABILITY_QOS</kind>
+              </reliability>
+            </datareader_qos>
+          </data_reader>
+        </subscriber>
+      </domain_participant>
+      <domain_participant name="DeviceParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
+        <publisher name="DevicePublisher">
+          <data_writer name="DeviceStateWriter" topic_ref="DeviceState">
+            <datawriter_qos>
+              <durability>
+                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+              </durability>
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+        <subscriber name="DeviceSubscriber">
+          <data_reader name="ConfigureDeviceReader" topic_ref="ConfigureDevice">
+            <content_filter name="MyFilter" kind="builtin.sql">
+              <expression>targetDeviceId.id=%0</expression>
+              <expression_parameters>
+                <element>20</element>
+              </expression_parameters>
+            </content_filter>
+            <datareader_qos>
+              <reliability>
+                <kind>RELIABLE_RELIABILITY_QOS</kind>
+              </reliability>
+            </datareader_qos>
+          </data_reader>
+        </subscriber>
+      </domain_participant>
+    </domain_participant_library>
+
+</dds>
