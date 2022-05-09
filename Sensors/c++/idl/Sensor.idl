@@ -1,0 +1,48 @@
+#ifndef SENSOR__IDL
+#define SENSOR__IDL
+
+#include "Common.idl"
+
+module Sensor {
+  module Constants {
+    const string HUMIDITY_TOPIC = "Humidity";
+    const string PRESSURE_TOPIC = "Pressure";
+    const string TEMPERATURE_TOPIC = "Temperature";
+    const string GAS_TOPIC = "Gas";
+    const string SENSOR_QOS_LIBRARY = "SensorQosLibrary";
+    const string RELIABLE_QOS_PROFILE = "ReliableQosProfile";
+    const string BEST_EFFORT_QOS_PROFILE = "BestEffortQosProfile";
+  };
+
+  @nested
+  @appendable
+  struct BaseSensor {
+        @key
+    Common::IdentifierType_t sourceId;
+        Common::Descriptor_t sensorTypeName;
+        Common::MetaData_t metaData;
+  };
+
+  @appendable
+  struct HumiditySensor: Sensor::BaseSensor {
+        Common::Percentage_t relativeHumidity;
+  };
+
+  @appendable
+  struct PressureSensor: Sensor::BaseSensor {
+        Common::PressureInPascal_t pressure;
+  };
+
+  @appendable
+  struct TemperatureSensor: Sensor::BaseSensor {
+        Common::TemperatureInDegreesKelvin_t temperature;
+  };
+
+  @appendable
+  struct GasSensor: Sensor::BaseSensor {
+        Common::ConcentrationInMolesPerCubicMetre_t concentration;
+  };
+  
+};
+
+#endif // SENSOR__IDL
