@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef AlarmsPlugin_1053329249_h
-#define AlarmsPlugin_1053329249_h
+#ifndef AlarmsPlugin_1053311872_h
+#define AlarmsPlugin_1053311872_h
 
 #include "Alarms.h"
 
@@ -2754,5 +2754,5 @@ extern "C"{
 #define NDDSUSERDllExport
 #endif
 
-#endif /* AlarmsPlugin_1053329249_h */
+#endif /* AlarmsPlugin_1053311872_h */
 

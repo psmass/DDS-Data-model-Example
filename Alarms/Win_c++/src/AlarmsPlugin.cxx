@@ -4267,7 +4267,7 @@ Alarms_ValueDefinitionPluginSupport_print_data(
     }
 
     RTICdrType_printFloat(
-        sample->number, "number", indent_level + 1);    
+        &sample->number, "number", indent_level + 1);    
 
     Common_UnitTypePluginSupport_print_data(
         (const Common_UnitType*) &sample->Units, "Units", indent_level + 1);

@@ -6048,7 +6048,7 @@ DDS_TypeCode * Alarms_ValueDefinition_get_typecode(void)
             0, /* Ignored */
             0, /* Ignored */
             NULL, /* Ignored */
-            RTI_CDR_NONKEY_MEMBER, /* Is a key? */
+            RTI_CDR_REQUIRED_MEMBER, /* Is a key? */
             DDS_PUBLIC_MEMBER,/* Member visibility */
             1,
             NULL, /* Ignored */
@@ -6103,6 +6103,8 @@ DDS_TypeCode * Alarms_ValueDefinition_get_typecode(void)
     Alarms_ValueDefinition_g_tc_members[1]._representation._typeCode = (RTICdrTypeCode *)Common_UnitType_get_typecode();
 
     /* Initialize the values for member annotations. */
+    Alarms_ValueDefinition_g_tc_members[0]._annotations._defaultValue._d = RTI_XCDR_TK_FLOAT;
+    Alarms_ValueDefinition_g_tc_members[0]._annotations._defaultValue._u.float_value = 0.0f;
     Alarms_ValueDefinition_g_tc_members[0]._annotations._minValue._d = RTI_XCDR_TK_FLOAT;
     Alarms_ValueDefinition_g_tc_members[0]._annotations._minValue._u.float_value = RTIXCdrFloat_MIN;
     Alarms_ValueDefinition_g_tc_members[0]._annotations._maxValue._d = RTI_XCDR_TK_FLOAT;
@@ -6258,29 +6260,8 @@ RTIBool Alarms_ValueDefinition_initialize_w_params(
         return RTI_FALSE;
     }
 
-    if (!allocParams->allocate_optional_members) {
-        sample->number=NULL;
-    } else {   
-        if (allocParams->allocate_memory){
-            sample->number = new (std::nothrow)   DDS_Float  ;
-            if (sample->number==NULL) {
-                return RTI_FALSE;
-            }
-            if (!RTICdrType_initFloat(sample->number)) {
-                return RTI_FALSE;
-            }
+    sample->number = 0.0f;
 
-        } else {
-
-            if (sample->number != NULL) {
-                if (!RTICdrType_initFloat(sample->number)) {
-                    return RTI_FALSE;
-                }
-            }
-
-        }
-
-    }
     sample->Units = Farenheit;
     return RTI_TRUE;
 }
@@ -6328,13 +6309,6 @@ void Alarms_ValueDefinition_finalize_w_params(
         return;
     }
 
-    if (deallocParams->delete_optional_members) {
-        if (sample->number != NULL) {
-
-            delete  sample->number;
-            sample->number=NULL;
-        }
-    }
     Common_UnitType_finalize_w_params(&sample->Units,deallocParams);
 
 }
@@ -6355,11 +6329,6 @@ void Alarms_ValueDefinition_finalize_optional_members(
     deallocParamsTmp.delete_pointers = (DDS_Boolean)deletePointers;
     deallocParamsTmp.delete_optional_members = DDS_BOOLEAN_TRUE;
 
-    if (sample->number != NULL) {
-
-        delete  sample->number;
-        sample->number=NULL;
-    }
 }
 
 RTIBool Alarms_ValueDefinition_copy(
@@ -6368,44 +6337,13 @@ RTIBool Alarms_ValueDefinition_copy(
 {
     try {
 
-        struct DDS_TypeDeallocationParams_t deallocParamsTmp =
-        DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
-        struct DDS_TypeDeallocationParams_t * deallocParams =
-        &deallocParamsTmp;
-
-        if (deallocParams) {} /* To avoid warnings */
-
-        deallocParamsTmp.delete_pointers = DDS_BOOLEAN_TRUE;
-        deallocParamsTmp.delete_optional_members = DDS_BOOLEAN_TRUE;    
-
         if (dst == NULL || src == NULL) {
             return RTI_FALSE;
         }
 
-        if (src->number!=NULL) {
-            if (dst->number==NULL) {
-
-                dst->number = new (std::nothrow)   DDS_Float  ;
-                if (dst->number==NULL) {
-                    return RTI_FALSE;
-                }
-
-                if (!RTICdrType_initFloat(dst->number)) {
-                    return RTI_FALSE;
-                }
-            }
-
-            if (!RTICdrType_copyFloat (
-                dst->number, src->number)) { 
-                return RTI_FALSE;
-            }
-        } else {
-
-            if (dst->number != NULL) {
-
-                delete  dst->number;
-                dst->number=NULL;
-            }   
+        if (!RTICdrType_copyFloat (
+            &dst->number, &src->number)) { 
+            return RTI_FALSE;
         }
         if (!Common_UnitType_copy(
             &dst->Units,(const Common_UnitType*)&src->Units)) {
@@ -6862,7 +6800,6 @@ void Alarms_Alarm_finalize_optional_members(
     deallocParamsTmp.delete_pointers = (DDS_Boolean)deletePointers;
     deallocParamsTmp.delete_optional_members = DDS_BOOLEAN_TRUE;
 
-    Alarms_ValueDefinition_finalize_optional_members(&sample->numericValue, deallocParams->delete_pointers);
 }
 
 RTIBool Alarms_Alarm_copy(

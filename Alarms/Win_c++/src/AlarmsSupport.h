@@ -9,8 +9,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef AlarmsSupport_1053329249_h
-#define AlarmsSupport_1053329249_h
+#ifndef AlarmsSupport_1053311872_h
+#define AlarmsSupport_1053311872_h
 
 /* Uses */
 #include "Alarms.h"
@@ -206,5 +206,5 @@ DDS_DATAREADER_W_DATA_CONSISTENCY_CHECK(Alarms_IntrusionAlarmDataReader, Alarms_
 #define NDDSUSERDllExport
 #endif
 
-#endif  /* AlarmsSupport_1053329249_h */
+#endif  /* AlarmsSupport_1053311872_h */
 

@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef Alarms_1053329249_h
-#define Alarms_1053329249_h
+#ifndef Alarms_1053311872_h
+#define Alarms_1053311872_h
 
 #ifndef NDDS_STANDALONE_TYPE
 #ifndef ndds_cpp_h
@@ -23,9 +23,13 @@ or consult the Code Generator User's Manual.
 #endif
 
 // Common Data Types 
+
 static const DDS_UnsignedShort Common_MIN_LEN= 100U;
+
 static const DDS_UnsignedShort Common_MED_LEN= 200U;
+
 static const DDS_UnsignedShort Common_MAX_LEN= 500U;
+
 typedef    DDS_Char *   Common_LargeString_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -88,6 +92,7 @@ RTIBool Common_LargeString_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Char *   Common_MediumString_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -150,6 +155,7 @@ RTIBool Common_MediumString_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Char *   Common_ShortString_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -212,6 +218,7 @@ RTIBool Common_ShortString_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Char *   Common_Descriptor_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -274,6 +281,7 @@ RTIBool Common_Descriptor_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Float   Common_Percentage_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -336,6 +344,7 @@ RTIBool Common_Percentage_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Float   Common_PressureInPascal_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -398,6 +407,7 @@ RTIBool Common_PressureInPascal_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Float   Common_TemperatureInDegreesKelvin_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -460,6 +470,7 @@ RTIBool Common_TemperatureInDegreesKelvin_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Float   Common_ConcentrationInMolesPerCubicMetre_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -523,6 +534,7 @@ RTIBool Common_ConcentrationInMolesPerCubicMetre_t_copy(
 #define NDDSUSERDllExport
 #endif
 // Identifies a resource 
+
 extern "C" {
 
     extern const char *Common_IdentifierType_tTYPENAME;
@@ -600,6 +612,7 @@ RTIBool Common_IdentifierType_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef     Common_IdentifierType_tSeq  Common_IdentifierList_t ;
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -731,6 +744,7 @@ RTIBool Common_ResponseCode_t_copy(
 #define NDDSUSERDllExport
 #endif
 // Time 
+
 extern "C" {
 
     extern const char *Common_DateTime_tTYPENAME;
@@ -808,6 +822,7 @@ RTIBool Common_DateTime_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Common_MetaData_tTYPENAME;
@@ -884,6 +899,7 @@ RTIBool Common_MetaData_t_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 typedef    DDS_Short   * Common_BinaryData_t [(Common_MAX_LEN)];
 #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
 /* If the code is building on Windows, start exporting symbols.
@@ -1013,6 +1029,7 @@ RTIBool Common_UnitType_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Common_MeasurementCoordinate_tTYPENAME;
@@ -1224,6 +1241,7 @@ RTIBool Alarms_State_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_ValueDefinitionTYPENAME;
@@ -1236,7 +1254,7 @@ class Alarms_ValueDefinition
   public:
     typedef struct Alarms_ValueDefinitionSeq Seq;
 
-    DDS_Float   * number ;
+    DDS_Float   number ;
     Common_UnitType   Units ;
 
 };
@@ -1301,6 +1319,7 @@ RTIBool Alarms_ValueDefinition_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_AlarmTYPENAME;
@@ -1391,6 +1410,7 @@ RTIBool Alarms_Alarm_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_HumidityAlarmTYPENAME;
@@ -1477,6 +1497,7 @@ RTIBool Alarms_HumidityAlarm_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_MotionAlarmTYPENAME;
@@ -1563,6 +1584,7 @@ RTIBool Alarms_MotionAlarm_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_FireAlarmTYPENAME;
@@ -1650,6 +1672,7 @@ RTIBool Alarms_FireAlarm_copy(
 #undef NDDSUSERDllExport
 #define NDDSUSERDllExport
 #endif
+
 extern "C" {
 
     extern const char *Alarms_IntrusionAlarmTYPENAME;

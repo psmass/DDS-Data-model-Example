@@ -90,7 +90,6 @@ module Alarms {
 
   @nested
   struct ValueDefinition {
-    @optional
     float number;
     Common::UnitType Units;
   };
