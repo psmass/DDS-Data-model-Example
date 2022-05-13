@@ -26,6 +26,7 @@ OR if you want to see the build output
 Device and Controller must be executed from the build directory.
 
 ## ToDo:
+- Add Writer and Reader Sub/pub events (track subs/pubs)- 
 - Check how to load an Dynamic data value enum (currently casting)
 - Use and load an array of octets for deviceID
 - Set Static Topic Values in Constructor vs. top of the handler
