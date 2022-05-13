@@ -36,6 +36,21 @@ To keep things simple, there are two topics:
 	The Device will filter on the targetID using it's own ID. The results in the device listening for "myRequests".
 
 	To keep things simple the device will not issue Alarms or any other non-requested topics except the State Change.
+	
+	
+	**Device / Controller Topic Exchange:**
+	
+	                   Requesting Device                |		Responding Controller
+								 | 
+  		DeviceState(INITIALIZED)(Key'd deviceDevID) --> |
+								 |(Controller sees new device in INITIALIZED STATE, 
+								 |  Issues a ConfigDevice command to turn ON)
+			                   	  	    <--- | ConfigDevice(targetDeviceID, ON)
+		(content filter on target(my)DevId)		 | 
+		(Device Sees Change of State, issues new State) | 
+					     DeviceState(ON) --> |  
+								 | (Controller sees and registers device in ON STATE) 	      	
+	  					
 
 ## **Discussion**
 ### **Objective State Pattern**
