@@ -2,16 +2,16 @@
 ![](https://github.com/psmass/DDSexamples/blob/master/RtiAsOne.png)
 
 
-# THIS DIRECTORY CONTAINS:
+# **THIS DIRECTORY CONTAINS:**
 
-1. Discussion of two simple Command Response data models: Master/Slave and Client / Server. Both discussion will use non-Objective state (i.e. immediate command execution vs. long lasting command execution as it achieves it's Objective or end-goal. As an example, a command to move a vehicle to a way-point.) 
+1. An implementation of a the Master / Slave model using the Objective State pattern. 
+2. Discussion
+	 - Objective State pattern.
+ 	 - Controller / Device and Consumer / Service data command/Response Models.
 
-2. An implementation of a the Master / Slave model.
+## **Implementation Example of a Master / Slave Model using the Objective State Pattern**
 
-
-### **Model 1) Master / Slave(s) or  Controller / Device(s)** 
-
-This model will have a Master Controller and a Slave Device (where there could be many devices, but one logical controller).
+The example coded here, will have a Master Controller and a Slave Device (where there could be many devices, but one logical controller), and use the Objective State Pattern (see below).
 
 To keep things simple, there are two topics:
 
@@ -37,37 +37,24 @@ To keep things simple, there are two topics:
 
 	To keep things simple the device will not issue Alarms or any other non-requested topics except the State Change.
 
-### **Model 2) Client(s) /  Server  or Consumer(s) / Service **
+## **Discussion**
+### **Objective State Pattern**
 
-This model has a well known service and may have multiple clients or consumers. The service, if Objective State, would need some protocol to both update the state of the Objective Command and provide deterministic behavior in the event of multiple clients issue conflicting commands. Choices such as implicit or explicit locks to prevent a super-ceding command, or perhaps canceling and override of the current command running by the super-ceding command. Another thought might be to use Ownership Strength QoS.
+Orthogonal to the Controller / Device or Consumer / Server models (discussed below) is the Objective State pattern. The Objective state pattern embodies the idea of issuing a command or Request with an Objective and then monitoring the associated topic(s) to verify the requesee is achieving the Objective. Independentlly, the system may also provide direct feedback on the command's state, indicating the command state (i.e.,  accepted, executing, aborted, or completed (with and without error)). Key to Objective State is that the system response determines if the Objective has been achieved and not the response to the command itself. The latter is typically used to clean up resources or ensure appropriate synchronization or blocking of requests from mulitiple sources. 
 
-To keep the model simple, in this example, the Service won't use Objective State, and therefore commands will process immediately and in the order received. Here we'll provide one consumer periodically requesting status (TOPIC_REQUEST_DEVICE_STATUS) of one service. The Service will send back a status reply (TOPIC_DEVICE_STATUS_REPLY). Again, this status request could be done implicitly via subscribing to a periodic a topic periodically emitted by the service (e.g., TOPIC_SERVICE_FOO_STATUS)
-# Request (Command) / Reply Discussion 
+An example of an Objective State Pattern is where a vehicle is commanded to a waypoint. The system may provide feedback as to the command state (accepted, executing etc.) but the GPS location topic is used to determine that the system is responding as commanded. 
 
-Command Patterns can be different depending upon requestor/requestee topology, as well as other criteria in dermining the best pattern which fits the problem space.  
+An example of a non-Objective state is where the correlated response to the command itself determines whether it has executed properly (e.g., Command Completed Sucess / Failure).
 
-**Command/Status request / w/immediate Response**
+### **Controller / Device Model ** 
 
-**One Controller requesting Command/Status/ request to one of many Devices**
+The Controller / Device Model has one or more slave devices, being commanded by a logical** Master Controller.
 
- 	Notes:
-		1. This is still one-to-one relationship, but a given command instance can be sent to many controllers, one at a time.
-		2. The device must first announce itself (and potentially be accepted/handshake) for the controller to recognize a new device to control
+In this model, the slave device must somehow 'Announce' itself on a topic the controller is monitoring. The Controller and Device may then handshake to ascertain capabilities. While the Device may request something of the Controller, usually the Controller is the 'Master' and directs the Device to activate itself for the given application. The specific interaction is implementation dependent. 
 
-Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
+Here the use of Objective State may be used. In this case, rather than an explicit and correlated state response to a command, a periodic, or 'on-change' state topic is provided by the requestee that the requestor monitors. 
 
-	           Requesting Controller 		 |		  Responding Device
-	      Foo Comnmand Issued (targetDevID) ------>	 |      (content filter on target(my)DevId)
-							 |
-				         <-------------  | Foo Response(cmdReq @key'd (my)deviceID, Result / Status)
-					 		 | 
-
-Here the Command key'd targetDeviceID allows many requests to different devices while allowing a given device to set a content filter for command FOO directed to it alone. As well the response holds the key'd deviceID allowing the requestor to both correlate outstanding requests as well as receive request instances and sample from multiple devices.
-
-
-**Many Devices Requesting Command to one Controller** (two or more if redundant)
-
-(note this is still a one-to-one relationship, where each device, sends an instance of the same command to one controller.)
+** note we use the term logical as the a Controller could be redundant but logically is one unit.
 
 Use-case for this example may be within the same system above but where the multiple devices are each, individually requesting something of the controller (e.g., approval to be accepted on the system).
 
@@ -78,22 +65,7 @@ Use-case for this example may be within the same system above but where the mult
 			                    <------------- | Foo Response(cmdReq reqDevID, Result / Status)
 	  (content filter on target(my)DevId)		   | 
 
-Here the Command key'd reqDeviceID allows many requests from different devices to be handled as separate instances by the controller. The controller copies the device from the request to the response. The Requesting device may set a content filter on it's deviceID to filter out only instances directed exclusively to it's requests. 
-
-A variant of the two above pattern, One-controller/many devices, is used with the Tactical Micro-grid standard(TMS).  A response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
-
-The differences in the above two use-cases is whether the device puts the Content Filter on the command or the response, and how the devices Key'd ID (the one of many Identifier) is placed in the command dependent upon who is sending the command.
-
-**Consumer/Service, short-lived(immediate) and long-lived commands** (e.g. Objective State)
-
-(e.g. Unmanned Maritime Architecture (UMAA)
-
-Generally there is a one-to-one relationship between consumer of a service and the service provider (the service).  The service will positively perform any requested command(1)) so long as a current commmand is not in progress. If more than one consumer is directing the same service, its within the context of the service to understand the situation and recognized if it is permitted or not. For UMAA, services such as steerage, thrust, anchor control, it makes no sense to have mulitiple controllers issuing commands except in the case of redundancy (here one controllers commands are recognized at a time dependent upon Active or Standby role.)  Where a service, is status only - not commanded, for example, providing sensor data - e.g., temperature, a many-to-one relationship is a possible use-case. Here the service application is unaware of the number of subscribers as this is handled by DDS. 
-
-	Notes: (1) DDS Secure can be  used to authenticate permissions of a specific command from a specific consumer.
-
-This pattern also handles the case where a command is not necessarily immediate (can take minutes/hours/days to run - e.g., move to a way point. With long-lived commands one needs the abilty to manage the lifecyle of a command and monitor it's state.
-As well, if a command is running, it must be cancelled before antoher command is issued by any consumer to the service (care must be taken to allow any consumer to cancel a currently running command). The consumer must subscribe to bothe the command_state response (how the command itself executing - e.g. accepted, executing, error, cancelled, completed) and how the service is responding to the commmand - e.g. gps position and speed as a result of an e.g. global_pos command/way point command).
+Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
 
 	                      Foo Consumer 		 	  |	             Foo Service
@@ -102,15 +74,24 @@ As well, if a command is running, it must be cancelled before antoher command is
 					           <------------- | Foo command_state (cmdReq reqDevID, cmd state)
 							  	  | (content filter on myDevId)
 
-Foo Consumer Subscribes to Foo service reports allowing the it to monitor the state of the Foo Service and how it is performing it's service relative to any commands issued.
-Foo Consumer subscribes to Foo Service command_state (with optional content filter on requestDevID==myDevID) on command_state to monitor the command.  It may cancel a command by a DDS dispose operation and then monitor the command_state for cancel (or complete/error etc if the command terminated prior to cancel processing).
+The differences in the above two use-cases is whether the device puts the Content Filter on the command or the response, and how the devices Key'd ID (the one of many Identifier) is placed in the command dependent upon who is sending the command.
 
-**Status / Command Response**
-From the above patterns there are three ways in which to get status:
- * Consumer Requests Status to service, service responds w/explict directed status report
- * Consumer sends command to service while monitoring subscribed aperiodic status topic published by service upon change (TMS)
- * Consumer sends command to service while monitoring subscribed periodic status topic published by service (UMAA)
- 
+*Tactical Micro-grid standard(TMS)* is an example of this type model, and uses Objective State.  A response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
+### **Consumer / Service Model**
+
+Sometimes referred to as a Client / Server model, this model has a well known Provider Service that one or more Clients are interested in Consuming.  Here the Client issues a command to the logical** Server and either gets a correlated response (non-Objective State) or monitors the appropriate topics to ensure the Objective has been / is being executed. In this model the Client is the 'Master' and the Service is the "Slave". Again, nothing precludes either the Consumer and/or the Service issuing requests of the other, but this is not typically the case.
+  
+** note we use the term logical as the service could be redundant but logically is one unit.
+
+*Unmanned Maritime Architecture (UMAA)* is an example of this model, and uses Objective State
+
+Generally there is a one-to-one relationship between consumer of a service and the service provider (the service).  The service will  perform any requested command(1)) so long as a current commmand is not in progress. If more than one consumer is directing the same service, its within the context of the service to understand the situation and recognized if it is permitted or not. For UMAA, services such as steerage, thrust, anchor control, it makes no sense to have mulitiple controllers issuing commands except in the case of redundancy (here one controllers commands are recognized at a time dependent upon Active or Standby role.)  Where a service, is status only - not commanded, for example, providing sensor data - e.g., temperature, a many-to-one relationship is a possible use-case. Here the service application is unaware of the number of subscribers as this is handled by DDS. 
+
+	Notes: (1) DDS Secure can be  used to authenticate permissions of a specific command from a specific consumer.
+
+This pattern also handles the case where a command is not necessarily immediate (can take minutes/hours/days to run - e.g., move to a way point. With long-lived commands one needs the abilty to manage the lifecyle of a command and monitor it's state.
+As well, if a command is running, it must be cancelled before antoher command is issued by any consumer to the service (care must be taken to allow any consumer to cancel a currently running command). The consumer must subscribe to bothe the command_state response (how the command itself executing - e.g. accepted, executing, error, cancelled, completed) and how the service is responding to the commmand - e.g. gps position and speed as a result of an e.g. global_pos command/way point command).
+
 **Connext Request / Reply patterns**
 (refer to Chapter 26 of the Connext Core Libraries manual)
 
