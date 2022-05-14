@@ -10,7 +10,7 @@
  * to use the software.
  */
 
-#include "ddsEntities.hpp"
+#include "ddsEntities.h"
 
 namespace MODULE
 {

@@ -10,8 +10,8 @@
  * to use the software.
  */
 
-#ifndef APPLICATION_HPP
-#define APPLICATION_HPP
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
 #include <iostream>
 #include <csignal>
@@ -34,4 +34,4 @@ namespace application
     }
 } // namespace application
 
-#endif // APPLICATION_HPP
+#endif // APPLICATION_H

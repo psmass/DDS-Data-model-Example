@@ -10,13 +10,13 @@
  * to use the software.
  */
 
-#ifndef DDS_ENTITIES_HPP
-#define DDS_ENTITIES_HPP
+#ifndef DDS_ENTITIES_H
+#define DDS_ENTITIES_H
 
 #include <iostream>
 #include <thread>
-#include <dds/dds.hpp>
-#include <rti/domain/find.hpp>
+#include <dds/dds.h>
+#include <rti/domain/find.h>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
 
@@ -86,4 +86,4 @@ namespace MODULE
 } // namespace MODULE
 
 
-#endif // TOPICS_HPP
+#endif // DDS_ENTITIES_H

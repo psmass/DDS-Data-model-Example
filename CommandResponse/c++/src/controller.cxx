@@ -14,8 +14,8 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <dds/dds.hpp>
-#include <rti/util/util.hpp> // for sleep
+#include <dds/dds.h>
+#include <rti/util/util.h> // for sleep
 #include "CommandResp.h"   // rti generated file from idl to use model const Topics
 #include "ddsEntities.h"
 #include "topics.h"

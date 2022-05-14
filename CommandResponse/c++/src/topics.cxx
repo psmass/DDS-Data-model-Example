@@ -10,9 +10,9 @@
  * to use the software.
  */
 
-#include "topics.hpp"
-#include "CommandResp.hpp"
-#include <dds/dds.hpp>
+#include "topics.h"
+#include "CommandResp.h"
+#include <dds/dds.h>
 
 const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;

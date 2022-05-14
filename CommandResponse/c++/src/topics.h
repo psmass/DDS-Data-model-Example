@@ -10,12 +10,12 @@
  * to use the software.
  */
 
-#ifndef TOPICS_HPP
-#define TOPICS_HPP
+#ifndef TOPICS_H
+#define TOPICS_H
 
 #include <iostream>
-#include "ddsEntities.hpp"
-#include "CommandResp.hpp"
+#include "ddsEntities.h"
+#include "CommandResp.h"
 
 
 const std::string _TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
@@ -139,4 +139,4 @@ class ConfigDevWtr : public Writer {
 } // namespace MODULE
 
 
-#endif // TOPICS_HPP
+#endif // TOPICS_H
