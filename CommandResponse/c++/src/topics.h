@@ -49,10 +49,10 @@ namespace MODULE
 
 class DeviceStateRdr : public Reader {
     public:
-        DeviceStateRdr(const dds::domain::DomainParticipant participant);
+        DeviceStateRdr(DDSDomainParticipant * participant);
         ~DeviceStateRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
+        void Handler(DDS_DynamicData & data);
 
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
@@ -68,13 +68,13 @@ class DeviceStateRdr : public Reader {
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
         // state sent when a devie announces itself.
-        enum MODULE::DeviceStateEnum previousState {MODULE::DeviceStateEnum::ERROR}; 
-        enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::ERROR}; 
+        enum MODULE::DeviceStateEnum previousState;
+        enum MODULE::DeviceStateEnum currentState; 
 };
 
 class DeviceStateWtr : public Writer {
     public:
-        DeviceStateWtr(const dds::domain::DomainParticipant participant);
+        DeviceStateWtr(DDSDomainParticipant * participant);
         ~DeviceStateWtr(void){};
 
         void Handler(void);
@@ -89,7 +89,7 @@ class DeviceStateWtr : public Writer {
             previousState=new_state; 
         }
         void setCurrentState(enum MODULE::DeviceStateEnum new_state){
-            if (new_state == MODULE::DeviceStateEnum::ON)
+            if (new_state == ON) // c++98 does allow  MODULE::DeviceStateEnum::ON
                 std::cout << "Controller set Device state ON" << std::endl;
 
             currentState=new_state; 
@@ -100,17 +100,17 @@ class DeviceStateWtr : public Writer {
         // initialize current as UNITIALIZED and ensure previous state is something different
         // so we will immedately send a state update to the controller (durabley), this
         // also 'Announces' ouselves to the controller.
-        enum MODULE::DeviceStateEnum previousState {MODULE::DeviceStateEnum::ERROR}; 
-        enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::UNINITIALIZED}; 
+        enum MODULE::DeviceStateEnum previousState; 
+        enum MODULE::DeviceStateEnum currentState; 
 };
 
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
+        ConfigDevRdr(DDSDomainParticipant * participant, const std::string filter_name);
         ~ConfigDevRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
+        void Handler(DDS_DynamicData & data);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 
@@ -122,7 +122,7 @@ class ConfigDevRdr : public Reader {
 
 class ConfigDevWtr : public Writer {
     public:
-        ConfigDevWtr(const dds::domain::DomainParticipant participant);
+        ConfigDevWtr(DDSDomainParticipant * participant);
         ~ConfigDevWtr(void){};
 
         void Handler(void);

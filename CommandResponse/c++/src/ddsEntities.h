@@ -15,8 +15,7 @@
 
 #include <iostream>
 #include <thread>
-#include <dds/dds.h>
-#include <rti/domain/find.h>
+#include <ndds/ndds_cpp.h>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
 
@@ -31,20 +30,20 @@ namespace MODULE
     class Writer {
         public:
             Writer(
-                dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string writer_name);
+                DDSDomainParticipant * participant,
+                std::string topic_name,
+                std::string writer_name);
             ~Writer(void) {}; 
 
-            void WriterThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            void WriterThread(DDSDomainParticipant * participant);
+            void RunThread(DDSDomainParticipant * participant);
 
             virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
+            DDSDynamicDataWriter* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
-            dds::core::xtypes::DynamicData * getMyDataSample(void)
+            DDS_DynamicData * getMyDataSample(void)
                 {return topicSample;};
             std::thread* getThreadHndl(void) { return &writerThread; };
             void enable(void) { MODULE::Writer::enabled=true; };
@@ -53,8 +52,8 @@ namespace MODULE
         protected:
             std::string topicName;
             std::string writerName;
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
-            dds::core::xtypes::DynamicData * topicSample; 
+            DDSDynamicDataWriter * topicWriter;
+            DDS_DynamicData * topicSample; 
             bool enabled;
             int period;
             std::thread writerThread;
@@ -63,15 +62,15 @@ namespace MODULE
     class Reader {
         public:
             Reader(
-                dds::domain::DomainParticipant participant,
-                const std::string topic_name, 
-                const std::string reader_name);
+                DDSDomainParticipant * participant,
+                std::string topic_name, 
+                std::string reader_name);
             ~Reader(void){};
 
-            void ReaderThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            void ReaderThread(DDSDomainParticipant * participant);
+            void RunThread(DDSDomainParticipant * participant);
 
-            virtual void Handler(dds::core::xtypes::DynamicData& data)
+            virtual void Handler(DDS_DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             std::thread * getThreadHndl(void) { return &readerThread; };

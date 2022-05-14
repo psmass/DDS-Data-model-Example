@@ -24,9 +24,9 @@ module ExCmdRsp {
        */
   const string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
-  const string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
+  const string TOPIC_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
 
-  const string TOPIC_DEVICE_STATE = "DeviceState";
+  const string TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
   const string CONTROLLER1_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant1";
 
@@ -72,14 +72,15 @@ module ExCmdRsp {
   typedef ExCmdRsp::DeviceConfigurationStuct DeviceConfiguration;
 
   struct ConfigureDevice {
-    DeviceId targetDeviceId;
+    ExCmdRsp::DeviceId targetDeviceId;
     ExCmdRsp::DeviceConfiguration deviceConfig;
   };
 
   struct DeviceState {
     @key
-    DeviceId myDeviceId;
+    ExCmdRsp::DeviceId myDeviceId;
     ExCmdRsp::DeviceStateEnum state;
   };
 
 };
+

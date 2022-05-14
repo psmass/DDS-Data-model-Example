@@ -14,7 +14,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <dds/dds.h>
+#include <ndds/ndds_cpp.h>
 #include <rti/util/util.h> // for sleep
 #include "CommandResp.h"   // rti generated file from idl to use model const Topics
 #include "ddsEntities.h"
@@ -27,7 +27,7 @@ namespace MODULE
 void run_controller_application() {
    // Create the participant
     dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    dds::domain::DomainParticipant participant =
+    DDSDomainParticipant participant =
         qos_provider->create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads

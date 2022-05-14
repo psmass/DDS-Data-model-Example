@@ -10,53 +10,65 @@
  * to use the software.
  */
 
+#include <string.h>
+#include <string>
 #include "topics.h"
 #include "CommandResp.h"
-#include <dds/dds.h>
+#include <ndds/ndds_cpp.h>
 
 const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
 const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
 const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
 const std::string _CONFIGURE_DEVICE_WRITER = MODULE::CONFIGURE_DEVICE_WRITER;
 
-const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
-const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_CONFIGURE_DEVICE;
+const std::string _TOPIC_DEVICE_STATE = MODULE::TOPIC_DEVICE_STATE;
+const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::TOPIC_CONFIGURE_DEVICE;
+
+
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
+    DeviceStateRdr::DeviceStateRdr(DDSDomainParticipant * participant )
                  : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
+
+        this->previousState = ERROR; // aka MODULE::DeviceStateEnum::ERROR:
+        this-> currentState = ERROR; 
     };
 
-    void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
+    void DeviceStateRdr::Handler(DDS_DynamicData & data) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
        
-        setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
+        //setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
+        DDS_Long state;
+        // ERROR_CHECK
+        data.get_long(state, "state", DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
+        setCurrentState((enum MODULE::DeviceStateEnum)state);
 
         std::cout << "Controller Tracking Device Current state to: ";
         switch(getCurrentState()) {
-            case MODULE::DeviceStateEnum::UNINITIALIZED:
+            case UNINITIALIZED:     // aka MODULE::DeviceStateEnum::UNINITIALIZED:
                 std::cout << "UNITIALIZED";
                 break;
-            case MODULE::DeviceStateEnum::OFF:
+            case OFF:
                 std::cout << "OFF";
                 break;
-            case MODULE::DeviceStateEnum::ON:
+            case ON:
                 std::cout << "ON";
                 break;
-            case MODULE::DeviceStateEnum::ERROR:
+            case ERROR:
                 std::cout << "ERROR";
                 break;
             default: std::cout << "OOPS - not a valid value";
         }
     }    
 
-    DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
+    DeviceStateWtr::DeviceStateWtr(DDSDomainParticipant * participant)
                  : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         //std::cout << "Device State C'Tor" << std::endl; 
-
+        this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
+        this->currentState = UNINITIALIZED; 
 
     };
 
@@ -65,8 +77,11 @@ namespace MODULE
         // Modify sample with current state as soon as I figure out how to load an enum
         //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
         //this->getMyDataSample()->value<int32_t>("state", current_state);
-        this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
-        this->getMyWriter()->write(*this->getMyDataSample());
+        
+        // load the current_state in to the sample to be written
+        // ERROR_CHECK
+        this->getMyDataSample()->set_long("state", (int32_t)current_state, DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
+        this->getMyWriter()->write(*this->getMyDataSample(), DDS_HANDLE_NIL);
     }
 
     void DeviceStateWtr::Handler() {
@@ -111,7 +126,7 @@ namespace MODULE
     }    
 
 
-    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
+    ConfigDevRdr::ConfigDevRdr(DDSDomainParticipant * participant, const std::string filter_name)
                  : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
         // std::cout << "Config Dev Reader C'tor " << std::endl; 
         // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
@@ -136,7 +151,7 @@ namespace MODULE
 
     };
 
-    void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
+    void ConfigDevRdr::Handler(DDS_DynamicData & data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
          // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
         devicesDevStateWtrPtr->setCurrentState(
@@ -145,7 +160,7 @@ namespace MODULE
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
+    ConfigDevWtr::ConfigDevWtr(DDSDomainParticipant * participant)
                  : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };

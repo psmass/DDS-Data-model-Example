@@ -16,9 +16,9 @@ namespace MODULE
 {
 
     Writer::Writer(
-        dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
-        const std::string writer_name) {
+        DDSDomainParticipant * participant, 
+        std::string topic_name, 
+        std::string writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         topicName = topic_name;
@@ -26,7 +26,7 @@ namespace MODULE
 
     }
 
-    void Writer::WriterThread(dds::domain::DomainParticipant participant) {
+    void Writer::WriterThread(DDSDomainParticipant * participant) {
         // Lookup the specific topic DeviceState as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
@@ -40,15 +40,14 @@ namespace MODULE
 
         // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> thisTopicWriter =
-            rti::pub::find_datawriter_by_name<
-                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+        DDSDynamicDataWriter thisTopicWriter =
+            rti::pub::find_datawriter_by_name<DDS_DynamicData>(
                 participant,
                 this->writerName);
 
         // Create one sample from the specified type and populate the id field.
         // This sample will be used repeatedly in the loop below.
-        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
+        DDS_DynamicData  thisTopicSample(thisTopicType);
 
         this->topicWriter=&thisTopicWriter; // These pointer stay around for the duration of
         this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
@@ -60,14 +59,14 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
-    void Writer::RunThread(dds::domain::DomainParticipant participant){
+    void Writer::RunThread(DDSDomainParticipant * participant){
         writerThread = std::thread(&Writer::WriterThread, this, participant);
     }
 
     Reader::Reader( 
-        dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
-        const std::string reader_name) {
+        DDSDomainParticipant * participant, 
+        std::string topic_name, 
+        std::string reader_name) {
 
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
         topicName = topic_name;
@@ -76,15 +75,14 @@ namespace MODULE
     }
 
 
-    void Reader::ReaderThread(dds::domain::DomainParticipant participant) {
+    void Reader::ReaderThread(DDSDomainParticipant * participant) {
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
         // Find the DataReader defined in the xml by using the participant and the
         // subscriber::reader pair as the datareader name.
-        dds::sub::DataReader<dds::core::xtypes::DynamicData> reader =
-            rti::sub::find_datareader_by_name<
-                dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
+        DDSDynamicDataReader reader =
+            rti::sub::find_datareader_by_name<DDS_DynamicData>(
                 participant,
                 this->readerName);
 
@@ -113,7 +111,7 @@ namespace MODULE
                     std::cout << sample.data() << std::endl;
 
                     // map the sample to the specific dynamic data type
-                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
+                    DDS_DynamicData& data = const_cast<DDS_DynamicData &>(sample.data());
                     this->Handler(data); // call the topic specific Handler (Virtual) 
 
                     std::cout << std::endl;
@@ -128,7 +126,7 @@ namespace MODULE
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
     }
 
-   void Reader::RunThread(dds::domain::DomainParticipant participant){
+   void Reader::RunThread(DDSDomainParticipant * participant){
         readerThread = std::thread(&Reader::ReaderThread, this, participant);
     }
 
