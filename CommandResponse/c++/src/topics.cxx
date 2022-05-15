@@ -80,30 +80,37 @@ namespace MODULE
         
         // load the current_state in to the sample to be written
         // ERROR_CHECK
-        this->getMyDataSample()->set_long("state", (int32_t)current_state, DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
+        this->getMyDataSample()->set_long("state", 
+                        DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, (int32_t)current_state);
         this->getMyWriter()->write(*this->getMyDataSample(), DDS_HANDLE_NIL);
     }
 
     void DeviceStateWtr::Handler() {
+
+        DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
 
         // Writer Handlers run in thread and don't return until exit
         // The handler loads up the specific data fields and writes the sample
         // Here we can write periodically, or on change or any other condition
         std::cout << "Device State Writer Handler Executing" << std::endl; 
 
+        // ERROR_CHECK
+        //Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
+        //Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        this->getMyDataSample()->set_long("myDeviceId.resource.Id", 
+                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
+        this->getMyDataSample()->set_long("myDeviceId.id", 
+                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
 
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
-
-        auto sampleNumber = 1;
+        int sampleNumber = 1;
     
         while (!application::shutdown_requested)
         {
             // this topic is not periodic, so we'll only use this thread to monitor writer events
             // once we figure out the API more Modern C++
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+            std::chrono::high_resolution_clock::duration duration = now.time_since_epoch();
+            // std::chrono::high_resolution_clock::nanoseconds nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
             // Modify the data to be written periodically here and uncomment the write
             //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
@@ -117,7 +124,7 @@ namespace MODULE
             //<< std::endl;
 
             // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
+            NDDSUtility::sleep(send_period);
             //sampleNumber++;
         }
 
@@ -154,8 +161,14 @@ namespace MODULE
     void ConfigDevRdr::Handler(DDS_DynamicData & data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
          // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
-        devicesDevStateWtrPtr->setCurrentState(
-            (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
+
+        //devicesDevStateWtrPtr->setCurrentState(
+        //    (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
+
+        DDS_Long requested_state;
+        // ERROR_CHECK
+        data.get_long(requested_state, "devicestate", DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
+        this->devicesDevStateWtrPtr->setCurrentState((enum MODULE::DeviceStateEnum)requested_state);
 
     }  
 
@@ -172,19 +185,24 @@ namespace MODULE
         // Here we can write periodically, or on change or any other condition
         std::cout << "Configure Device Writer Handler Executing" << std::endl; 
 
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", 20);
+        DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
 
-        auto sampleNumber = 1;
+        this->getMyDataSample()->set_long("targetDeviceId.resource.Id", 
+                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
+        this->getMyDataSample()->set_long("targetDeviceId.id", 
+                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
+
+        int sampleNumber = 1;
     
         while (!application::shutdown_requested)
         {
 
             // this topic is not periodic, so we'll only use this thread to monitor writer events
             // once we figure out the API more Modern C++
+
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+            std::chrono::high_resolution_clock::duration duration = now.time_since_epoch();
+            //std::chrono::time_point<std::chrono::system_clock>  nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
             // Modify the data to be written here
             // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
@@ -197,7 +215,7 @@ namespace MODULE
             //<< std::endl;
 
             // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
+            NDDSUtility::sleep(send_period);
             //sampleNumber++;
         }
     }
@@ -206,8 +224,9 @@ namespace MODULE
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
 
-        Writer::getMyDataSample()->value<int32_t>("deviceConfig.stateReq", (int32_t)configReq);
-        Writer::getMyWriter()->write(*Writer::getMyDataSample());
+        this->getMyDataSample()->set_long("deviceConfig.stateReq", 
+            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, (int32_t)configReq);
+        this->getMyWriter()->write(*this->getMyDataSample(), DDS_HANDLE_NIL);
 
     }   
 

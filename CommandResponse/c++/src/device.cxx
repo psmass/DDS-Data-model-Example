@@ -24,6 +24,9 @@
 namespace MODULE
 {
 
+//https://thispointer.com/c-how-to-pass-class-member-function-to-pthread_create/
+typedef void * (*THREADFUNCPTR)(void *participant); // used to cast to a non-static member func  
+
 void run_device_application() {  
     // Create the participant
     dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
@@ -34,7 +37,7 @@ void run_device_application() {
     ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
     config_dev_reader.RunThread(participant);
-    device_state_writer.RunThread(participant);
+    pthread_create(&(device_state_writer.getPthreadId()), NULL, (THREADFUNCPTR) &Writer::WriterThread, (void *) participant);
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);

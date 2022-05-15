@@ -14,7 +14,7 @@
 #define DDS_ENTITIES_H
 
 #include <iostream>
-#include <thread>
+#include <pthread.h>
 #include <ndds/ndds_cpp.h>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
@@ -22,11 +22,10 @@
 namespace application {
     extern bool shutdown_requested;
 }
-
 namespace MODULE
 {
     const std::string QOS_FILE = "../../model/CommandProject.xml";
-
+    
     class Writer {
         public:
             Writer(
@@ -35,8 +34,7 @@ namespace MODULE
                 std::string writer_name);
             ~Writer(void) {}; 
 
-            void WriterThread(DDSDomainParticipant * participant);
-            void RunThread(DDSDomainParticipant * participant);
+            void WriterThread(void * participant);
 
             virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
@@ -45,7 +43,7 @@ namespace MODULE
                  {return topicWriter;};  // needed for Requests to get the response writer
             DDS_DynamicData * getMyDataSample(void)
                 {return topicSample;};
-            std::thread* getThreadHndl(void) { return &writerThread; };
+            pthread_t getPthreadId(void) {return this->writerThreadId;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
         
@@ -55,8 +53,7 @@ namespace MODULE
             DDSDynamicDataWriter * topicWriter;
             DDS_DynamicData * topicSample; 
             bool enabled;
-            int period;
-            std::thread writerThread;
+            pthread_t writerThreadId;
     };
 
     class Reader {
@@ -68,17 +65,18 @@ namespace MODULE
             ~Reader(void){};
 
             void ReaderThread(DDSDomainParticipant * participant);
-            void RunThread(DDSDomainParticipant * participant);
+
+            pthread_t getPthreadId(void) {return this->readerThreadId;};
 
             virtual void Handler(DDS_DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
-            std::thread * getThreadHndl(void) { return &readerThread; };
-
         protected:
             std::string topicName;
             std::string readerName;
-            std::thread readerThread;
+            DDSDynamicDataReader * topicReader;
+            pthread_t readerThreadId;
+
 
     };
 

@@ -11,6 +11,7 @@
  */
 
 #include "ddsEntities.h"
+#include <pthread.h>
 
 namespace MODULE
 {
@@ -26,42 +27,24 @@ namespace MODULE
 
     }
 
-    void Writer::WriterThread(DDSDomainParticipant * participant) {
+    void Writer::WriterThread(void* _participant) {
+        DDSDomainParticipant * participant = (DDSDomainParticipant *)_participant;
         // Lookup the specific topic DeviceState as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
-        dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
+        // ERROR_CHECK
+        this->topicWriter= DDSDynamicDataWriter::narrow(
+                participant->lookup_datawriter_by_name(this->writerName.c_str()));
+        
+        this->topicSample = topicWriter->create_data(DDS_DYNAMIC_DATA_PROPERTY_DEFAULT);
 
-        const dds::core::xtypes::DynamicType &thisTopicType =
-            qos_provider->type(this->topicName);
-
-        // rti::core::xtypes::print_idl(deviceStateType);
-
-        // Find the DataWriter defined in the xml by using the participant and the
-        // publisher::writer pair as the datawriter name.
-        DDSDynamicDataWriter thisTopicWriter =
-            rti::pub::find_datawriter_by_name<DDS_DynamicData>(
-                participant,
-                this->writerName);
-
-        // Create one sample from the specified type and populate the id field.
-        // This sample will be used repeatedly in the loop below.
-        DDS_DynamicData  thisTopicSample(thisTopicType);
-
-        this->topicWriter=&thisTopicWriter; // These pointer stay around for the duration of
-        this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
-                                            // until thread exit.
-
-        this->Handler(); // call the topic specific Handler (Virtual)
+        this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
 
     } // end Writer::WriterThread
 
-    void Writer::RunThread(DDSDomainParticipant * participant){
-        writerThread = std::thread(&Writer::WriterThread, this, participant);
-    }
 
     Reader::Reader( 
         DDSDomainParticipant * participant, 
@@ -76,58 +59,109 @@ namespace MODULE
 
 
     void Reader::ReaderThread(DDSDomainParticipant * participant) {
+        DDSReadCondition * read_condition = NULL;
+        DDSStatusCondition * status_condition =  NULL;
+        DDSWaitSet *waitset = new DDSWaitSet();
+        DDSConditionSeq active_conditions_seq;
+	    DDS_DynamicDataSeq data_seq;
+	    DDS_SampleInfoSeq info_seq;
+        DDS_ReturnCode_t retcode;
+        DDS_Duration_t wait_duration = {4,0};
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
         // Find the DataReader defined in the xml by using the participant and the
         // subscriber::reader pair as the datareader name.
-        DDSDynamicDataReader reader =
-            rti::sub::find_datareader_by_name<DDS_DynamicData>(
-                participant,
-                this->readerName);
+        // Lookup reader handles and put them in myReaders[this_topic_enum]
+        this->topicReader = DDSDynamicDataReader::narrow(
+            participant->lookup_datareader_by_name(this->readerName.c_str()));
 
-        // WaitSet will be woken when the attached condition is triggered
-        dds::core::cond::WaitSet waitset;
-        
-        // Create a ReadCondition for any data on this reader, and add to WaitSet
-        dds::sub::cond::ReadCondition read_condition(
-            reader,
-            dds::sub::status::DataState::any()
-         );
+        // Create read condition
+        read_condition = this->topicReader->create_readcondition(
+            DDS_NOT_READ_SAMPLE_STATE,
+            DDS_ANY_VIEW_STATE,
+            DDS_ANY_INSTANCE_STATE);
 
-        waitset += read_condition;
+        //  Get & Set status conditions
+        status_condition = this->topicReader->get_statuscondition();
+        retcode = status_condition->set_enabled_statuses(DDS_SUBSCRIPTION_MATCHED_STATUS);  
+
+        /* Attach Read Conditions */
+        retcode = waitset->attach_condition(read_condition);
+
+        /* Attach Status Conditions */
+        retcode = waitset->attach_condition(status_condition);
+        if (retcode != DDS_RETCODE_OK) {
+            std::cerr << "Reader thread: attach_condition error" << std::endl;
+            goto end_reader_thread;
+        }
 
         while (!application::shutdown_requested) {
             // Wait 4 seconds for data 
-            //waitset.dispatch(dds::core::Duration(4));
-            waitset.wait(dds::core::Duration(4));
-            // Take all samples
-            dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
+            retcode = waitset->wait(active_conditions_seq, wait_duration);
+            // waitset.wait(dds::core::Duration(4));
+            if (retcode == DDS_RETCODE_TIMEOUT) {  
+            // std::cout << "Reader thread: Wait timed out!! No conditions were triggered" << std::endl;
+            continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                std::cerr << "Reader thread:  wait returned error: " << retcode << std::endl; 
+                goto end_reader_thread;
+            }
 
-            for (const auto sample : samples) {
+            int active_conditions = active_conditions_seq.length();
 
-                if (sample.info().valid()) {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
+            for (int i = 0; i < active_conditions; ++i) {
+                if (active_conditions_seq[i] == status_condition) {
+                    /* Get the status changes so we can check which status
+                    * condition triggered. */
+                    DDS_StatusMask triggeredmask =
+                            topicReader->get_status_changes();
 
-                    // map the sample to the specific dynamic data type
-                    DDS_DynamicData& data = const_cast<DDS_DynamicData &>(sample.data());
-                    this->Handler(data); // call the topic specific Handler (Virtual) 
+                    /* Subscription matched */
+                    if (triggeredmask & DDS_SUBSCRIPTION_MATCHED_STATUS) {
+                        DDS_SubscriptionMatchedStatus st;
+                        topicReader->get_subscription_matched_status(st);
+                        std::cout << this->topicName << "Reader Pubs: " 
+                        << st.current_count << "  " << st.current_count_change << std::endl;
+                    }
+                } else if (active_conditions_seq[i] == read_condition) { 
+                    // Get the latest samples
+                    retcode = topicReader->take(
+                                data_seq, info_seq, DDS_LENGTH_UNLIMITED,
+                                DDS_ANY_SAMPLE_STATE, DDS_ANY_VIEW_STATE, DDS_ANY_INSTANCE_STATE);
 
-                    std::cout << std::endl;
+                    if (retcode == DDS_RETCODE_OK) {
+                        // we've got some data for what ever topic we recieved, figure that out, make an
+                        // internal variable change as a result (if that's the case) and respond accordingly 
+                        // (with a RequestResponse not an On Change Topic. On Change topics trigger from the 
+                        // main loop as you peruse through internal variables that you see have changed as a
+                        // result of a request or other internal event.
+                        for (int i = 0; i < data_seq.length(); ++i) {
+                            if (info_seq[i].valid_data) {  
+                                if (retcode != DDS_RETCODE_OK) goto end_reader_thread;
 
-                }
-                else {
-                    std::cout << "  Received metadata" << std::endl;
+                                // *******  Dispatch out to the topic handler ******** 
+ 
+                                //myReaderThreadInfo->dataSeqIndx = i;
+                                // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; // announce oneself in handler
+                                this->Handler(data_seq[i])); // call the topic specific Handler (Virtual)
+                            }
+                        }
+                    } else if (retcode == DDS_RETCODE_NO_DATA) {
+                        continue;
+                    } else {
+                        std::cerr << "Reader thread: read data error " << retcode << std::endl; 
+                        goto end_reader_thread;
+                    }
+                    retcode = myReaderThreadInfo->reader->return_loan(data_seq, info_seq);
+                    if (retcode != DDS_RETCODE_OK) {
+                        std::cerr << "Reader thread:return_loan error " << retcode << std::endl; 
+                        goto end_reader_thread;
+                    }  
                 }
             }
         }
-        
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
-    }
-
-   void Reader::RunThread(DDSDomainParticipant * participant){
-        readerThread = std::thread(&Reader::ReaderThread, this, participant);
     }
 
 } // NAMESPACE MODULE
