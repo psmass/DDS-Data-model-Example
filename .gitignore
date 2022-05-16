@@ -16,3 +16,4 @@ CommandResponse/c++11/.DS_Store
 *.user
 *.sln
 *.json
+*.vs
