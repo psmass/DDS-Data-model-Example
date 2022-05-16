@@ -45,15 +45,35 @@ void run_publisher_application(unsigned int domain_id, unsigned int sample_count
     // Create a DataWriter with default QoS
     dds::pub::DataWriter<Alarms::IntrusionAlarm> writer(publisher, topic);
 
+//Create Instance 1
     Alarms::IntrusionAlarm data;
+//Create Instance 2
+	Alarms::IntrusionAlarm data2;
+
     for (unsigned int samples_written = 0;
     !application::shutdown_requested && samples_written < sample_count;
     samples_written++) {
         // Modify the data to be written here
 
-        std::cout << "Writing Alarms::IntrusionAlarm, count " << samples_written << std::endl;
+//Set Instance 1		
+		data.sourceId(Common::IdentifierType_t(1, 1));//keyed data field
+		data.alarmTypeName(Common::Descriptor_t("Alarm_name_here"));
+		data.severity(Alarms::Severities::Critical);//Critical
+		data.null(Alarms::State::Open); //Open
+		data.numericValue(Alarms::ValueDefinition((float)-0.111110, Common::UnitType::Celcius));
 
+//Set Instance 2        
+		data2.sourceId(Common::IdentifierType_t(2, 2)); //keyed data field
+		data2.alarmTypeName(Common::Descriptor_t("Alarm_name_here"));
+		data2.severity(Alarms::Severities::Critical);//Critical
+		data2.null(Alarms::State::Open); //Open
+		data2.numericValue(Alarms::ValueDefinition((float)-0.20, Common::UnitType::Celcius));
+
+		std::cout << "Writing Alarms::IntrusionAlarm, count " << samples_written << std::endl;
+//Write Instance 1
         writer.write(data);
+//Write Instance 2
+		writer.write(data2);
 
         // Send once every second
         rti::util::sleep(dds::core::Duration(1));

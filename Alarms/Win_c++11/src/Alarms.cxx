@@ -339,11 +339,12 @@ namespace Alarms {
     // ---- ValueDefinition: 
 
     ValueDefinition::ValueDefinition() :
+        m_number_ (0.0f) ,
         m_Units_(Common::UnitType::Farenheit)  {
     }   
 
     ValueDefinition::ValueDefinition (
-        const ::dds::core::optional< float >& number,
+        float number,
         const Common::UnitType& Units)
         :
             m_number_( number ),
@@ -390,7 +391,7 @@ namespace Alarms {
     {
         ::rti::util::StreamFlagSaver flag_saver (o);
         o <<"[";
-        o << "number: " << sample.number()<<", ";
+        o << "number: " << std::setprecision(9) <<sample.number()<<", ";
         o << "Units: " << sample.Units() ;
         o <<"]";
         return o;
@@ -3545,7 +3546,7 @@ namespace rti {
                         0, /* Ignored */
                         0, /* Ignored */
                         NULL, /* Ignored */
-                        RTI_CDR_NONKEY_MEMBER, /* Is a key? */
+                        RTI_CDR_REQUIRED_MEMBER, /* Is a key? */
                         DDS_PUBLIC_MEMBER,/* Member visibility */
                         1,
                         NULL, /* Ignored */
@@ -3600,6 +3601,8 @@ namespace rti {
                 ValueDefinition_g_tc_members[1]._representation._typeCode = (RTICdrTypeCode *)&::rti::topic::dynamic_type< Common::UnitType>::get().native();
 
                 /* Initialize the values for member annotations. */
+                ValueDefinition_g_tc_members[0]._annotations._defaultValue._d = RTI_XCDR_TK_FLOAT;
+                ValueDefinition_g_tc_members[0]._annotations._defaultValue._u.float_value = 0.0f;
                 ValueDefinition_g_tc_members[0]._annotations._minValue._d = RTI_XCDR_TK_FLOAT;
                 ValueDefinition_g_tc_members[0]._annotations._minValue._u.float_value = RTIXCdrFloat_MIN;
                 ValueDefinition_g_tc_members[0]._annotations._maxValue._d = RTI_XCDR_TK_FLOAT;
@@ -4683,7 +4686,7 @@ namespace dds {
 
         void topic_type_support< Alarms::ValueDefinition >::reset_sample(Alarms::ValueDefinition& sample) 
         {
-            ::rti::topic::reset_sample(sample.number());
+            sample.number(0.0f);
             sample.Units(Common::UnitType::Farenheit);
         }
 

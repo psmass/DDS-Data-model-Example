@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef Alarms_1053329249_hpp
-#define Alarms_1053329249_hpp
+#ifndef Alarms_1053311872_hpp
+#define Alarms_1053311872_hpp
 
 #include <iosfwd>
 
@@ -388,7 +388,7 @@ namespace Alarms {
         ValueDefinition();
 
         ValueDefinition(
-            const ::dds::core::optional< float >& number,
+            float number,
             const Common::UnitType& Units);
 
         #ifdef RTI_CXX11_RVALUE_REFERENCES
@@ -403,21 +403,18 @@ namespace Alarms {
         #endif
         #endif 
 
-        ::dds::core::optional< float >& number() OMG_NOEXCEPT {
+        float& number() OMG_NOEXCEPT {
             return m_number_;
         }
 
-        const ::dds::core::optional< float >& number() const OMG_NOEXCEPT {
+        const float& number() const OMG_NOEXCEPT {
             return m_number_;
         }
 
-        void number(const ::dds::core::optional< float >& value) {
+        void number(float value) {
             m_number_ = value;
         }
 
-        void number(::dds::core::optional< float >&& value) {
-            m_number_ = std::move(value);
-        }
         Common::UnitType& Units() OMG_NOEXCEPT {
             return m_Units_;
         }
@@ -441,7 +438,7 @@ namespace Alarms {
 
       private:
 
-        ::dds::core::optional< float > m_number_;
+        float m_number_;
         Common::UnitType m_Units_;
 
     };
@@ -1431,5 +1428,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // Alarms_1053329249_hpp
+#endif // Alarms_1053311872_hpp
 
