@@ -24,21 +24,49 @@ namespace MODULE
         this->topicParticipant = participant;
         this->topicName = topic_name;
         this->writerName = writer_name;
+        this->waitset = new DDSWaitSet();;
     }
 
     void * Writer::WriterThread() {
+
+        DDS_ReturnCode_t retcode;
+        
         // Lookup the specific topic DeviceState as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
         // ERROR_CHECK
+        // get the specific topic writer
         this->topicWriter= DDSDynamicDataWriter::narrow(
                 this->topicParticipant->lookup_datawriter_by_name(this->writerName.c_str()));
         
         this->topicSample = topicWriter->create_data(DDS_DYNAMIC_DATA_PROPERTY_DEFAULT);
 
+        // Configure Waitset for Writer Status ****
+        this->statusCondition = this->topicWriter->get_statuscondition();
+        if (statusCondition == NULL) {
+            std::cerr << "Writer thread: get_statuscondition error " << retcode << std::endl; 
+            goto end_writer_thread;
+        }
+
+        // Set enabled statuses
+        retcode = statusCondition->set_enabled_statuses(
+                DDS_PUBLICATION_MATCHED_STATUS);
+        if (retcode != DDS_RETCODE_OK) {
+            std::cerr << "Writer thread: set_enabled_statuses error " << retcode << std::endl; 
+            goto end_writer_thread;
+        }
+
+        // Attach Status Conditions to the above waitset
+        retcode =this->waitset->attach_condition(statusCondition);
+        if (retcode != DDS_RETCODE_OK) {
+            std::cerr << "Writer thread: attach_condition error " << retcode << std::endl; 
+            goto end_writer_thread;
+        }
+ 
         this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
+        end_writer_thread:
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
         
         return NULL;

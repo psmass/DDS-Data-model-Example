@@ -70,7 +70,6 @@ namespace MODULE
         //std::cout << "Device State C'Tor" << std::endl; 
         this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
         this->currentState = UNINITIALIZED; 
-
     };
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
@@ -88,24 +87,62 @@ namespace MODULE
 
     void DeviceStateWtr::Handler() {
 
+        // Writer Handlers run in the topic writerthread and don't return until exit
+        // The handler does three things:
+        //   1) Sets to static topic data fields such as deviceId 
+        //   2) Sets wait conditions to monitor writer events
+        //   3) can be used to write sample periodically
+
+        DDS_ReturnCode_t retcode;
+        DDSConditionSeq active_conditions_seq;
         DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
 
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
+  
         std::cout << "Device State Writer Handler Executing" << std::endl; 
-
+        
         // ERROR_CHECK
-        this->getMyDataSample()->set_long("myDeviceId.resourceId", 
+        this->topicSample->set_long("myDeviceId.resourceId", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
-        this->getMyDataSample()->set_long("myDeviceId.id", 
-                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
+        this->topicSample->set_long("myDeviceId.id", 
+                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20); 
  
-
         int sampleNumber = 1;
     
         while (!application::shutdown_requested)
         {
+            retcode = this->waitset->wait(active_conditions_seq, send_period);
+
+            if (retcode == DDS_RETCODE_TIMEOUT) {
+            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
+            continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                std::cerr << "Writer thread: wait returned error " << retcode << std::endl;
+                goto end_writer_handler;
+            }
+
+            // if (myWriterEventsThreadInfo->topic_enum()== tms_TOPIC_SOURCE_TRANSITION_STATE_ENUM)
+            // while(1); //simulate a dead thread to test heartbeat disable
+
+            // Get the number of active conditions 
+            int active_conditions = active_conditions_seq.length();
+
+            for (int i = 0; i < active_conditions; ++i) {
+                // Compare with Status Conditions 
+                if (active_conditions_seq[i] == statusCondition) {
+                    DDS_StatusMask triggeredmask =
+                            this->topicWriter->get_status_changes();
+
+                    if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
+                        DDS_PublicationMatchedStatus st;
+                        this->topicWriter->get_publication_matched_status(st);
+                        std::cout << this->topicName << " Writer Subs: " 
+                        << st.current_count << "  " << st.current_count_change << std::endl;
+                    }
+                } else {
+                    // writers can only have status condition
+                    std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
+                }
+            }
             // this topic is not periodic, so we'll only use this thread to monitor writer events
             // once we figure out the API more Modern C++
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -123,11 +160,10 @@ namespace MODULE
             //<< ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
             //<< std::endl;
 
-            // Send once every second
-            NDDSUtility::sleep(send_period);
             //sampleNumber++;
         }
-
+        end_writer_handler:
+        ;
         // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
 
     }    
@@ -180,17 +216,18 @@ namespace MODULE
 
     void ConfigDevWtr::Handler() {
 
+        DDS_ReturnCode_t retcode;
+        DDS_Duration_t send_period = {1,0}; 
+
         // Writer Handlers run in thread and don't return until exit
         // The handler loads up the specific data fields and writes the sample
         // Here we can write periodically, or on change or any other condition
         std::cout << "Configure Device Writer Handler Executing" << std::endl; 
 
-        DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
-
         this->getMyDataSample()->set_long("targetDeviceId.resourceId", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
         this->getMyDataSample()->set_long("targetDeviceId.id", 
-                                            DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
+                                           DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
 
         int sampleNumber = 1;
     

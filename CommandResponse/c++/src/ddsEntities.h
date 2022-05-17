@@ -39,8 +39,8 @@ namespace MODULE
             }
             void RunThread(void);
 
-            virtual void Handler(void) 
-                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+            virtual void Handler(void) // implemented by the concrete topic class
+                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; 
 
             DDSDynamicDataWriter* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
@@ -49,13 +49,14 @@ namespace MODULE
             pthread_t getThreadId(void) {return this->tid;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
-            pthread_t writerThreadId;
         
         protected:
             std::string topicName;
             std::string writerName;
             DDSDomainParticipant * topicParticipant;
             DDSDynamicDataWriter * topicWriter;
+            DDSWaitSet *waitset;
+            DDSStatusCondition *statusCondition;
             DDS_DynamicData * topicSample; 
             pthread_t tid;
             bool enabled;
@@ -75,11 +76,10 @@ namespace MODULE
             };
             void RunThread(void);
 
-
             pthread_t getThreadId(void) {return this->tid;};
 
-            virtual void Handler(DDS_DynamicData& data)
-                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+            virtual void Handler(DDS_DynamicData& data) // implemented by the concrete topic class
+                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; 
 
         protected:
             DDSDomainParticipant * topicParticipant;
