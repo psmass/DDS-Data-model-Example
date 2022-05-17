@@ -21,9 +21,13 @@
 namespace MODULE
 {
 
+// Path relative to build directory in CommandResponse c++ example
+const char* QOS_FILE = "../../../model/CommandProject.xml";
+
 void run_device_application() {  
     // Create the participant
-    const char *url_profiles[1] = { QOS_FILE };  
+    const char *url_profiles[1] = { QOS_FILE }; 
+    DDS_Duration_t wait_period = {2,0};
 
     DDSDomainParticipantFactory *factory =
 	    DDSDomainParticipantFactory::get_instance();
@@ -38,14 +42,15 @@ void run_device_application() {
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
-
-    //config_dev_reader.RunThread(participant);
+    config_dev_reader.RunThread();
     device_state_writer.RunThread();
+
+    NDDSUtility::sleep(wait_period); // let entities get up and running
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+    NDDSUtility::sleep(wait_period); // let entities get up and running
 
     while (!application::shutdown_requested)  {
         //Device State Machine goes here;
@@ -57,13 +62,13 @@ void run_device_application() {
         }
         std::cout << "." << std::flush;        
         //device_state_writer.writeData(device_state_writer.getCurrentState());
-        rti::util::sleep(dds::core::Duration(1));
+        NDDSUtility::sleep(wait_period); // let entities get up and running
     }
 
-    config_dev_reader.Reader::getThreadHndl()->join();
-    device_state_writer.Writer::getThreadHndl()->join();
+    pthread_cancel(config_dev_reader.Reader::getThreadId());
+    pthread_cancel(device_state_writer.Writer::getThreadId());
     // give threads a second to shut down
-    rti::util::sleep(dds::core::Duration(1));
+    NDDSUtility::sleep(wait_period); // give time for entities to shutdown
     std::cout << "Device main thread shutting down" << std::endl;
 }
 } // namespace MODULE
@@ -88,7 +93,7 @@ int main(int argc, char *argv[])
 
     // Releases the memory used by the participant factory.  Optional at
     // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
+    // dds::domain::DomainParticipant::finalize_participant_factory();
 
     return EXIT_SUCCESS;
 }

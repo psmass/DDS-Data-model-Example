@@ -24,8 +24,6 @@ namespace application {
 }
 namespace MODULE
 {
-    const char* QOS_FILE = "../../../model/CommandProject.xml";
-
     class Writer {
         public:
             Writer(
@@ -48,7 +46,7 @@ namespace MODULE
                  {return topicWriter;};  // needed for Requests to get the response writer
             DDS_DynamicData * getMyDataSample(void)
                 {return topicSample;};
-            pthread_t getPthreadId(void) {return this->tid;};
+            pthread_t getThreadId(void) {return this->tid;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
             pthread_t writerThreadId;
@@ -78,7 +76,7 @@ namespace MODULE
             void RunThread(void);
 
 
-            pthread_t getPthreadId(void) {return this->tid;};
+            pthread_t getThreadId(void) {return this->tid;};
 
             virtual void Handler(DDS_DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic

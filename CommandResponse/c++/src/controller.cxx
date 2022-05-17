@@ -21,11 +21,15 @@
 namespace MODULE
 {
 
+// Path relative to build directory in CommandResponse c++ example
+const char* QOS_FILE = "../../../model/CommandProject.xml";
+
 void run_controller_application() {
    // Create the participant
 
-    // Path relative to build directory in CommandResponse c++ example
-    const char *url_profiles[1] = { QOS_FILE };  
+
+    const char *url_profiles[1] = { QOS_FILE }; 
+    DDS_Duration_t wait_period = {2,0}; 
 
     DDSDomainParticipantFactory *factory =
 	    DDSDomainParticipantFactory::get_instance();
@@ -40,26 +44,26 @@ void run_controller_application() {
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
-    
-    pthread_create(&(config_dev_writer.getPthreadId()), NULL, (THREADFUNCPTR) &Writer::WriterThread, (void *) participant);
-    device_state_reader.RunThread(participant);
+    config_dev_writer.RunThread();
+    device_state_reader.RunThread();
 
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+ 
+    NDDSUtility::sleep(wait_period); // let entities get up and running
 
     while (!application::shutdown_requested) {
         //Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on
-        if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
-            config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
+        if (device_state_reader.getCurrentState() == UNINITIALIZED) {
+            config_dev_writer.writeData (ON);
         }
         std::cout << "." << std::flush;                 
-        rti::util::sleep(dds::core::Duration(1));
+        NDDSUtility::sleep(wait_period);
     }
 
-    config_dev_writer.Writer::getThreadHndl()->join();
-    device_state_reader.Reader::getThreadHndl()->join();
+    pthread_cancel(config_dev_writer.Writer::getThreadId());
+    pthread_cancel(device_state_reader.Reader::getThreadId());
     // give threads a second to shut down
-    rti::util::sleep(dds::core::Duration(1));
+    NDDSUtility::sleep(wait_period); // give time for entities to shutdown
     std::cout << "Controller main thread shutting down" << std::endl;
 
     // TO_DO do I need a delete_participant call to clean anything up?

@@ -23,6 +23,7 @@ const std::string _TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceR
 namespace MODULE
 {
 
+
     /* How to use specific topic Readers and Writers:
 
     The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
