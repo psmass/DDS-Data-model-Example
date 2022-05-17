@@ -42,6 +42,9 @@ namespace MODULE
             virtual void Handler(void) // implemented by the concrete topic class
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; 
 
+            /// used to factor wrt event waitset code
+            void WriterEventHandler(DDS_ReturnCode_t retcode, DDSConditionSeq active_conditions_seq);
+
             DDSDynamicDataWriter* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
             DDS_DynamicData * getMyDataSample(void)

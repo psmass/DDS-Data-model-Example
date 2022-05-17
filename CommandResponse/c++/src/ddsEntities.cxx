@@ -77,6 +77,29 @@ namespace MODULE
         pthread_create(&this->tid, NULL, &Writer::WriterThreadHelper, this);
     }
 
+    void Writer::WriterEventHandler(DDS_ReturnCode_t retcode, DDSConditionSeq active_conditions_seq) {
+        // Get the number of active conditions 
+        int active_conditions = active_conditions_seq.length();
+
+        for (int i = 0; i < active_conditions; ++i) {
+            // Compare with Status Conditions 
+            if (active_conditions_seq[i] == statusCondition) {
+                DDS_StatusMask triggeredmask =
+                        this->topicWriter->get_status_changes();
+
+                if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
+                    DDS_PublicationMatchedStatus st;
+                    this->topicWriter->get_publication_matched_status(st);
+                    std::cout << this->topicName << " Writer Subs: " 
+                    << st.current_count << "  " << st.current_count_change << std::endl;
+                }
+            } else {
+                // writers can only have status condition
+                std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
+            }
+        }
+    }
+
 
     Reader::Reader( 
         DDSDomainParticipant * participant, 

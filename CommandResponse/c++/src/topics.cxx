@@ -108,41 +108,19 @@ namespace MODULE
  
         int sampleNumber = 1;
     
-        while (!application::shutdown_requested)
-        {
-            retcode = this->waitset->wait(active_conditions_seq, send_period);
+        while (!application::shutdown_requested)  {
 
+            // Wait for event or timeout, if event call event handler
+            retcode = this->waitset->wait(active_conditions_seq, send_period);
             if (retcode == DDS_RETCODE_TIMEOUT) {
             //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
-            continue;
+                continue;
             } else if (retcode != DDS_RETCODE_OK) {
                 std::cerr << "Writer thread: wait returned error " << retcode << std::endl;
                 goto end_writer_handler;
             }
-
-            // if (myWriterEventsThreadInfo->topic_enum()== tms_TOPIC_SOURCE_TRANSITION_STATE_ENUM)
-            // while(1); //simulate a dead thread to test heartbeat disable
-
-            // Get the number of active conditions 
-            int active_conditions = active_conditions_seq.length();
-
-            for (int i = 0; i < active_conditions; ++i) {
-                // Compare with Status Conditions 
-                if (active_conditions_seq[i] == statusCondition) {
-                    DDS_StatusMask triggeredmask =
-                            this->topicWriter->get_status_changes();
-
-                    if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
-                        DDS_PublicationMatchedStatus st;
-                        this->topicWriter->get_publication_matched_status(st);
-                        std::cout << this->topicName << " Writer Subs: " 
-                        << st.current_count << "  " << st.current_count_change << std::endl;
-                    }
-                } else {
-                    // writers can only have status condition
-                    std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
-                }
-            }
+            this->WriterEventHandler(retcode, active_conditions_seq);
+ 
             // this topic is not periodic, so we'll only use this thread to monitor writer events
             // once we figure out the API more Modern C++
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -215,7 +193,7 @@ namespace MODULE
     };
 
     void ConfigDevWtr::Handler() {
-
+        DDSConditionSeq active_conditions_seq;
         DDS_ReturnCode_t retcode;
         DDS_Duration_t send_period = {1,0}; 
 
@@ -233,7 +211,16 @@ namespace MODULE
     
         while (!application::shutdown_requested)
         {
-
+            // Wait for event or timeout, if event call event handler
+            retcode = this->waitset->wait(active_conditions_seq, send_period);
+            if (retcode == DDS_RETCODE_TIMEOUT) {
+            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
+                continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                std::cerr << "Writer thread: wait returned error " << retcode << std::endl;
+                goto end_writer_handler;
+            }
+            this->WriterEventHandler(retcode, active_conditions_seq);
             // this topic is not periodic, so we'll only use this thread to monitor writer events
             // once we figure out the API more Modern C++
 
@@ -251,10 +238,10 @@ namespace MODULE
             //<< ", 'id': " << configDeviceSample.value<int32_t>("targetDeviceId.id") << "}"
             //<< std::endl;
 
-            // Send once every second
-            NDDSUtility::sleep(send_period);
             //sampleNumber++;
         }
+        end_writer_handler:
+        ;
     }
 
 
