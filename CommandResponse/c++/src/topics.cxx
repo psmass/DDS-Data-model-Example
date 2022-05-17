@@ -60,6 +60,7 @@ namespace MODULE
                 break;
             default: std::cout << "OOPS - not a valid value";
         }
+        std::cout << std::endl;
     }    
 
     DeviceStateWtr::DeviceStateWtr(DDSDomainParticipant * participant)
@@ -95,12 +96,11 @@ namespace MODULE
         std::cout << "Device State Writer Handler Executing" << std::endl; 
 
         // ERROR_CHECK
-        //Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
-        //Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
-        this->getMyDataSample()->set_long("myDeviceId.resource.Id", 
+        this->getMyDataSample()->set_long("myDeviceId.resourceId", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
         this->getMyDataSample()->set_long("myDeviceId.id", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
+ 
 
         int sampleNumber = 1;
     
@@ -167,7 +167,7 @@ namespace MODULE
 
         DDS_Long requested_state;
         // ERROR_CHECK
-        data.get_long(requested_state, "devicestate", DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
+        data.get_long(requested_state, "deviceConfig.stateReq", DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED);
         this->devicesDevStateWtrPtr->setCurrentState((enum MODULE::DeviceStateEnum)requested_state);
 
     }  
@@ -187,7 +187,7 @@ namespace MODULE
 
         DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
 
-        this->getMyDataSample()->set_long("targetDeviceId.resource.Id", 
+        this->getMyDataSample()->set_long("targetDeviceId.resourceId", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 2 );
         this->getMyDataSample()->set_long("targetDeviceId.id", 
                                             DDS_DYNAMIC_DATA_MEMBER_ID_UNSPECIFIED, 20);
