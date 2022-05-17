@@ -12,10 +12,7 @@
 
 #include <algorithm>
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <ndds/ndds_cpp.h>
-#include <rti/util/util.h> // for sleep
 #include "CommandResp.h"   // rti generated file from idl to use model const Topics
 #include "ddsEntities.h"
 #include "topics.h"
@@ -26,14 +23,25 @@ namespace MODULE
 
 void run_controller_application() {
    // Create the participant
-    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    DDSDomainParticipant participant =
-        qos_provider->create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
+
+    // Path relative to build directory in CommandResponse c++ example
+    const char *url_profiles[1] = { QOS_FILE };  
+
+    DDSDomainParticipantFactory *factory =
+	    DDSDomainParticipantFactory::get_instance();
+    DDS_DomainParticipantFactoryQos factoryQos;
+    DDS_ReturnCode_t retcode = factory->get_qos(factoryQos);
+    factoryQos.profile.url_profile.from_array(url_profiles, 1);
+    factory->set_qos(factoryQos);
+
+    DDSDomainParticipant * participant = DDSTheParticipantFactory->
+            create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
-    config_dev_writer.RunThread(participant);
+    
+    pthread_create(&(config_dev_writer.getPthreadId()), NULL, (THREADFUNCPTR) &Writer::WriterThread, (void *) participant);
     device_state_reader.RunThread(participant);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
@@ -54,6 +62,7 @@ void run_controller_application() {
     rti::util::sleep(dds::core::Duration(1));
     std::cout << "Controller main thread shutting down" << std::endl;
 
+    // TO_DO do I need a delete_participant call to clean anything up?
 }
 } // namespace MODULE
 
@@ -72,10 +81,6 @@ int main(int argc, char *argv[]) {
                   << std::endl;
         return EXIT_FAILURE;
     }
-
-    // Releases the memory used by the participant factory.  Optional at
-    // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
 
     return EXIT_SUCCESS;
 }

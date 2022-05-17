@@ -117,19 +117,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Controller
-
-# Build rule for target.
-Controller: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Controller
-.PHONY : Controller
-
-# fast build rule for target.
-Controller/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/build
-.PHONY : Controller/fast
-
-#=============================================================================
 # Target rules for targets named Device
 
 # Build rule for target.
@@ -141,6 +128,19 @@ Device: cmake_check_build_system
 Device/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/build
 .PHONY : Device/fast
+
+#=============================================================================
+# Target rules for targets named Controller
+
+# Build rule for target.
+Controller: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Controller
+.PHONY : Controller
+
+# fast build rule for target.
+Controller/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/build
+.PHONY : Controller/fast
 
 controller.o: controller.cxx.o
 .PHONY : controller.o
@@ -171,8 +171,8 @@ ddsEntities.o: ddsEntities.cxx.o
 
 # target to build an object file
 ddsEntities.cxx.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/ddsEntities.cxx.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.o
 .PHONY : ddsEntities.cxx.o
 
 ddsEntities.i: ddsEntities.cxx.i
@@ -180,8 +180,8 @@ ddsEntities.i: ddsEntities.cxx.i
 
 # target to preprocess a source file
 ddsEntities.cxx.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/ddsEntities.cxx.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.i
 .PHONY : ddsEntities.cxx.i
 
 ddsEntities.s: ddsEntities.cxx.s
@@ -189,8 +189,8 @@ ddsEntities.s: ddsEntities.cxx.s
 
 # target to generate assembly for a file
 ddsEntities.cxx.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/ddsEntities.cxx.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/ddsEntities.cxx.s
 .PHONY : ddsEntities.cxx.s
 
 device.o: device.cxx.o
@@ -222,8 +222,8 @@ topics.o: topics.cxx.o
 
 # target to build an object file
 topics.cxx.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/topics.cxx.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.o
 .PHONY : topics.cxx.o
 
 topics.i: topics.cxx.i
@@ -231,8 +231,8 @@ topics.i: topics.cxx.i
 
 # target to preprocess a source file
 topics.cxx.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/topics.cxx.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.i
 .PHONY : topics.cxx.i
 
 topics.s: topics.cxx.s
@@ -240,8 +240,8 @@ topics.s: topics.cxx.s
 
 # target to generate assembly for a file
 topics.cxx.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/topics.cxx.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/topics.cxx.s
 .PHONY : topics.cxx.s
 
 # Help Target

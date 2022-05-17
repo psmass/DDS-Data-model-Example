@@ -31,5 +31,5 @@ Device and Controller must be executed from the build directory.
 - Use and load an array of octets for deviceID
 - Set Static Topic Values in Constructor vs. top of the handler
 - Set deviceID Filter programatically so that xml is not unique per Partipant
-- 
+- Add .vscode option to kick off build and run of controller and device
 

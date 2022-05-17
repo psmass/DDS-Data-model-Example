@@ -15,33 +15,33 @@
 
 namespace MODULE
 {
-
     Writer::Writer(
         DDSDomainParticipant * participant, 
         std::string topic_name, 
         std::string writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        topicName = topic_name;
-        writerName = writer_name;
-
+        this->topicParticipant = participant;
+        this->topicName = topic_name;
+        this->writerName = writer_name;
     }
 
-    void Writer::WriterThread(void* _participant) {
-        DDSDomainParticipant * participant = (DDSDomainParticipant *)_participant;
+    void * Writer::WriterThread() {
         // Lookup the specific topic DeviceState as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
         // ERROR_CHECK
         this->topicWriter= DDSDynamicDataWriter::narrow(
-                participant->lookup_datawriter_by_name(this->writerName.c_str()));
+                this->topicParticipant->lookup_datawriter_by_name(this->writerName.c_str()));
         
         this->topicSample = topicWriter->create_data(DDS_DYNAMIC_DATA_PROPERTY_DEFAULT);
 
         this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
+        
+        return NULL;
 
     } // end Writer::WriterThread
 
@@ -144,7 +144,7 @@ namespace MODULE
  
                                 //myReaderThreadInfo->dataSeqIndx = i;
                                 // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; // announce oneself in handler
-                                this->Handler(data_seq[i])); // call the topic specific Handler (Virtual)
+                                this->Handler(data_seq[i]); // call the topic specific Handler (Virtual)
                             }
                         }
                     } else if (retcode == DDS_RETCODE_NO_DATA) {
@@ -153,14 +153,16 @@ namespace MODULE
                         std::cerr << "Reader thread: read data error " << retcode << std::endl; 
                         goto end_reader_thread;
                     }
-                    retcode = myReaderThreadInfo->reader->return_loan(data_seq, info_seq);
+                    retcode = topicReader->return_loan(data_seq, info_seq);
                     if (retcode != DDS_RETCODE_OK) {
                         std::cerr << "Reader thread:return_loan error " << retcode << std::endl; 
                         goto end_reader_thread;
                     }  
                 }
             }
-        }
+        } //while
+
+        end_reader_thread:
         std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
     }
 

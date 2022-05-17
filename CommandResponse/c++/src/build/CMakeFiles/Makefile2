@@ -63,8 +63,8 @@ CMAKE_BINARY_DIR = /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/Controller.dir/all
 all: CMakeFiles/Device.dir/all
+all: CMakeFiles/Controller.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,35 +72,9 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/Controller.dir/clean
 clean: CMakeFiles/Device.dir/clean
+clean: CMakeFiles/Controller.dir/clean
 .PHONY : clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/Controller.dir
-
-# All Build rule for target.
-CMakeFiles/Controller.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles --progress-num=1,2,3,4 "Built target Controller"
-.PHONY : CMakeFiles/Controller.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/Controller.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles 4
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Controller.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles 0
-.PHONY : CMakeFiles/Controller.dir/rule
-
-# Convenience name for target.
-Controller: CMakeFiles/Controller.dir/rule
-.PHONY : Controller
-
-# clean rule for target.
-CMakeFiles/Controller.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/clean
-.PHONY : CMakeFiles/Controller.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/Device.dir
@@ -127,6 +101,32 @@ Device: CMakeFiles/Device.dir/rule
 CMakeFiles/Device.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Device.dir/build.make CMakeFiles/Device.dir/clean
 .PHONY : CMakeFiles/Device.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Controller.dir
+
+# All Build rule for target.
+CMakeFiles/Controller.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles --progress-num=1,2,3,4 "Built target Controller"
+.PHONY : CMakeFiles/Controller.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Controller.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Controller.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src/build/CMakeFiles 0
+.PHONY : CMakeFiles/Controller.dir/rule
+
+# Convenience name for target.
+Controller: CMakeFiles/Controller.dir/rule
+.PHONY : Controller
+
+# clean rule for target.
+CMakeFiles/Controller.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Controller.dir/build.make CMakeFiles/Controller.dir/clean
+.PHONY : CMakeFiles/Controller.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

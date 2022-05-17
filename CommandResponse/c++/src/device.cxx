@@ -11,10 +11,7 @@
  */
 
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <ndds/ndds_cpp.h>
-#include <rti/util/util.h> // for sleep()
 #include "CommandResp.h"   // rti generated file from idl to use model const Topics
 #include "ddsEntities.h"
 #include "topics.h"
@@ -24,20 +21,28 @@
 namespace MODULE
 {
 
-//https://thispointer.com/c-how-to-pass-class-member-function-to-pthread_create/
-typedef void * (*THREADFUNCPTR)(void *participant); // used to cast to a non-static member func  
-
 void run_device_application() {  
     // Create the participant
-    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    DDSDomainParticipant * participant =
-        qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
+    const char *url_profiles[1] = { QOS_FILE };  
+
+    DDSDomainParticipantFactory *factory =
+	    DDSDomainParticipantFactory::get_instance();
+    DDS_DomainParticipantFactoryQos factoryQos;
+    DDS_ReturnCode_t retcode = factory->get_qos(factoryQos);
+    factoryQos.profile.url_profile.from_array(url_profiles, 1);
+    factory->set_qos(factoryQos);
+
+    DDSDomainParticipant * participant = DDSTheParticipantFactory->
+            create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
-    config_dev_reader.RunThread(participant);
-    pthread_create(&(device_state_writer.getPthreadId()), NULL, (THREADFUNCPTR) &Writer::WriterThread, (void *) participant);
+
+    //config_dev_reader.RunThread(participant);
+    //Writer * writerPtr = new Writer();
+    pthread_t _tid;
+    pthread_create(&_tid, NULL, &Writer::WriterThreadHelper, &device_state_writer);
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);

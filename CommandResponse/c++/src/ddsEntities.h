@@ -24,8 +24,8 @@ namespace application {
 }
 namespace MODULE
 {
-    const std::string QOS_FILE = "../../model/CommandProject.xml";
-    
+    const char* QOS_FILE = "../../../model/CommandProject.xml";
+
     class Writer {
         public:
             Writer(
@@ -34,7 +34,11 @@ namespace MODULE
                 std::string writer_name);
             ~Writer(void) {}; 
 
-            void WriterThread(void * participant);
+            void * WriterThread();
+            // pthred requires a static _f* so we need helper to convert
+            static void * WriterThreadHelper(void * context) {
+                return ((Writer *)context)->WriterThread();
+            }
 
             virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
@@ -46,14 +50,15 @@ namespace MODULE
             pthread_t getPthreadId(void) {return this->writerThreadId;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
+            pthread_t writerThreadId;
         
         protected:
             std::string topicName;
             std::string writerName;
+            DDSDomainParticipant * topicParticipant;
             DDSDynamicDataWriter * topicWriter;
             DDS_DynamicData * topicSample; 
             bool enabled;
-            pthread_t writerThreadId;
     };
 
     class Reader {
