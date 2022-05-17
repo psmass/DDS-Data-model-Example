@@ -45,6 +45,10 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
+    void Writer::RunThread(){
+        pthread_create(&this->tid, NULL, &Writer::WriterThreadHelper, this);
+    }
+
 
     Reader::Reader( 
         DDSDomainParticipant * participant, 
@@ -52,13 +56,14 @@ namespace MODULE
         std::string reader_name) {
 
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
-        topicName = topic_name;
-        readerName = reader_name;
+        this->topicParticipant=participant;
+        this->topicName = topic_name;
+        this->readerName = reader_name;
  
     }
 
 
-    void Reader::ReaderThread(DDSDomainParticipant * participant) {
+    void * Reader::ReaderThread(void) {
         DDSReadCondition * read_condition = NULL;
         DDSStatusCondition * status_condition =  NULL;
         DDSWaitSet *waitset = new DDSWaitSet();
@@ -74,7 +79,7 @@ namespace MODULE
         // subscriber::reader pair as the datareader name.
         // Lookup reader handles and put them in myReaders[this_topic_enum]
         this->topicReader = DDSDynamicDataReader::narrow(
-            participant->lookup_datareader_by_name(this->readerName.c_str()));
+            this->topicParticipant->lookup_datareader_by_name(this->readerName.c_str()));
 
         // Create read condition
         read_condition = this->topicReader->create_readcondition(
@@ -115,18 +120,18 @@ namespace MODULE
                     /* Get the status changes so we can check which status
                     * condition triggered. */
                     DDS_StatusMask triggeredmask =
-                            topicReader->get_status_changes();
+                            this->topicReader->get_status_changes();
 
                     /* Subscription matched */
                     if (triggeredmask & DDS_SUBSCRIPTION_MATCHED_STATUS) {
                         DDS_SubscriptionMatchedStatus st;
-                        topicReader->get_subscription_matched_status(st);
+                        this->topicReader->get_subscription_matched_status(st);
                         std::cout << this->topicName << "Reader Pubs: " 
                         << st.current_count << "  " << st.current_count_change << std::endl;
                     }
                 } else if (active_conditions_seq[i] == read_condition) { 
                     // Get the latest samples
-                    retcode = topicReader->take(
+                    retcode = this->topicReader->take(
                                 data_seq, info_seq, DDS_LENGTH_UNLIMITED,
                                 DDS_ANY_SAMPLE_STATE, DDS_ANY_VIEW_STATE, DDS_ANY_INSTANCE_STATE);
 
@@ -153,7 +158,7 @@ namespace MODULE
                         std::cerr << "Reader thread: read data error " << retcode << std::endl; 
                         goto end_reader_thread;
                     }
-                    retcode = topicReader->return_loan(data_seq, info_seq);
+                    retcode = this->topicReader->return_loan(data_seq, info_seq);
                     if (retcode != DDS_RETCODE_OK) {
                         std::cerr << "Reader thread:return_loan error " << retcode << std::endl; 
                         goto end_reader_thread;
@@ -163,8 +168,14 @@ namespace MODULE
         } //while
 
         end_reader_thread:
-        std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
+        std::cout << this->topicName << "Reader thread shutting down" << std::endl;  
+        return NULL;
     }
+
+    void Reader::RunThread(){
+        pthread_create(&this->tid, NULL, &Reader::ReaderThreadHelper, this);
+    }
+
 
 } // NAMESPACE MODULE
 

@@ -34,11 +34,12 @@ namespace MODULE
                 std::string writer_name);
             ~Writer(void) {}; 
 
-            void * WriterThread();
+            void * WriterThread(void);
             // pthred requires a static _f* so we need helper to convert
             static void * WriterThreadHelper(void * context) {
                 return ((Writer *)context)->WriterThread();
             }
+            void RunThread(void);
 
             virtual void Handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
@@ -47,7 +48,7 @@ namespace MODULE
                  {return topicWriter;};  // needed for Requests to get the response writer
             DDS_DynamicData * getMyDataSample(void)
                 {return topicSample;};
-            pthread_t getPthreadId(void) {return this->writerThreadId;};
+            pthread_t getPthreadId(void) {return this->tid;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
             pthread_t writerThreadId;
@@ -58,6 +59,7 @@ namespace MODULE
             DDSDomainParticipant * topicParticipant;
             DDSDynamicDataWriter * topicWriter;
             DDS_DynamicData * topicSample; 
+            pthread_t tid;
             bool enabled;
     };
 
@@ -69,18 +71,24 @@ namespace MODULE
                 std::string reader_name);
             ~Reader(void){};
 
-            void ReaderThread(DDSDomainParticipant * participant);
+            void * ReaderThread(void);
+            static void * ReaderThreadHelper(void * context) {
+                return ((Reader *)context)->ReaderThread();
+            };
+            void RunThread(void);
 
-            pthread_t getPthreadId(void) {return this->readerThreadId;};
+
+            pthread_t getPthreadId(void) {return this->tid;};
 
             virtual void Handler(DDS_DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
         protected:
+            DDSDomainParticipant * topicParticipant;
             std::string topicName;
             std::string readerName;
             DDSDynamicDataReader * topicReader;
-            pthread_t readerThreadId;
+            pthread_t tid;
 
 
     };

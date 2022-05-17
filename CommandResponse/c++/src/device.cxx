@@ -40,9 +40,7 @@ void run_device_application() {
     DeviceStateWtr device_state_writer(participant);
 
     //config_dev_reader.RunThread(participant);
-    //Writer * writerPtr = new Writer();
-    pthread_t _tid;
-    pthread_create(&_tid, NULL, &Writer::WriterThreadHelper, &device_state_writer);
+    device_state_writer.RunThread();
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
