@@ -67,6 +67,13 @@
       </module>
     </types>
 
+    <qos_library name="CmdRspLibrary">
+      <qos_profile name="DeviceStateProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable.TransientLocal">
+      </qos_profile>
+      <qos_profile name="ConfigDevProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable">
+      </qos_profile>
+    </qos_library>
+
     <domain_library name="CmdRspDomainLibrary">
       <domain name="SystemDomain" domain_id="0">
         <register_type name="DeviceStateType" type_ref="ExCmdRsp::DeviceState"/>
@@ -79,17 +86,14 @@
     <domain_participant_library name="CmdRspParticipantLibrary">
       <domain_participant name="ControllerParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="ControllerPublisher">
-          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice"/>
+          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice">
+            <datawriter_qos base_name="CmdRspLibrary::ConfigDevProfile">
+            </datawriter_qos>
+          </data_writer>
         </publisher>
         <subscriber name="ControllerSubscriber">
           <data_reader name="DeviceStateReader" topic_ref="DeviceState">
-            <datareader_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspLibrary::DeviceStateProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>
@@ -97,10 +101,7 @@
       <domain_participant name="DeviceParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="DevicePublisher">
           <data_writer name="DeviceStateWriter" topic_ref="DeviceState">
-            <datawriter_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
+            <datawriter_qos base_name="CmdRspLibrary::DeviceStateProfile">
             </datawriter_qos>
           </data_writer>
         </publisher>
@@ -112,10 +113,7 @@
                 <element>20</element>
               </expression_parameters>
             </content_filter>
-            <datareader_qos>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspLibrary::ConfigDevProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>
