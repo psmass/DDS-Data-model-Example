@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
     <types>
-      <!-- Commands below are 'short-lived' meaning they are responded to immediately and 
-	     don't require Objective State. 
-
-         This example will have a Controller and a Device (where there could be many devices).
-	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
-	     a QoS of Durable, then wait to be commanded.
-	     The Controller will recognize the device and issue a command to TURN_ON. 
-	     Controller will then periodically request status.  There is a one-to-one
-	     correspondence between Controller Commands and Device Responses. That is for 
-	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
-	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
-
-         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
-	     does not filter since it may expect key'd responses from many deviceIDs.
-
-         To keep things simple the device
-	     will not issue Alarms or any other non-requested topics except the intial DA.
-
-      -->
       <module name="ExCmdRsp">
         <!--Start_Header_File_Const-Block 
        These Constants are defined here as part of the system model and used to generate a header file where they can be used 
@@ -67,6 +48,13 @@
       </module>
     </types>
 
+    <qos_library name="CmdRspLibrary">
+      <qos_profile name="DeviceStateProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable.TransientLocal">
+      </qos_profile>
+      <qos_profile name="ConfigDevProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable">
+      </qos_profile>
+    </qos_library>
+
     <domain_library name="CmdRspDomainLibrary">
       <domain name="SystemDomain" domain_id="0">
         <register_type name="DeviceStateType" type_ref="ExCmdRsp::DeviceState"/>
@@ -79,17 +67,14 @@
     <domain_participant_library name="CmdRspParticipantLibrary">
       <domain_participant name="ControllerParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="ControllerPublisher">
-          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice"/>
+          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice">
+            <datawriter_qos base_name="CmdRspLibrary::ConfigDevProfile">
+            </datawriter_qos>
+          </data_writer>
         </publisher>
         <subscriber name="ControllerSubscriber">
           <data_reader name="DeviceStateReader" topic_ref="DeviceState">
-            <datareader_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspLibrary::DeviceStateProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>
@@ -97,10 +82,7 @@
       <domain_participant name="DeviceParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="DevicePublisher">
           <data_writer name="DeviceStateWriter" topic_ref="DeviceState">
-            <datawriter_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
+            <datawriter_qos base_name="CmdRspLibrary::DeviceStateProfile">
             </datawriter_qos>
           </data_writer>
         </publisher>
@@ -112,10 +94,7 @@
                 <element>20</element>
               </expression_parameters>
             </content_filter>
-            <datareader_qos>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspLibrary::ConfigDevProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>
