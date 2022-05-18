@@ -50,7 +50,7 @@ static int publisher_shutdown(DDSDomainParticipant *participant)
 
     retcode = DDSDomainParticipantFactory::finalize_instance();
     if (retcode != DDS_RETCODE_OK) {
-        printf("finalize_instance error %d\n", retcode);
+        std::cout << "finalize_instance error" << retcode << std::endl;
         status = -1;
     }
 
@@ -58,7 +58,7 @@ static int publisher_shutdown(DDSDomainParticipant *participant)
 }
 
 
-extern "C" int run_controller_application() {
+extern "C" int run_controller_application(int domain_id) {
    // Create the participant
 
 
@@ -72,9 +72,17 @@ extern "C" int run_controller_application() {
     factoryQos.profile.url_profile.from_array(url_profiles, 1);
     factory->set_qos(factoryQos);
 
-    DDSDomainParticipant * participant = DDSTheParticipantFactory->
-            create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
 
+     DDSDomainParticipant * participant = DDSTheParticipantFactory->create_participant(
+            domainId,
+            DDS_PARTICIPANT_QOS_DEFAULT,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+    if (participant == NULL) {
+        printf("create_participant error\n");
+        publisher_shutdown(participant);
+        return -1;
+    }
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
@@ -111,10 +119,12 @@ int main(int argc, char *argv[]) {
 
     using namespace application;
 
+    int domain_id = 0;
+
     setup_signal_handlers();
 
     try {
-        return MODULE::run_controller_application();
+        return MODULE::run_controller_application(domain_id);
     }
     catch (const std::exception &ex) {
         // This will catch DDS exceptions
