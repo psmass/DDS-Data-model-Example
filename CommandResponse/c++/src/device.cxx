@@ -24,15 +24,50 @@ namespace MODULE
 // Path relative to build directory in CommandResponse c++ example
 const char* QOS_FILE = "../../../model/CommandProject.xml";
 
-void run_device_application() {  
+/* Delete all entities */
+static int publisher_shutdown(DDSDomainParticipant *participant)
+{
+    DDS_ReturnCode_t retcode;
+    int status = 0;
+
+    if (participant != NULL) {
+        retcode = participant->delete_contained_entities();
+        if (retcode != DDS_RETCODE_OK) {
+            printf("delete_contained_entities error %d\n", retcode);
+            status = -1;
+        }
+
+        retcode = DDSTheParticipantFactory->delete_participant(participant);
+        if (retcode != DDS_RETCODE_OK) {
+            printf("delete_participant error %d\n", retcode);
+            status = -1;
+        }
+    }
+
+    /* RTI Connext provides finalize_instance() method on
+       domain participant factory for people who want to release memory used
+       by the participant factory. Uncomment the following block of code for
+       clean destruction of the singleton. */
+
+    retcode = DDSDomainParticipantFactory::finalize_instance();
+    if (retcode != DDS_RETCODE_OK) {
+        printf("finalize_instance error %d\n", retcode);
+        status = -1;
+    }
+
+    return status;
+}
+
+extern "C" int run_device_application() {  
     // Create the participant
     const char *url_profiles[1] = { QOS_FILE }; 
     DDS_Duration_t wait_period = {2,0};
+    DDS_ReturnCode_t retcode;
 
     DDSDomainParticipantFactory *factory =
 	    DDSDomainParticipantFactory::get_instance();
     DDS_DomainParticipantFactoryQos factoryQos;
-    DDS_ReturnCode_t retcode = factory->get_qos(factoryQos);
+    retcode = factory->get_qos(factoryQos);
     factoryQos.profile.url_profile.from_array(url_profiles, 1);
     factory->set_qos(factoryQos);
 
@@ -64,11 +99,14 @@ void run_device_application() {
         //device_state_writer.writeData(device_state_writer.getCurrentState());
         NDDSUtility::sleep(wait_period); // let entities get up and running
     }
-
+    
     pthread_cancel(config_dev_reader.Reader::getThreadId());
     pthread_cancel(device_state_writer.Writer::getThreadId());
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
+
+    /* Delete all entities */
+    return publisher_shutdown(participant);
     std::cout << "Device main thread shutting down" << std::endl;
 }
 } // namespace MODULE
@@ -82,7 +120,7 @@ int main(int argc, char *argv[])
     setup_signal_handlers();
 
     try  {
-        MODULE::run_device_application();
+        return MODULE::run_device_application();
     }
     catch (const std::exception &ex)  {
         // This will catch DDS exceptions

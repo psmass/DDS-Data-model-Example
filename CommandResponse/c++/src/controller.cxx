@@ -24,7 +24,41 @@ namespace MODULE
 // Path relative to build directory in CommandResponse c++ example
 const char* QOS_FILE = "../../../model/CommandProject.xml";
 
-void run_controller_application() {
+static int publisher_shutdown(DDSDomainParticipant *participant)
+{
+    DDS_ReturnCode_t retcode;
+    int status = 0;
+
+    if (participant != NULL) {
+        retcode = participant->delete_contained_entities();
+        if (retcode != DDS_RETCODE_OK) {
+            printf("delete_contained_entities error %d\n", retcode);
+            status = -1;
+        }
+
+        retcode = DDSTheParticipantFactory->delete_participant(participant);
+        if (retcode != DDS_RETCODE_OK) {
+            printf("delete_participant error %d\n", retcode);
+            status = -1;
+        }
+    }
+
+    /* RTI Connext provides finalize_instance() method on
+       domain participant factory for people who want to release memory used
+       by the participant factory. Uncomment the following block of code for
+       clean destruction of the singleton. */
+
+    retcode = DDSDomainParticipantFactory::finalize_instance();
+    if (retcode != DDS_RETCODE_OK) {
+        printf("finalize_instance error %d\n", retcode);
+        status = -1;
+    }
+
+    return status;
+}
+
+
+extern "C" int run_controller_application() {
    // Create the participant
 
 
@@ -64,6 +98,9 @@ void run_controller_application() {
     pthread_cancel(device_state_reader.Reader::getThreadId());
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
+    
+    /* Delete all entities */
+    return publisher_shutdown(participant);
     std::cout << "Controller main thread shutting down" << std::endl;
 
     // TO_DO do I need a delete_participant call to clean anything up?
@@ -77,7 +114,7 @@ int main(int argc, char *argv[]) {
     setup_signal_handlers();
 
     try {
-        MODULE::run_controller_application();
+        return MODULE::run_controller_application();
     }
     catch (const std::exception &ex) {
         // This will catch DDS exceptions
