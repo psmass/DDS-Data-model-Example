@@ -31,7 +31,7 @@ void run_device_application() {
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
+    ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
     config_dev_reader.RunThread(participant);
     device_state_writer.RunThread(participant);

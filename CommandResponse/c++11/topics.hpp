@@ -18,8 +18,6 @@
 #include "CommandResp.hpp"
 
 
-const std::string _TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
-
 namespace MODULE
 {
 
