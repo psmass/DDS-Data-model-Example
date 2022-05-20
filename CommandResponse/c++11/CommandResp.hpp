@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433895_hpp
-#define CommandResp_2073433895_hpp
+#ifndef CommandResp_2073433936_hpp
+#define CommandResp_2073433936_hpp
 
 #include <iosfwd>
 
@@ -61,9 +61,9 @@ namespace ExCmdRsp {
 
     static const std::string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
-    static const std::string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
+    static const std::string TOPIC_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
 
-    static const std::string TOPIC_DEVICE_STATE = "DeviceState";
+    static const std::string TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
     static const std::string CONTROLLER1_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant1";
 
@@ -631,5 +631,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // CommandResp_2073433895_hpp
+#endif // CommandResp_2073433936_hpp
 

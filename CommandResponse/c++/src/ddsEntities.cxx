@@ -16,13 +16,15 @@
 namespace MODULE
 {
     Writer::Writer(
-        DDSDomainParticipant * participant, 
-        std::string topic_name, 
-        std::string writer_name) {
+        DDSDomainParticipant * participant,
+        DDSPublisher * publisher,
+        const char* topic_name, 
+        const char* writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         this->topicParticipant = participant;
-        this->topicName = topic_name;
+        this->topicPublisher = publisher;
+        this->topicName = (char *) topic_name;
         this->writerName = writer_name;
         this->waitset = new DDSWaitSet();;
     }
@@ -31,38 +33,9 @@ namespace MODULE
 
         DDS_ReturnCode_t retcode;
         
-        // Lookup the specific topic DeviceState as defined in the xml file.
-        // This will be needed to create samples of the correct type
+        // Use the topic name to register the Topic Type, create the Topic 
+        // Create the Writer and create the data sample
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
-
-        // ERROR_CHECK
-        // get the specific topic writer
-        this->topicWriter= DDSDynamicDataWriter::narrow(
-                this->topicParticipant->lookup_datawriter_by_name(this->writerName.c_str()));
-        
-        this->topicSample = topicWriter->create_data(DDS_DYNAMIC_DATA_PROPERTY_DEFAULT);
-
-        // Configure Waitset for Writer Status ****
-        this->statusCondition = this->topicWriter->get_statuscondition();
-        if (statusCondition == NULL) {
-            std::cerr << "Writer thread: get_statuscondition error " << retcode << std::endl; 
-            goto end_writer_thread;
-        }
-
-        // Set enabled statuses
-        retcode = statusCondition->set_enabled_statuses(
-                DDS_PUBLICATION_MATCHED_STATUS);
-        if (retcode != DDS_RETCODE_OK) {
-            std::cerr << "Writer thread: set_enabled_statuses error " << retcode << std::endl; 
-            goto end_writer_thread;
-        }
-
-        // Attach Status Conditions to the above waitset
-        retcode =this->waitset->attach_condition(statusCondition);
-        if (retcode != DDS_RETCODE_OK) {
-            std::cerr << "Writer thread: attach_condition error " << retcode << std::endl; 
-            goto end_writer_thread;
-        }
  
         this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
@@ -77,38 +50,17 @@ namespace MODULE
         pthread_create(&this->tid, NULL, &Writer::WriterThreadHelper, this);
     }
 
-    void Writer::WriterEventHandler(DDS_ReturnCode_t retcode, DDSConditionSeq active_conditions_seq) {
-        // Get the number of active conditions 
-        int active_conditions = active_conditions_seq.length();
-
-        for (int i = 0; i < active_conditions; ++i) {
-            // Compare with Status Conditions 
-            if (active_conditions_seq[i] == statusCondition) {
-                DDS_StatusMask triggeredmask =
-                        this->topicWriter->get_status_changes();
-
-                if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
-                    DDS_PublicationMatchedStatus st;
-                    this->topicWriter->get_publication_matched_status(st);
-                    std::cout << this->topicName << " Writer Subs: " 
-                    << st.current_count << "  " << st.current_count_change << std::endl;
-                }
-            } else {
-                // writers can only have status condition
-                std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
-            }
-        }
-    }
-
 
     Reader::Reader( 
-        DDSDomainParticipant * participant, 
-        std::string topic_name, 
-        std::string reader_name) {
+        DDSDomainParticipant * participant,
+        DDSSubscriber * subscriber,
+        const char* topic_name, 
+        const char* reader_name) {
 
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
         this->topicParticipant=participant;
-        this->topicName = topic_name;
+        this->topicSubscriber=subscriber;
+        this->topicName = (char *) topic_name;
         this->readerName = reader_name;
  
     }
@@ -126,31 +78,6 @@ namespace MODULE
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
-        // Find the DataReader defined in the xml by using the participant and the
-        // subscriber::reader pair as the datareader name.
-        // Lookup reader handles and put them in myReaders[this_topic_enum]
-        this->topicReader = DDSDynamicDataReader::narrow(
-            this->topicParticipant->lookup_datareader_by_name(this->readerName.c_str()));
-
-        // Create read condition
-        read_condition = this->topicReader->create_readcondition(
-            DDS_NOT_READ_SAMPLE_STATE,
-            DDS_ANY_VIEW_STATE,
-            DDS_ANY_INSTANCE_STATE);
-
-        //  Get & Set status conditions
-        status_condition = this->topicReader->get_statuscondition();
-        retcode = status_condition->set_enabled_statuses(DDS_SUBSCRIPTION_MATCHED_STATUS);  
-
-        /* Attach Read Conditions */
-        retcode = waitset->attach_condition(read_condition);
-
-        /* Attach Status Conditions */
-        retcode = waitset->attach_condition(status_condition);
-        if (retcode != DDS_RETCODE_OK) {
-            std::cerr << "Reader thread: attach_condition error" << std::endl;
-            goto end_reader_thread;
-        }
 
         while (!application::shutdown_requested) {
             // Wait 4 seconds for data 

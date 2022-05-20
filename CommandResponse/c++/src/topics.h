@@ -50,7 +50,7 @@ namespace MODULE
 
 class DeviceStateRdr : public Reader {
     public:
-        DeviceStateRdr(DDSDomainParticipant * participant);
+        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber);
         ~DeviceStateRdr(void){};
 
         void Handler(DDS_DynamicData & data);
@@ -65,6 +65,8 @@ class DeviceStateRdr : public Reader {
         }
         
     private:
+        MODULE::DeviceStateDataReader * topicReader;
+        DDSStatusCondition *statusCondition;
         // Controller will track the devices state as well, note if there were more than one
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
@@ -75,10 +77,11 @@ class DeviceStateRdr : public Reader {
 
 class DeviceStateWtr : public Writer {
     public:
-        DeviceStateWtr(DDSDomainParticipant * participant);
+        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher);
         ~DeviceStateWtr(void){};
 
         void Handler(void);
+        void WriterEventHandler(DDSConditionSeq active_conditions_seq);
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
@@ -101,6 +104,9 @@ class DeviceStateWtr : public Writer {
         // initialize current as UNITIALIZED and ensure previous state is something different
         // so we will immedately send a state update to the controller (durabley), this
         // also 'Announces' ouselves to the controller.
+        MODULE::DeviceStateDataWriter * topicWriter;
+        MODULE::DeviceState * topicSample; 
+        DDSStatusCondition *statusCondition;
         enum MODULE::DeviceStateEnum previousState; 
         enum MODULE::DeviceStateEnum currentState; 
 };
@@ -108,7 +114,10 @@ class DeviceStateWtr : public Writer {
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(DDSDomainParticipant * participant, const std::string filter_name);
+        ConfigDevRdr(
+            DDSDomainParticipant * participant,
+            DDSSubscriber * subscriber,
+            const std::string filter_name);
         ~ConfigDevRdr(void){};
 
         void Handler(DDS_DynamicData & data);
@@ -119,14 +128,19 @@ class ConfigDevRdr : public Reader {
         // will need the associated devStateWtr when receive a new config command and have
         // to change the state of the device
         DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
+
+        MODULE::ConfigureDeviceDataReader * topicReader;
+        DDSStatusCondition *statusCondition;
 };
 
 class ConfigDevWtr : public Writer {
     public:
-        ConfigDevWtr(DDSDomainParticipant * participant);
+        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher);
         ~ConfigDevWtr(void){};
 
         void Handler(void);
+        void WriterEventHandler(DDSConditionSeq active_conditions_seq);
+
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
@@ -135,6 +149,9 @@ class ConfigDevWtr : public Writer {
         void writeData(enum MODULE::DeviceStateEnum configReq); 
 
     private:
+        ConfigureDeviceDataWriter * topicWriter;
+        MODULE::ConfigureDevice * topicSample; 
+        DDSStatusCondition *statusCondition;
 };
 
 } // namespace MODULE

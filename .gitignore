@@ -9,6 +9,8 @@ Sensors/c++11/build
 CommandResponse/.DS_Store
 CommandResponse/c++11/build
 CommandResponse/c++11/.DS_Store
+CommandResponse/c++/src/build
+CommandResponse/c++/.DS_Store
 
 *.DS_Store
 *.vcxproj

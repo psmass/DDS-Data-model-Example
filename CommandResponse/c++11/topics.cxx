@@ -14,18 +14,11 @@
 #include "CommandResp.hpp"
 #include <dds/dds.hpp>
 
-const std::string _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
-const std::string _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
-const std::string _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
-const std::string _CONFIGURE_DEVICE_WRITER = MODULE::CONFIGURE_DEVICE_WRITER;
-
-const std::string _TOPIC_DEVICE_STATE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_DEVICE_STATE;
-const std::string _TOPIC_CONFIGURE_DEVICE = MODULE::MODULE_EX_CMD_RSP + "::" + MODULE::TOPIC_CONFIGURE_DEVICE;
 namespace MODULE
 {
 
     DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
-                 : Reader(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
+      : Reader(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
     };
 
     void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
@@ -52,7 +45,7 @@ namespace MODULE
     }    
 
     DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
-                 : Writer(participant, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
+      : Writer(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         //std::cout << "Device State C'Tor" << std::endl; 
@@ -112,7 +105,7 @@ namespace MODULE
 
 
     ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
-                 : Reader(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
+      : Reader(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
         // std::cout << "Config Dev Reader C'tor " << std::endl; 
         // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
         // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
@@ -146,7 +139,7 @@ namespace MODULE
 
 
     ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
-                 : Writer(participant, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
+      : Writer(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
