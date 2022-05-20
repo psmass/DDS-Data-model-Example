@@ -28,8 +28,9 @@ namespace MODULE
         public:
             Writer(
                 DDSDomainParticipant * participant,
-                std::string topic_name,
-                std::string writer_name);
+                DDSPublisher * publisher,
+                const char* topic_name,
+                const char* writer_name);
             ~Writer(void) {}; 
 
             void * WriterThread(void);
@@ -42,25 +43,17 @@ namespace MODULE
             virtual void Handler(void) // implemented by the concrete topic class
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; 
 
-            /// used to factor wrt event waitset code
-            void WriterEventHandler(DDS_ReturnCode_t retcode, DDSConditionSeq active_conditions_seq);
-
-            DDSDynamicDataWriter* getMyWriter(void)
-                 {return topicWriter;};  // needed for Requests to get the response writer
-            DDS_DynamicData * getMyDataSample(void)
-                {return topicSample;};
             pthread_t getThreadId(void) {return this->tid;};
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
-            std::string topicName;
+            char * topicName;
+            char * topicTypeName;
             std::string writerName;
             DDSDomainParticipant * topicParticipant;
-            DDSDynamicDataWriter * topicWriter;
+            DDSPublisher * topicPublisher;
             DDSWaitSet *waitset;
-            DDSStatusCondition *statusCondition;
-            DDS_DynamicData * topicSample; 
             pthread_t tid;
             bool enabled;
     };
@@ -69,8 +62,9 @@ namespace MODULE
         public:
             Reader(
                 DDSDomainParticipant * participant,
-                std::string topic_name, 
-                std::string reader_name);
+                DDSSubscriber * subscriber,
+                const char* topic_name, 
+                const char* reader_name);
             ~Reader(void){};
 
             void * ReaderThread(void);
@@ -86,9 +80,10 @@ namespace MODULE
 
         protected:
             DDSDomainParticipant * topicParticipant;
-            std::string topicName;
+            DDSSubscriber * topicSubscriber;
+            char * topicName;
+            char * topicTypeName;
             std::string readerName;
-            DDSDynamicDataReader * topicReader;
             pthread_t tid;
 
 

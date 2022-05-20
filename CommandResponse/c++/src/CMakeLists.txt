@@ -26,6 +26,9 @@ find_package(
 )
 
 set(CONTROLLER_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespPlugin.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespSupport.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandResp.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
@@ -37,6 +40,9 @@ add_executable(Controller
 )
 
 set(DEVICE_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespPlugin.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespSupport.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandResp.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/device.cxx"
