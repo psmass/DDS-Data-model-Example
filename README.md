@@ -1,6 +1,5 @@
 ![](https://github.com/psmass/DDSexamples/blob/master/RtiAsOne.png)
 
-This branch contains the Command/Response Traditional C++ and C++11 as XML App Create examples.
 
 Top-level Data Model Directory:
 
