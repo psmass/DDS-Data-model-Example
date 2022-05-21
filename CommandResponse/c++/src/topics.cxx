@@ -52,9 +52,10 @@ namespace MODULE
         }
 
         // This DataReader reads data on "Example MODULE_DeviceState" Topic
-        DDSDataReader *untyped_reader = subscriber->create_datareader(
+        DDSDataReader *untyped_reader = subscriber->create_datareader_with_profile(
             topic,
-            DDS_DATAREADER_QOS_DEFAULT,
+            MODULE::CMD_RSP_QOS_LIBRARY,
+            MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
         if (untyped_reader == NULL) {
@@ -164,6 +165,7 @@ namespace MODULE
                                     default: std::cout << "OOPS - not a valid value";
                                 }
                                 std::cout << std::endl;
+                                MODULE::DeviceStateTypeSupport::print_data(&data_seq[i]); 
                             }
                         }
                     } else if (retcode == DDS_RETCODE_NO_DATA) {
@@ -213,9 +215,10 @@ namespace MODULE
         }
 
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = publisher->create_datawriter(
+        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
             topic,
-            DDS_DATAWRITER_QOS_DEFAULT,
+            MODULE::CMD_RSP_QOS_LIBRARY,
+            MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
         if (untyped_writer == NULL) {
@@ -400,9 +403,10 @@ namespace MODULE
         }
 
         // This DataReader reads data on "Example MODULE_DeviceState" Topic
-        DDSDataReader *untyped_reader = subscriber->create_datareader(
+        DDSDataReader *untyped_reader = subscriber->create_datareader_with_profile(
             topic,
-            DDS_DATAREADER_QOS_DEFAULT,
+            MODULE::CMD_RSP_QOS_LIBRARY,
+            MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
         if (untyped_reader == NULL) {
@@ -498,6 +502,7 @@ namespace MODULE
                                 // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; 
                                 DDS_Long requested_state = data_seq[i].deviceConfig.stateReq;
                                 this->devicesDevStateWtrPtr->setCurrentState((enum MODULE::DeviceStateEnum)requested_state);
+                                MODULE::ConfigureDeviceTypeSupport::print_data(&data_seq[i]); 
                             }
                         }
                     } else if (retcode == DDS_RETCODE_NO_DATA) {
@@ -543,9 +548,10 @@ namespace MODULE
         }
 
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = publisher->create_datawriter(
+        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
             topic,
-            DDS_DATAWRITER_QOS_DEFAULT,
+            MODULE::CMD_RSP_QOS_LIBRARY,
+            MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
         if (untyped_writer == NULL) {
