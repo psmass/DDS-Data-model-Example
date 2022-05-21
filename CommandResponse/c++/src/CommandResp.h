@@ -10,8 +10,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433936_h
-#define CommandResp_2073433936_h
+#ifndef CommandResp_2073433127_h
+#define CommandResp_2073433127_h
 
 #ifndef NDDS_STANDALONE_TYPE
 #ifndef ndds_cpp_h
@@ -25,6 +25,7 @@ or consult the Code Generator User's Manual.
 namespace ExCmdRsp {
     static const DDS_Char * const MODULE_EX_CMD_RSP= "ExCmdRsp";
     static const DDS_Char * const TOPIC_CONFIGURE_DEVICE= "ExCmdRsp::ConfigureDevice";
+    static const DDS_Char * const TOPIC_CONFIGURE_DEV_CFT= "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
     static const DDS_Char * const TOPIC_DEVICE_STATE= "ExCmdRsp::DeviceState";
     static const DDS_Char * const CONTROLLER1_PARTICIPANT= "CmdRspParticipantLibrary::ControllerParticipant1";
     static const DDS_Char * const DEVICE1_PARTICIPANT= "CmdRspParticipantLibrary::DeviceParticipant1";
@@ -32,6 +33,9 @@ namespace ExCmdRsp {
     static const DDS_Char * const DEVICE_STATE_READER= "ControllerSubscriber::DeviceStateReader";
     static const DDS_Char * const CONFIGURE_DEVICE_WRITER= "ControllerPublisher::ConfigureDeviceWriter";
     static const DDS_Char * const CONFIGURE_DEVICE_READER= "DeviceSubscriber::ConfigureDeviceReader";
+    static const DDS_Char * const CMD_RSP_QOS_LIBRARY= "CmdRspQoSLibrary";
+    static const DDS_Char * const DEVICE_STATE_TOPIC_QOS_PROFILE= "DeviceStateProfile";
+    static const DDS_Char * const CONFIG_DEV_TOPIC_QOS_PROFILE= "ConfigDevProfile";
     static const DDS_UnsignedLong LEN_DEVICE_ID= 32UL;
     static const DDS_UnsignedLong LEN_STR_FOO= 10UL;
     static const DDS_UnsignedLong LEN_STR_BAR= 16UL;

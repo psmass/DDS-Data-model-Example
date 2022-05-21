@@ -111,7 +111,7 @@ extern "C" int run_device_application(int domain_id) {
     }
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, subscriber, _TOPIC_CONFIGURE_DEV_CFT); 
+    ConfigDevRdr config_dev_reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant, publisher);
     config_dev_reader.RunThread();
     device_state_writer.RunThread();

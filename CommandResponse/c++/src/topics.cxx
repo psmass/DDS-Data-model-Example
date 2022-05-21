@@ -17,23 +17,13 @@
 #include "CommandRespSupport.h"
 #include <ndds/ndds_cpp.h>
 
-
-const char* _DEVICE_STATE_READER = MODULE::DEVICE_STATE_READER;
-const char* _DEVICE_STATE_WRITER = MODULE::DEVICE_STATE_WRITER;
-const char* _CONFIGURE_DEVICE_READER = MODULE::CONFIGURE_DEVICE_READER;
-const char* _CONFIGURE_DEVICE_WRITER = MODULE::CONFIGURE_DEVICE_WRITER;
-
-const char* _TOPIC_DEVICE_STATE = MODULE::TOPIC_DEVICE_STATE;
-const char* _TOPIC_CONFIGURE_DEVICE = MODULE::TOPIC_CONFIGURE_DEVICE;
-
-
 namespace MODULE
 {
 
     DeviceStateRdr::DeviceStateRdr(
         DDSDomainParticipant * participant,
         DDSSubscriber * subscriber) : 
-            Reader(participant, subscriber, _TOPIC_DEVICE_STATE, _DEVICE_STATE_READER) {
+            Reader(participant, subscriber, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
 
@@ -173,6 +163,7 @@ namespace MODULE
                                         break;
                                     default: std::cout << "OOPS - not a valid value";
                                 }
+                                std::cout << std::endl;
                             }
                         }
                     } else if (retcode == DDS_RETCODE_NO_DATA) {
@@ -193,7 +184,7 @@ namespace MODULE
     DeviceStateWtr::DeviceStateWtr(
         DDSDomainParticipant * participant, 
         DDSPublisher * publisher) :
-            Writer(participant, publisher, _TOPIC_DEVICE_STATE, _DEVICE_STATE_WRITER) {
+            Writer(participant, publisher, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         //std::cout << "Device State C'Tor" << std::endl; 
@@ -362,7 +353,7 @@ namespace MODULE
         DDSDomainParticipant * participant, 
         DDSSubscriber * subscriber,
         const std::string filter_name)
-                 : Reader(participant, subscriber, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_READER) {
+                 : Reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
 
@@ -526,7 +517,7 @@ namespace MODULE
 
 
     ConfigDevWtr::ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher)
-                 : Writer(participant, publisher, _TOPIC_CONFIGURE_DEVICE, _CONFIGURE_DEVICE_WRITER) {
+                 : Writer(participant, publisher, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
         // std::cout << "Config Device Writer C'tor" << std::endl;
 
 
