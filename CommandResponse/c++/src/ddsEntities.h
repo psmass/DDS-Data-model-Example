@@ -48,12 +48,13 @@ namespace MODULE
             void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
-            char * topicName;
-            char * topicTypeName;
-            std::string writerName;
             DDSDomainParticipant * topicParticipant;
             DDSPublisher * topicPublisher;
             DDSWaitSet *waitset;
+            DDSStatusCondition *statusCondition;
+            char * topicName;
+            char * topicTypeName;
+            std::string writerName;
             pthread_t tid;
             bool enabled;
     };
@@ -75,15 +76,18 @@ namespace MODULE
 
             pthread_t getThreadId(void) {return this->tid;};
 
-            virtual void Handler(DDS_DynamicData& data) // implemented by the concrete topic class
+            virtual void Handler(void) // implemented by the concrete topic class
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; 
 
         protected:
             DDSDomainParticipant * topicParticipant;
             DDSSubscriber * topicSubscriber;
+            std::string readerName;
+            DDSWaitSet *waitset;
+            DDSStatusCondition *statusCondition;
+	        DDSReadCondition * readCondition;
             char * topicName;
             char * topicTypeName;
-            std::string readerName;
             pthread_t tid;
 
 

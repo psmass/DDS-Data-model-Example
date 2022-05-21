@@ -53,7 +53,7 @@ class DeviceStateRdr : public Reader {
         DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber);
         ~DeviceStateRdr(void){};
 
-        void Handler(DDS_DynamicData & data);
+        void Handler(void);
 
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
@@ -66,7 +66,8 @@ class DeviceStateRdr : public Reader {
         
     private:
         MODULE::DeviceStateDataReader * topicReader;
-        DDSStatusCondition *statusCondition;
+
+
         // Controller will track the devices state as well, note if there were more than one
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
@@ -106,7 +107,6 @@ class DeviceStateWtr : public Writer {
         // also 'Announces' ouselves to the controller.
         MODULE::DeviceStateDataWriter * topicWriter;
         MODULE::DeviceState * topicSample; 
-        DDSStatusCondition *statusCondition;
         enum MODULE::DeviceStateEnum previousState; 
         enum MODULE::DeviceStateEnum currentState; 
 };
@@ -120,7 +120,7 @@ class ConfigDevRdr : public Reader {
             const std::string filter_name);
         ~ConfigDevRdr(void){};
 
-        void Handler(DDS_DynamicData & data);
+        void Handler(void);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 
@@ -130,7 +130,7 @@ class ConfigDevRdr : public Reader {
         DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
 
         MODULE::ConfigureDeviceDataReader * topicReader;
-        DDSStatusCondition *statusCondition;
+
 };
 
 class ConfigDevWtr : public Writer {
@@ -149,9 +149,8 @@ class ConfigDevWtr : public Writer {
         void writeData(enum MODULE::DeviceStateEnum configReq); 
 
     private:
-        ConfigureDeviceDataWriter * topicWriter;
+        MODULE::ConfigureDeviceDataWriter * topicWriter;
         MODULE::ConfigureDevice * topicSample; 
-        DDSStatusCondition *statusCondition;
 };
 
 } // namespace MODULE
