@@ -20,30 +20,24 @@
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(
-        DDSDomainParticipant * participant,
-        DDSSubscriber * subscriber) : 
-            Reader(participant, subscriber, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
+template <typename S, typename T, typename U> void createReader(S * thisReader, const char* qos_profile, DDSDomainParticipant * participant, DDSSubscriber * subscriber) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
-
-        this->previousState = ERROR; // aka MODULE::DeviceStateEnum::ERROR:
-        this-> currentState = ERROR; 
 
         // Register the specific datatype to use when creating the Topic
         // this calls a type specific type, so is required to be done in the specific
         // type Reader/Writer. The remaining work is done in the base class
-        this->topicTypeName = (char *)MODULE::DeviceStateTypeSupport::get_type_name();
-       retcode =
-            MODULE::DeviceStateTypeSupport::register_type(participant, this->topicTypeName);
+        thisReader->setTopicTypeName((char *)T::get_type_name());
+        retcode =
+            T::register_type(participant, thisReader->getTopicTypeName());
         if (retcode != DDS_RETCODE_OK) {
             throw std::invalid_argument("Reader thread: type name error");
         }
 
         // Create a Topic with a name and a datatype
         DDSTopic *topic = participant->create_topic(
-            this->topicName,
-            this->topicTypeName,
+            thisReader->getTopicName(),
+            thisReader->getTopicTypeName(),
             DDS_TOPIC_QOS_DEFAULT,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
@@ -55,7 +49,7 @@ namespace MODULE
         DDSDataReader *untyped_reader = subscriber->create_datareader_with_profile(
             topic,
             MODULE::CMD_RSP_QOS_LIBRARY,
-            MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
+            qos_profile,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
         if (untyped_reader == NULL) {
@@ -63,30 +57,41 @@ namespace MODULE
         }
 
         // Narrow casts from an untyped DataReaderto a Reader of your type 
-        this->topicReader = MODULE::DeviceStateDataReader::narrow(untyped_reader);
-            if (this->topicReader == NULL) {
+        thisReader->setTopicReader(U::narrow(untyped_reader));
+            if (thisReader->getTopicReader() == NULL) {
                 throw std::invalid_argument("Reader thread: get narrow Reader error");
             }  
 
         // Create read condition
-        this->readCondition = this->topicReader->create_readcondition(
+        thisReader->setReadCondition((thisReader->getTopicReader())->create_readcondition (
             DDS_NOT_READ_SAMPLE_STATE,
             DDS_ANY_VIEW_STATE,
-            DDS_ANY_INSTANCE_STATE);
+            DDS_ANY_INSTANCE_STATE));
 
         //  Get & Set status conditions
-        this->statusCondition = this->topicReader->get_statuscondition();
-        retcode = this->statusCondition->set_enabled_statuses(DDS_SUBSCRIPTION_MATCHED_STATUS);  
+        thisReader->setStatusCondition((thisReader->getTopicReader())->get_statuscondition());
+        retcode = thisReader->getStatusCondition()->set_enabled_statuses(DDS_SUBSCRIPTION_MATCHED_STATUS);  
 
         /* Attach Read Conditions */
-        retcode1 = this->waitset->attach_condition(this->readCondition);
+        retcode1 = thisReader->getWaitset()->attach_condition(thisReader->getReadCondition());
 
 
         /* Attach Status Conditions */
-        retcode2 = waitset->attach_condition(this->statusCondition);
+        retcode2 = thisReader->getWaitset()->attach_condition(thisReader->getStatusCondition());
         if ((retcode != DDS_RETCODE_OK) | (retcode1 != DDS_RETCODE_OK) | (retcode2 != DDS_RETCODE_OK)) {
             throw std::invalid_argument("Reader thread: get/attach condition error");
         }
+}
+
+    DeviceStateRdr::DeviceStateRdr(
+        DDSDomainParticipant * participant,
+        DDSSubscriber * subscriber) : 
+            Reader(participant, subscriber, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
+
+        this->previousState = ERROR; // aka MODULE::DeviceStateEnum::ERROR:
+        this-> currentState = ERROR; 
+        createReader<DeviceStateRdr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataReader> (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, subscriber);
+
     }
 
 
@@ -358,14 +363,17 @@ namespace MODULE
         const std::string filter_name)
                  : Reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
+        createReader<ConfigDevRdr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataReader> (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, subscriber);
+
         DDS_ReturnCode_t retcode, retcode1, retcode2;
 
+    /*
         // std::cout << "Config Dev Reader C'tor " << std::endl; 
         // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
         // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
  
         //rti::topic::CustomFilter<MODULE::ConfigureDevice> configDevReaderCft=rti::topic::find_content_filter (participant, filter_name);
-        /*
+        
         // Find the Topic
         dds::topic::Topic<dds::topic::AnyTopic> topic = dds::topic::find(participant, _TOPIC_CONFIGURE_DEVICE);
         // Create the parameter list
@@ -379,7 +387,7 @@ namespace MODULE
             dds::topic::Filter(         // filter (constructed in-line in this example)
                 "targetDeviceId.id=%0", // expression
                 cft_parameters));       // parameter vector
-        */
+        
         
         // Register the specific datatype to use when creating the Topic
         // this calls a type specific type, so is required to be done in the specific
@@ -396,7 +404,7 @@ namespace MODULE
             this->topicName,
             this->topicTypeName,
             DDS_TOPIC_QOS_DEFAULT,
-            NULL /* listener */,
+            NULL, // listener 
             DDS_STATUS_MASK_NONE);
         if (topic == NULL) {
             throw std::invalid_argument("Reader thread: create topic error");
@@ -407,7 +415,7 @@ namespace MODULE
             topic,
             MODULE::CMD_RSP_QOS_LIBRARY,
             MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
-            NULL /* listener */,
+            NULL,  // listener 
             DDS_STATUS_MASK_NONE);
         if (untyped_reader == NULL) {
             throw std::invalid_argument("Reader thread: create data reader error");
@@ -429,15 +437,16 @@ namespace MODULE
         this->statusCondition = this->topicReader->get_statuscondition();
         retcode = this->statusCondition->set_enabled_statuses(DDS_SUBSCRIPTION_MATCHED_STATUS);  
 
-        /* Attach Read Conditions */
+        // Attach Read Conditions 
         retcode1 = this->waitset->attach_condition(this->readCondition);
 
 
-        /* Attach Status Conditions */
+        // Attach Status Conditions 
         retcode2 = waitset->attach_condition(this->statusCondition);
         if ((retcode != DDS_RETCODE_OK) | (retcode1 != DDS_RETCODE_OK) | (retcode2 != DDS_RETCODE_OK)) {
             throw std::invalid_argument("Reader thread: get/attach condition error");
         }
+        */
 
     };
 

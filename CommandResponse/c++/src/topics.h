@@ -53,14 +53,18 @@ class DeviceStateRdr : public Reader {
 
         void Handler(void);
 
-        enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
-        enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
+        enum MODULE::DeviceStateEnum getPrevState(void) { return previousState; };
+        enum MODULE::DeviceStateEnum getCurrentState(void) { return currentState; };
         void setPrevState(enum MODULE::DeviceStateEnum new_state){
             previousState=new_state; 
         }
         void setCurrentState(enum MODULE::DeviceStateEnum new_state){
             currentState=new_state; 
         }
+
+        void setTopicReader(MODULE::DeviceStateDataReader* topic_reader)
+            { this->topicReader=topic_reader; };
+        MODULE::DeviceStateDataReader* getTopicReader(void) { return this->topicReader; };
         
     private:
         MODULE::DeviceStateDataReader * topicReader;
@@ -121,6 +125,11 @@ class ConfigDevRdr : public Reader {
         void Handler(void);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
+
+        void setTopicReader(MODULE::ConfigureDeviceDataReader* topic_reader)
+            { this->topicReader=topic_reader; };
+        MODULE::ConfigureDeviceDataReader* getTopicReader(void) { return this->topicReader; };
+        
 
     private:
         // will need the associated devStateWtr when receive a new config command and have

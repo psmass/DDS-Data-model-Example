@@ -74,7 +74,16 @@ namespace MODULE
             };
             void RunThread(void);
 
-            pthread_t getThreadId(void) {return this->tid;};
+            const char* getTopicName(void) { return this->topicName; };
+            void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
+            const char* getTopicTypeName(void) { return this->topicTypeName; };
+            void setReadCondition(DDSReadCondition * read_condition) { this->readCondition=read_condition; };
+            DDSReadCondition * getReadCondition(void) { return this->readCondition; }; 
+            void setStatusCondition(DDSStatusCondition * status_condition) { this->statusCondition=status_condition; };
+            DDSStatusCondition * getStatusCondition(void) { return this->statusCondition; };
+            DDSWaitSet * getWaitset(void) { return this->waitset; };
+
+            pthread_t getThreadId(void) { return this->tid; };
 
             virtual void Handler(void) // implemented by the concrete topic class
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; 
@@ -84,7 +93,7 @@ namespace MODULE
             DDSSubscriber * topicSubscriber;
             std::string readerName;
             DDSWaitSet *waitset;
-            DDSStatusCondition *statusCondition;
+            DDSStatusCondition * statusCondition;
 	        DDSReadCondition * readCondition;
             char * topicName;
             char * topicTypeName;
