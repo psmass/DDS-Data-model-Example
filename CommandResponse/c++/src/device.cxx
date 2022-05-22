@@ -50,11 +50,13 @@ static int participant_shutdown(DDSDomainParticipant *participant)
        by the participant factory. Uncomment the following block of code for
        clean destruction of the singleton. */
 
+    /*
     retcode = DDSDomainParticipantFactory::finalize_instance();
     if (retcode != DDS_RETCODE_OK) {
         std::cout << "finalize_instance error" << retcode << std::endl;
         status = -1;
     }
+    */
 
     return status;
 }
