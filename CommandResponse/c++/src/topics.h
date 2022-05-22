@@ -66,6 +66,7 @@ class DeviceStateRdr : public Reader {
             { this->topicReader=topic_reader; };
         MODULE::DeviceStateDataReader* getTopicReader(void) { return this->topicReader; };
         
+        
     private:
         MODULE::DeviceStateDataReader * topicReader;
 
@@ -101,6 +102,14 @@ class DeviceStateWtr : public Writer {
 
             currentState=new_state; 
         }
+
+        void setTopicWriter(MODULE::DeviceStateDataWriter* topic_writer)
+            { this->topicWriter=topic_writer; };
+        MODULE::DeviceStateDataWriter* getTopicWriter(void) { return this->topicWriter; }; 
+        void setTopicSample(MODULE::DeviceState* topic_sample)
+            { this->topicSample=topic_sample; };
+        MODULE::DeviceState * getTopicSample(void) { return this->topicSample; };
+        
         
     private:
         // Save previous state since we send a state update any time there is a difference
@@ -148,12 +157,19 @@ class ConfigDevWtr : public Writer {
         void Handler(void);
         void WriterEventHandler(DDSConditionSeq active_conditions_seq);
 
-
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
         // is provided to allow the main loop of the controller reliably publish a configuration
         // change request to the evice.
         void writeData(enum MODULE::DeviceStateEnum configReq); 
+
+        void setTopicWriter(ConfigureDeviceDataWriter* topic_writer)
+            { this->topicWriter=topic_writer; };
+        ConfigureDeviceDataWriter* getTopicWriter(void) { return this->topicWriter; };
+        void setTopicSample(MODULE::ConfigureDevice* topic_sample)
+            { this->topicSample=topic_sample; };
+        MODULE::ConfigureDevice * getTopicSample(void) { return this->topicSample; };
+        
 
     private:
         MODULE::ConfigureDeviceDataWriter * topicWriter;

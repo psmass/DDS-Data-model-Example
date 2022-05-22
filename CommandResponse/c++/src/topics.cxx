@@ -20,6 +20,30 @@
 namespace MODULE
 {
 
+template <typename T> void defaultWtrEventHdlr(T *thisWriter, DDSConditionSeq active_conditions_seq) {
+        // uses this->topicWriter which is topic specific
+        // Get the number of active conditions 
+        int active_conditions = active_conditions_seq.length();
+
+        for (int i = 0; i < active_conditions; ++i) {
+            // Compare with Status Conditions 
+            if (active_conditions_seq[i] == thisWriter->getStatusCondition()) {
+                DDS_StatusMask triggeredmask =
+                        thisWriter->getTopicWriter()->get_status_changes();
+
+                if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
+                    DDS_PublicationMatchedStatus st;
+                    thisWriter->getTopicWriter()->get_publication_matched_status(st);
+                    std::cout << thisWriter->getTopicName() << " Writer Subs: " 
+                    << st.current_count << "  " << st.current_count_change << std::endl;
+                }
+            } else {
+                // writers can only have status condition
+                std::cout << thisWriter->getTopicName() << " Writer: False Writer Event Trigger" << std::endl;
+            }
+        }
+}
+
 template <typename S, typename T, typename U> void createReader(S * thisReader, const char* qos_profile, DDSDomainParticipant * participant, DDSSubscriber * subscriber) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
@@ -83,6 +107,75 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
         }
 }
 
+
+template <typename S, typename T, typename U> void createWriter(S * thisWriter, const char* qos_profile, DDSDomainParticipant * participant, DDSPublisher * publisher) {
+
+        // Register the specific datatype to use when creating the Topic
+        // this calls a type specific type, so is required to be done in the specific
+        // type Reader/Writer. The remaining work is done in the base class
+        thisWriter->setTopicTypeName((char *)T::get_type_name());
+        DDS_ReturnCode_t retcode =
+            T::register_type(participant, thisWriter->getTopicTypeName());
+        if (retcode != DDS_RETCODE_OK) {
+            throw std::invalid_argument("Writer thread: type name error");
+        }
+
+        // Create a Topic with a name and a datatype
+        DDSTopic *topic = participant->create_topic(
+            thisWriter->getTopicName(),
+            thisWriter->getTopicTypeName(),
+            DDS_TOPIC_QOS_DEFAULT,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+        if (topic == NULL) {
+            throw std::invalid_argument("Writer thread: create topic error");
+        }
+
+        // This DataWriter writes data on "Example MODULE_DeviceState" Topic
+        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
+            topic,
+            MODULE::CMD_RSP_QOS_LIBRARY,
+            qos_profile,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+        if (untyped_writer == NULL) {
+            throw std::invalid_argument("Writer thread: create data writer error");
+        }
+
+        // Narrow casts from an untyped DataWriter to a writer of your type 
+        thisWriter->setTopicWriter(U::narrow(untyped_writer));
+            if (thisWriter->getTopicWriter() == NULL) {
+                throw std::invalid_argument("Writer thread: get narrow writer error");
+            }  
+
+    
+        // Create data for writing, allocating all members
+        thisWriter->setTopicSample(T::create_data());
+        if (thisWriter->getTopicSample() == NULL) {
+            throw std::invalid_argument("Writer thread: create data error");
+        }
+
+        // Configure Waitset for Writer Status ****
+        thisWriter->setStatusCondition(thisWriter->getTopicWriter()->get_statuscondition());
+        if (thisWriter->getStatusCondition() == NULL) {
+            throw std::invalid_argument("Writer thread: get_statuscondition error");
+        }
+
+        // Set enabled statuses
+        retcode = thisWriter->getStatusCondition()->set_enabled_statuses(
+                DDS_PUBLICATION_MATCHED_STATUS);
+        if (retcode != DDS_RETCODE_OK) {
+            throw std::invalid_argument("Writer thread: set_enabled_statuses error");
+        }
+
+        // Attach Status Conditions to the above waitset
+        retcode =thisWriter->getWaitset()->attach_condition(thisWriter->getStatusCondition());
+        if (retcode != DDS_RETCODE_OK) {
+            throw std::invalid_argument("Writer thread: attach_condition error");
+        }
+    }
+
+    
     DeviceStateRdr::DeviceStateRdr(
         DDSDomainParticipant * participant,
         DDSSubscriber * subscriber) : 
@@ -198,70 +291,9 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
         this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
         this->currentState = UNINITIALIZED; 
 
-        // Register the specific datatype to use when creating the Topic
-        // this calls a type specific type, so is required to be done in the specific
-        // type Reader/Writer. The remaining work is done in the base class
-        this->topicTypeName = (char *)MODULE::DeviceStateTypeSupport::get_type_name();
-        DDS_ReturnCode_t retcode =
-            MODULE::DeviceStateTypeSupport::register_type(participant, this->topicTypeName);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: type name error");
-        }
+        createWriter<DeviceStateWtr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, publisher);
+    }
 
-        // Create a Topic with a name and a datatype
-        DDSTopic *topic = participant->create_topic(
-            this->topicName,
-            this->topicTypeName,
-            DDS_TOPIC_QOS_DEFAULT,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (topic == NULL) {
-            throw std::invalid_argument("Writer thread: create topic error");
-        }
-
-        // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
-            topic,
-            MODULE::CMD_RSP_QOS_LIBRARY,
-            MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (untyped_writer == NULL) {
-            throw std::invalid_argument("Writer thread: create data writer error");
-        }
-
-        // Narrow casts from an untyped DataWriter to a writer of your type 
-        this->topicWriter= MODULE::DeviceStateDataWriter::narrow(untyped_writer);
-            if (this->topicWriter == NULL) {
-                throw std::invalid_argument("Writer thread: get narrow writer error");
-            }  
-
-        // Create data for writing, allocating all members
-        this->topicSample = MODULE::DeviceStateTypeSupport::create_data();
-        if (this->topicSample == NULL) {
-            throw std::invalid_argument("Writer thread: creat data error");
-        }
-
-        // Configure Waitset for Writer Status ****
-        this->statusCondition = this->topicWriter->get_statuscondition();
-        if (statusCondition == NULL) {
-            throw std::invalid_argument("Writer thread: get_statuscondition error");
-        }
-
-        // Set enabled statuses
-        retcode = statusCondition->set_enabled_statuses(
-                DDS_PUBLICATION_MATCHED_STATUS);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: set_enabled_statuses error");
-        }
-
-        // Attach Status Conditions to the above waitset
-        retcode =this->waitset->attach_condition(statusCondition);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: attach_condition error");
-        }
-
-    };
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
@@ -274,6 +306,7 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
         this->topicSample->state=current_state;
         this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
     }
+
 
     void DeviceStateWtr::Handler() {
 
@@ -335,25 +368,8 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
     void DeviceStateWtr::WriterEventHandler(DDSConditionSeq active_conditions_seq) {
         // uses this->topicWriter which is topic specific
         // Get the number of active conditions 
-        int active_conditions = active_conditions_seq.length();
 
-        for (int i = 0; i < active_conditions; ++i) {
-            // Compare with Status Conditions 
-            if (active_conditions_seq[i] == statusCondition) {
-                DDS_StatusMask triggeredmask =
-                        this->topicWriter->get_status_changes();
-
-                if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
-                    DDS_PublicationMatchedStatus st;
-                    this->topicWriter->get_publication_matched_status(st);
-                    std::cout << this->topicName << " Writer Subs: " 
-                    << st.current_count << "  " << st.current_count_change << std::endl;
-                }
-            } else {
-                // writers can only have status condition
-                std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
-            }
-        }
+        defaultWtrEventHdlr<DeviceStateWtr>(this, active_conditions_seq);
     }
 
 
@@ -366,6 +382,7 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
         createReader<ConfigDevRdr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataReader> (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, subscriber);
 
     };
+
 
     void ConfigDevRdr::Handler() {
 
@@ -451,71 +468,10 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
                  : Writer(participant, publisher, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
         // std::cout << "Config Device Writer C'tor" << std::endl;
 
-
-        // Register the specific datatype to use when creating the Topic
-        // this calls a type specific type, so is required to be done in the specific
-        // type Reader/Writer. The remaining work is done in the base class
-        this->topicTypeName = (char *)MODULE::ConfigureDeviceTypeSupport::get_type_name();
-        DDS_ReturnCode_t retcode =
-            MODULE::ConfigureDeviceTypeSupport::register_type(participant, this->topicTypeName);
-        if (retcode != DDS_RETCODE_OK) {
-            ; // throw error
-        }
-
-        // Create a Topic with a name and a datatype
-        DDSTopic *topic = participant->create_topic(
-            this->topicName,
-            this->topicTypeName,
-            DDS_TOPIC_QOS_DEFAULT,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (topic == NULL) {
-             throw std::invalid_argument("Writer thread: create_topic error");;
-        }
-
-        // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
-            topic,
-            MODULE::CMD_RSP_QOS_LIBRARY,
-            MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (untyped_writer == NULL) {
-             throw std::invalid_argument("Writer thread: creat_topic error");
-        }
-
-        // Narrow casts from an untyped DataWriter to a writer of your type 
-        this->topicWriter= MODULE::ConfigureDeviceDataWriter::narrow(untyped_writer);
-            if (this->topicWriter == NULL) {
-                 throw std::invalid_argument("Writer thread: create narrow error");
-            }  
-
-        // Create data for writing, allocating all members
-        this->topicSample = MODULE::ConfigureDeviceTypeSupport::create_data();
-        if (this->topicSample == NULL) {
-             throw std::invalid_argument("Writer thread: create_data error");
-        }
-
-        // Configure Waitset for Writer Status ****
-        this->statusCondition = this->topicWriter->get_statuscondition();
-        if (statusCondition == NULL) {
-            throw std::invalid_argument("Writer thread: get_statuscondition error");
-        }
-
-        // Set enabled statuses
-        retcode = statusCondition->set_enabled_statuses(
-                DDS_PUBLICATION_MATCHED_STATUS);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: set_enabled_statuses error");
-        }
-
-        // Attach Status Conditions to the above waitset
-        retcode =this->waitset->attach_condition(statusCondition);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: attach_condition error");
-        }
+        createWriter<ConfigDevWtr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, publisher);
 
     };
+
 
     void ConfigDevWtr::Handler() {
         DDSConditionSeq active_conditions_seq;
@@ -564,29 +520,14 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
         }
     }
 
+
     void ConfigDevWtr::WriterEventHandler(DDSConditionSeq active_conditions_seq) {
             // uses this->topicWriter which is topic specific
             // Get the number of active conditions 
-            int active_conditions = active_conditions_seq.length();
 
-            for (int i = 0; i < active_conditions; ++i) {
-                // Compare with Status Conditions 
-                if (active_conditions_seq[i] == statusCondition) {
-                    DDS_StatusMask triggeredmask =
-                            this->topicWriter->get_status_changes();
-
-                    if (triggeredmask & DDS_PUBLICATION_MATCHED_STATUS) {
-                        DDS_PublicationMatchedStatus st;
-                        this->topicWriter->get_publication_matched_status(st);
-                        std::cout << this->topicName << " Writer Subs: " 
-                        << st.current_count << "  " << st.current_count_change << std::endl;
-                    }
-                } else {
-                    // writers can only have status condition
-                    std::cout << this->topicName << " Writer: False Writer Event Trigger" << std::endl;
-                }
-            }
+            defaultWtrEventHdlr<ConfigDevWtr>(this, active_conditions_seq);
         }
+
  
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
