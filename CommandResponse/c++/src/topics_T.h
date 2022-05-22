@@ -13,11 +13,6 @@
 #ifndef TOPICS_T_H
 #define TOPICS_T_H
 
-#include <string.h>
-#include <string>
-#include "topics.h"
-#include "CommandResp.h"
-#include "CommandRespSupport.h"
 #include <ndds/ndds_cpp.h>
 
 namespace MODULE
@@ -46,7 +41,8 @@ template <typename T> void defaultWtrEventHdlr(T *thisWriter, DDSConditionSeq ac
         }
 }
 
-template <typename S, typename T, typename U> void createReader(S * thisReader, const char* qos_profile, DDSDomainParticipant * participant, DDSSubscriber * subscriber) {
+template <typename S, typename T, typename U> void createReader
+    (S * thisReader, const char* qos_profile, DDSDomainParticipant * participant, DDSSubscriber * subscriber) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
 
@@ -110,7 +106,8 @@ template <typename S, typename T, typename U> void createReader(S * thisReader, 
 }
 
 
-template <typename S, typename T, typename U> void createWriter(S * thisWriter, const char* qos_profile, DDSDomainParticipant * participant, DDSPublisher * publisher) {
+template <typename S, typename T, typename U> void createWriter
+    (S * thisWriter, const char* qos_profile, DDSDomainParticipant * participant, DDSPublisher * publisher) {
 
         // Register the specific datatype to use when creating the Topic
         // this calls a type specific type, so is required to be done in the specific

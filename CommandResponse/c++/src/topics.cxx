@@ -20,7 +20,7 @@
 
 namespace MODULE
 {
-    
+
     DeviceStateRdr::DeviceStateRdr(
         DDSDomainParticipant * participant,
         DDSSubscriber * subscriber) : 
@@ -28,7 +28,8 @@ namespace MODULE
 
         this->previousState = ERROR; // aka MODULE::DeviceStateEnum::ERROR:
         this-> currentState = ERROR; 
-        createReader<DeviceStateRdr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataReader> (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, subscriber);
+        createReader<DeviceStateRdr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataReader> 
+            (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, subscriber);
 
     }
 
@@ -136,7 +137,8 @@ namespace MODULE
         this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
         this->currentState = UNINITIALIZED; 
 
-        createWriter<DeviceStateWtr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, publisher);
+        createWriter<DeviceStateWtr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> 
+            (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, publisher);
     }
 
 
@@ -224,7 +226,8 @@ namespace MODULE
         const std::string filter_name)
                  : Reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
-        createReader<ConfigDevRdr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataReader> (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, subscriber);
+        createReader<ConfigDevRdr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataReader> 
+            (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, subscriber);
 
     };
 
@@ -313,7 +316,8 @@ namespace MODULE
                  : Writer(participant, publisher, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
         // std::cout << "Config Device Writer C'tor" << std::endl;
 
-        createWriter<ConfigDevWtr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, publisher);
+        createWriter<ConfigDevWtr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> 
+            (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, publisher);
 
     };
 
