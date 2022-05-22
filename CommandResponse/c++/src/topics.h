@@ -16,6 +16,7 @@
 #include <iostream>
 #include "ddsEntities.h"
 #include "CommandResp.h"
+#include "CommandRespSupport.h"
 
 
 namespace MODULE
@@ -52,6 +53,7 @@ class DeviceStateRdr : public Reader {
         ~DeviceStateRdr(void){};
 
         void Handler(void);
+        void process_data(MODULE::DeviceState * data); // specific topic to process
 
         enum MODULE::DeviceStateEnum getPrevState(void) { return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) { return currentState; };
@@ -110,7 +112,6 @@ class DeviceStateWtr : public Writer {
             { this->topicSample=topic_sample; };
         MODULE::DeviceState * getTopicSample(void) { return this->topicSample; };
         
-        
     private:
         // Save previous state since we send a state update any time there is a difference
         // initialize current as UNITIALIZED and ensure previous state is something different
@@ -132,6 +133,8 @@ class ConfigDevRdr : public Reader {
         ~ConfigDevRdr(void){};
 
         void Handler(void);
+        void process_data(MODULE::ConfigureDevice * data); // specific topic to process
+
         void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 

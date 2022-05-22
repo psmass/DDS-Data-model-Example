@@ -174,6 +174,75 @@ template <typename S, typename T, typename U> void createWriter
         }
     }
 
+// S is the Object e.g. this, T is the data type e.g. MODULE::DeviceStateSeq
+template <typename S, typename T> void readerHandler (S * thisReader) {
+        T data_seq;
+        DDS_SampleInfoSeq info_seq;
+        DDSConditionSeq active_conditions_seq;
+        DDS_ReturnCode_t retcode;
+        DDS_Duration_t wait_duration = {1,0}; // timeout wait to ensure running
+
+        std::cout << "Device State Reader Handler Executing" << std::endl; 
+
+        while (!application::shutdown_requested) {
+            // Wait 4 seconds for data 
+            retcode = thisReader->getWaitset()->wait(active_conditions_seq, wait_duration);
+            // waitset.wait(dds::core::Duration(4));
+            if (retcode == DDS_RETCODE_TIMEOUT) {  
+                // std::cout << "Reader thread: Wait timed out!! No conditions were triggered" << std::endl;
+                // put thead health check here since we verified we are running
+                continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                throw std::invalid_argument("Reader handler: wait returned error ");
+            }
+
+            int active_conditions = active_conditions_seq.length();
+
+            for (int i = 0; i < active_conditions; ++i) {
+                if (active_conditions_seq[i] == thisReader->getStatusCondition()) {
+                    // Get the status changes so we can check which status
+                    // ondition triggered.
+                    DDS_StatusMask triggeredmask =
+                            thisReader->getTopicReader()->get_status_changes();
+
+                    // Subscription matched 
+                    if (triggeredmask & DDS_SUBSCRIPTION_MATCHED_STATUS) {
+                        DDS_SubscriptionMatchedStatus st;
+                        thisReader->getTopicReader()->get_subscription_matched_status(st);
+                        std::cout << thisReader->getTopicName() << "Reader Pubs: " 
+                        << st.current_count << "  " << st.current_count_change << std::endl;
+                    }
+                } else if (active_conditions_seq[i] == thisReader->getReadCondition()) { 
+                    // Get the latest samples
+                    retcode = thisReader->getTopicReader()->take(
+                                data_seq, info_seq, DDS_LENGTH_UNLIMITED,
+                                DDS_ANY_SAMPLE_STATE, DDS_ANY_VIEW_STATE, DDS_ANY_INSTANCE_STATE);
+
+                    if (retcode == DDS_RETCODE_OK) {
+                        // we've got some data for what ever topic we recieved, figure that out, make an
+                        // internal variable change as a result (if that's the case) and respond accordingly 
+                        // (with a RequestResponse not an On Change Topic. On Change topics trigger from the 
+                        // main loop as you peruse through internal variables that you see have changed as a
+                        // result of a request or other internal event.
+                        for (int i = 0; i < data_seq.length(); ++i) {
+                            if (info_seq[i].valid_data) {  
+                                thisReader->process_data(&data_seq[i]);
+                            }
+                        }
+                    } else if (retcode == DDS_RETCODE_NO_DATA) {
+                        continue;
+                    } else {
+                        throw std::invalid_argument("Reader handler: read data error ");
+                    }
+                    retcode = thisReader->getTopicReader()->return_loan(data_seq, info_seq);
+                    if (retcode != DDS_RETCODE_OK) {
+                        throw std::invalid_argument("Reader handler: return_loan error  ");
+                    }  
+                }
+            }
+        } //while
+        std::cout << thisReader->getTopicName()<< " Reader Handler shutting down" << std::endl; 
+    }
 
 } // namespace MODULE
 
