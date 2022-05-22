@@ -18,6 +18,8 @@
 #include <ndds/ndds_cpp.h>
 #include "topics_T.h"
 
+extern bool application::shutdown_requested;
+
 namespace MODULE
 {
 
@@ -124,6 +126,7 @@ namespace MODULE
                 }
             }
         } //while
+        std::cout << this->Reader::topicName << " Reader Handler shutting down" << std::endl; 
     }
 
 
@@ -207,7 +210,7 @@ namespace MODULE
 
             //sampleNumber++;
         }
-        // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
+        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
 
     } 
 
@@ -308,6 +311,7 @@ namespace MODULE
                 }
             }
         } //while
+        std::cout << this->Reader::topicName << " Reader Handler shutting down" << std::endl; 
 
     }  
 
@@ -367,6 +371,7 @@ namespace MODULE
 
             //sampleNumber++;
         }
+        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
     }
 
 

@@ -13,6 +13,7 @@
 #include "ddsEntities.h"
 #include <pthread.h>
 
+extern bool application::shutdown_requested;
 namespace MODULE
 {
     Writer::Writer(
@@ -37,7 +38,7 @@ namespace MODULE
  
         this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
-        std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
+        std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
         
         return NULL;
 
@@ -70,7 +71,7 @@ namespace MODULE
 
         this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
 
-        std::cout << this->topicName << "Reader thread shutting down" << std::endl;  
+        std::cout << this->topicName << " Reader thread shutting down" << std::endl;  
         return NULL;
     }
 
