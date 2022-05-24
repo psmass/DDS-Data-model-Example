@@ -159,26 +159,10 @@ namespace MODULE
     }
 
 
-    ConfigDevRdr::ConfigDevRdr(
-        DDSDomainParticipant * participant, 
-        DDSSubscriber * subscriber,
-        const std::string filter_name)
-                 : Reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
-
-        createReader<ConfigDevRdr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataReader> 
-            (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, subscriber);
-
-    };
-
     void ConfigDevRdr::process_data(MODULE::ConfigureDevice * data) {
             this->devicesDevStateWtrPtr->setCurrentState((enum MODULE::DeviceStateEnum)data->deviceConfig.stateReq);
             MODULE::ConfigureDeviceTypeSupport::print_data(data); 
     }
-
-
-    void ConfigDevRdr::Handler() {
-        readerHandler<ConfigDevRdr, MODULE::ConfigureDeviceSeq> (this);
-    }  
 
 
     void ConfigDevWtr::WriteData(MODULE::ConfigureDevice configDevReq) {
@@ -189,7 +173,6 @@ namespace MODULE
         this->topicSample->targetDeviceId.resourceId = configDevReq.targetDeviceId.resourceId;
         this->topicSample->deviceConfig.stateReq=configDevReq.deviceConfig.stateReq;
         this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
-
     }   
 
     void ConfigDevWtr::Handler() {
@@ -239,6 +222,5 @@ namespace MODULE
         }
         std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
     }
-
 
 } // namespace

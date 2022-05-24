@@ -22,8 +22,6 @@
 
 namespace MODULE
 {
-
-
     /* How to use specific topic Readers and Writers:
 
     The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
@@ -126,31 +124,36 @@ class DeviceStateWtr : public Writer {
 };
 
 
-class ConfigDevRdr : public Reader {
+class ConfigDevRdr : public TopicRdr<
+    MODULE::ConfigureDevice,
+    MODULE::ConfigureDeviceTypeSupport,
+    MODULE::ConfigureDeviceDataReader,
+    MODULE::ConfigureDeviceSeq> {
     public:
-        ConfigDevRdr(
-            DDSDomainParticipant * participant,
-            DDSSubscriber * subscriber,
-            const std::string filter_name);
+        ConfigDevRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, const char* filter_name) :
+            TopicRdr(
+                participant, 
+                subscriber,
+                filter_name,
+                MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
+                MODULE::TOPIC_CONFIGURE_DEVICE,
+                MODULE::CONFIGURE_DEVICE_READER
+                )
+            {};
         ~ConfigDevRdr(void){};
 
-        void Handler(void);
-        void process_data(MODULE::ConfigureDevice * data); // specific topic to process
+    void process_data(MODULE::ConfigureDevice * data);
 
-        void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
+    void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
 
-        void setTopicReader(MODULE::ConfigureDeviceDataReader* topic_reader)
+    void setTopicReader(MODULE::ConfigureDeviceDataReader* topic_reader)
             { this->topicReader=topic_reader; };
-        MODULE::ConfigureDeviceDataReader* getTopicReader(void) { return this->topicReader; };
-        
 
     private:
         // will need the associated devStateWtr when receive a new config command and have
         // to change the state of the device
-        DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
-
-        MODULE::ConfigureDeviceDataReader * topicReader;
+        DeviceStateWtr * devicesDevStateWtrPtr;  // hol
 
 };
 

@@ -18,22 +18,23 @@
 namespace MODULE
 {
 
-
 // These Class Templates are intended to replace the function remplates below
 // This allows the user to have type specific classes by inheriting from these
 // TopicRdr and TopicWtr and exent them as wll as add specficic handlers or
 // data_processing routines for the concrete class. (Likely we can remove the
 // higher level Reader/Writer classes as they don't add much - as they did for
 // XML Application creation).
-// T is the Topic - e.g. DeviceState // not actually used inthe template
+// T is the Topic e.g. DeviceState
 // S is the TopicTypeSupport e.g. DeviceStatusTypeSupport
 // R is the Reader for the specific topic - e.g. DeviceStateReader
-template<typename T, class S, typename R>
+// D is the Topic - Topic Data Sequence e.g. DeviceStateSeq
+template<typename T, class S, typename R, typename D>
 class TopicRdr : public Reader {
     public:
         TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
+            const char* filter_name,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name);
@@ -42,7 +43,7 @@ class TopicRdr : public Reader {
         void Handler(void);
         // override for specific topic process_data 
         virtual void process_data(T * data) { // default prints the data
-            MODULE::DeviceStateTypeSupport::print_data(data); 
+            S::print_data(data); 
         };
         
     protected:
@@ -50,10 +51,11 @@ class TopicRdr : public Reader {
 };
 
 
-template<class T, class S, class R>
-TopicRdr<T,S,R>::TopicRdr(
+template<class T, class S, class R, class D>
+TopicRdr<T,S,R, D>::TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
+            const char* filter_name,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name) 
@@ -119,10 +121,10 @@ TopicRdr<T,S,R>::TopicRdr(
         }
 }
 
-template<class T, class S, class R>
-void TopicRdr<T,S,R>::Handler()
+template<class T, class S, class R, class D>
+void TopicRdr<T,S,R,D>::Handler()
 {
-        T data_seq;
+        D data_seq;
         DDS_SampleInfoSeq info_seq;
         DDSConditionSeq active_conditions_seq;
         DDS_ReturnCode_t retcode;
@@ -132,7 +134,7 @@ void TopicRdr<T,S,R>::Handler()
 
         while (!application::shutdown_requested) {
             // Wait 4 seconds for data 
-            retcode = this->waitset()->wait(active_conditions_seq, wait_duration);
+            retcode = this->waitset->wait(active_conditions_seq, wait_duration);
             // waitset.wait(dds::core::Duration(4));
             if (retcode == DDS_RETCODE_TIMEOUT) {  
                 // std::cout << "Reader thread: Wait timed out!! No conditions were triggered" << std::endl;
@@ -145,7 +147,7 @@ void TopicRdr<T,S,R>::Handler()
             int active_conditions = active_conditions_seq.length();
 
             for (int i = 0; i < active_conditions; ++i) {
-                if (active_conditions_seq[i] == this->statusCondition()) {
+                if (active_conditions_seq[i] == this->statusCondition) {
                     // Get the status changes so we can check which status
                     // ondition triggered.
                     DDS_StatusMask triggeredmask =
