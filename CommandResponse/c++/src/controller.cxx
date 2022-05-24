@@ -116,14 +116,19 @@ extern "C" int run_controller_application(int domain_id) {
     config_dev_writer.RunThread();
     device_state_reader.RunThread();
 
- 
+    // configure the request
+    MODULE::ConfigureDevice config_dev_topic;
+    config_dev_topic.targetDeviceId.resourceId=2;
+    config_dev_topic.targetDeviceId.id = 20;
+    config_dev_topic.deviceConfig.stateReq=ON;
+
     NDDSUtility::sleep(wait_period); // let entities get up and running
 
     while (!application::shutdown_requested) {
         //Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on
         if (device_state_reader.getCurrentState() == UNINITIALIZED) {
-            config_dev_writer.writeData (ON);
+            config_dev_writer.WriteData (config_dev_topic);
         }
         std::cout << "." << std::flush;                 
         NDDSUtility::sleep(wait_period);

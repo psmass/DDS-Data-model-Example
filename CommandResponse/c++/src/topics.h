@@ -17,6 +17,7 @@
 #include "ddsEntities.h"
 #include "CommandResp.h"
 #include "CommandRespSupport.h"
+#include "topics_T.h"
 
 
 namespace MODULE
@@ -46,6 +47,7 @@ namespace MODULE
     allow the main program to set data and write at will.
 
 */
+
 
 class DeviceStateRdr : public Reader {
     public:
@@ -152,32 +154,26 @@ class ConfigDevRdr : public Reader {
 
 };
 
-class ConfigDevWtr : public Writer {
+class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> {
     public:
-        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher);
+        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher) :
+            TopicWtr(
+                participant, 
+                publisher, 
+                MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
+                MODULE::TOPIC_CONFIGURE_DEVICE,
+                MODULE::CONFIGURE_DEVICE_WRITER
+                )
+            {};
         ~ConfigDevWtr(void){};
 
+        void WriteData(MODULE::ConfigureDevice configDevReq);
+
         void Handler(void);
-        void WriterEventHandler(DDSConditionSeq active_conditions_seq);
+        // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
 
-        // Configure Device is writen when by the controller as it demand (i.e. intitial and
-        // changing conditions require it). The writeData member function
-        // is provided to allow the main loop of the controller reliably publish a configuration
-        // change request to the evice.
-        void writeData(enum MODULE::DeviceStateEnum configReq); 
-
-        void setTopicWriter(ConfigureDeviceDataWriter* topic_writer)
-            { this->topicWriter=topic_writer; };
-        ConfigureDeviceDataWriter* getTopicWriter(void) { return this->topicWriter; };
-        void setTopicSample(MODULE::ConfigureDevice* topic_sample)
-            { this->topicSample=topic_sample; };
-        MODULE::ConfigureDevice * getTopicSample(void) { return this->topicSample; };
-        
-
-    private:
-        MODULE::ConfigureDeviceDataWriter * topicWriter;
-        MODULE::ConfigureDevice * topicSample; 
 };
+
 
 } // namespace MODULE
 

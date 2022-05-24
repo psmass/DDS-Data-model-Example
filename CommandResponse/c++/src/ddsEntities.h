@@ -40,8 +40,7 @@ namespace MODULE
             }
             void RunThread(void);
 
-            virtual void Handler(void) // implemented by the concrete topic class
-                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; 
+            virtual void Handler(void) { };// implemented by the concrete topic class
 
             const char* getTopicName(void) { return this->topicName; };
             void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
@@ -50,7 +49,6 @@ namespace MODULE
             void setStatusCondition(DDSStatusCondition * status_condition) { this->statusCondition=status_condition; };
             DDSStatusCondition * getStatusCondition(void) { return this->statusCondition; };
             DDSWaitSet * getWaitset(void) { return this->waitset; };
-
 
             pthread_t getThreadId(void) {return this->tid;};
             void enable(void) { MODULE::Writer::enabled=true; };

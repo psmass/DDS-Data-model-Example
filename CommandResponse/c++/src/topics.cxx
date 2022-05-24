@@ -181,14 +181,16 @@ namespace MODULE
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher)
-                 : Writer(participant, publisher, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
-        // std::cout << "Config Device Writer C'tor" << std::endl;
+    void ConfigDevWtr::WriteData(MODULE::ConfigureDevice configDevReq) {
+        std::cout << "Writing Config Request to device " << std::endl; 
 
-        createWriter<ConfigDevWtr, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> 
-            (this, MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE, participant, publisher);
-    };
+        // this is a straight copy so perhaps a more efficient way to do this
+        this->topicSample->targetDeviceId.id = configDevReq.targetDeviceId.id;
+        this->topicSample->targetDeviceId.resourceId = configDevReq.targetDeviceId.resourceId;
+        this->topicSample->deviceConfig.stateReq=configDevReq.deviceConfig.stateReq;
+        this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
 
+    }   
 
     void ConfigDevWtr::Handler() {
         DDSConditionSeq active_conditions_seq;
@@ -238,21 +240,5 @@ namespace MODULE
         std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
     }
 
-
-    void ConfigDevWtr::WriterEventHandler(DDSConditionSeq active_conditions_seq) {
-            // uses this->topicWriter which is topic specific
-            // Get the number of active conditions 
-
-            defaultWtrEventHdlr<ConfigDevWtr>(this, active_conditions_seq);
-        }
-
- 
-    void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
-        std::cout << "Writing Config Request to device " << std::endl; 
-
-        this->topicSample->deviceConfig.stateReq=configReq;
-        this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
-
-    }   
 
 } // namespace
