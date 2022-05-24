@@ -81,18 +81,33 @@ class DeviceStateRdr : public Reader {
         enum MODULE::DeviceStateEnum currentState; 
 };
 
-class DeviceStateWtr : public Writer {
+class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> {
     public:
-        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher);
+        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher) :
+            TopicWtr(
+                participant, 
+                publisher, 
+                MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
+                MODULE::TOPIC_DEVICE_STATE,
+                MODULE::DEVICE_STATE_WRITER
+                )
+            // initialize previousState and current state different so device will publish on startup
+            { this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
+              this->currentState = UNINITIALIZED;
+            };
+
         ~DeviceStateWtr(void){};
 
         void Handler(void);
-        void WriterEventHandler(DDSConditionSeq active_conditions_seq);
+       // fine with the default writer event handler
+       // void WriterEventHandler(DDSConditionSeq active_conditions_seq);
+       
+
+        void WriteData(const enum MODULE::DeviceStateEnum current_state); 
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
         // state and to durably publish the updated and latest state.
-        void writeData(const enum MODULE::DeviceStateEnum current_state); 
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
         void setPrevState(enum MODULE::DeviceStateEnum new_state){
@@ -105,15 +120,9 @@ class DeviceStateWtr : public Writer {
             currentState=new_state; 
         }
 
-        void setTopicWriter(MODULE::DeviceStateDataWriter* topic_writer)
-            { this->topicWriter=topic_writer; };
-        MODULE::DeviceStateDataWriter* getTopicWriter(void) { return this->topicWriter; }; 
-        void setTopicSample(MODULE::DeviceState* topic_sample)
-            { this->topicSample=topic_sample; };
-        MODULE::DeviceState * getTopicSample(void) { return this->topicSample; };
-        
     private:
-        // Save previous state since we send a state update any time there is a difference
+        // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
+            // Save previous state since we send a state update any time there is a difference
         // initialize current as UNITIALIZED and ensure previous state is something different
         // so we will immedately send a state update to the controller (durabley), this
         // also 'Announces' ouselves to the controller.
@@ -121,6 +130,7 @@ class DeviceStateWtr : public Writer {
         MODULE::DeviceState * topicSample; 
         enum MODULE::DeviceStateEnum previousState; 
         enum MODULE::DeviceStateEnum currentState; 
+
 };
 
 
@@ -167,7 +177,7 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
                 MODULE::TOPIC_CONFIGURE_DEVICE,
                 MODULE::CONFIGURE_DEVICE_WRITER
                 )
-            {};
+            { };
         ~ConfigDevWtr(void){};
 
         void WriteData(MODULE::ConfigureDevice configDevReq);
@@ -176,7 +186,6 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
         // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
 
 };
-
 
 } // namespace MODULE
 

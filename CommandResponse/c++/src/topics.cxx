@@ -66,33 +66,18 @@ namespace MODULE
     }
 
 
-    DeviceStateWtr::DeviceStateWtr(
-        DDSDomainParticipant * participant, 
-        DDSPublisher * publisher) :
-            Writer(participant, publisher, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER) {
-        // Update Static Topic Data parameters in the beginning of the handler
-        // prior to the loop, but after the entity base class creates the sample.
-        //std::cout << "Device State C'Tor" << std::endl; 
-        this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
-        this->currentState = UNINITIALIZED; 
-
-        createWriter<DeviceStateWtr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> 
-            (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, publisher);
-    }
-
-
-    void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
+    void DeviceStateWtr::WriteData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
         // Modify sample with current state as soon as I figure out how to load an enum
         //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
         //this->getMyDataSample()->value<int32_t>("state", current_state);
         
         // load the current_state in to the sample to be written
-        // ERROR_CHECK
-        this->topicSample->state=current_state;
-        this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
+        this->getTopicSample()->state=current_state; 
+        //MODULE::DeviceStateTypeSupport::print_data(this->getTopicSample()); 
+        this->getTopicWriter()->write(*this->getTopicSample(), DDS_HANDLE_NIL);
+    
     }
-
 
     void DeviceStateWtr::Handler() {
 
@@ -106,12 +91,12 @@ namespace MODULE
         DDSConditionSeq active_conditions_seq;
         DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
 
-  
+
         std::cout << "Device State Writer Handler Executing" << std::endl; 
         
         // ERROR_CHECK
-        this->topicSample->myDeviceId.resourceId=2;
-        this->topicSample->myDeviceId.id=20;
+        //this->topicSample->myDeviceId.resourceId=2;
+        //this->topicSample->myDeviceId.id=20;
  
         int sampleNumber = 1;
     
@@ -149,14 +134,6 @@ namespace MODULE
         std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
 
     } 
-
-    
-    void DeviceStateWtr::WriterEventHandler(DDSConditionSeq active_conditions_seq) {
-        // uses this->topicWriter which is topic specific
-        // Get the number of active conditions 
-
-        defaultWtrEventHdlr<DeviceStateWtr>(this, active_conditions_seq);
-    }
 
 
     void ConfigDevRdr::process_data(MODULE::ConfigureDevice * data) {
