@@ -64,6 +64,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
             : Reader(participant, subscriber, topic_name, topic_rdr_name ) {
 
         DDS_ReturnCode_t retcode, retcode1, retcode2;
+        DDSDataReader *untyped_reader; 
 
         // Register the specific datatype to use when creating the Topic
         // this calls a type specific type, so is required to be done in the specific
@@ -86,15 +87,36 @@ TopicRdr<T,S,R, D>::TopicRdr(
             throw std::invalid_argument("Reader thread: create topic error");
         }
 
-        // This DataReader reads data on "Example MODULE_DeviceState" Topic
-        DDSDataReader *untyped_reader = subscriber->create_datareader_with_profile(
-            topic,
-            MODULE::CMD_RSP_QOS_LIBRARY,
-            qos_profile,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (untyped_reader == NULL) {
-            throw std::invalid_argument("Reader thread: create data reader error");
+        if (filter_name !=NULL) { // create a filter topic
+            // Device filters ConfigureDeviceRequests to it's deviceID
+            DDS_StringSeq parameters(2);
+            const char *param_list[] = { "2", "20" };
+            parameters.from_array(param_list, 2);
+
+            DDSContentFilteredTopic *cft = NULL;
+            cft = participant->create_contentfilteredtopic(
+                    "ContentFilteredTopic",
+                    topic,
+                    "targetDeviceId.resourceId = %0, targetDeviceId.id=%2",
+                    parameters);
+                    // This DataReader reads data on "Example MODULE_DeviceState" Topic
+            untyped_reader = subscriber->create_datareader_with_profile(
+                cft,
+                MODULE::CMD_RSP_QOS_LIBRARY,
+                qos_profile,
+                NULL,  // listener 
+                DDS_STATUS_MASK_NONE);
+                        
+        } else {
+            untyped_reader = subscriber->create_datareader_with_profile(
+                topic,
+                MODULE::CMD_RSP_QOS_LIBRARY,
+                qos_profile,
+                NULL, // listener 
+                DDS_STATUS_MASK_NONE);
+            if (untyped_reader == NULL) {
+                throw std::invalid_argument("Reader thread: create data reader error");
+            }
         }
 
         // Narrow casts from an untyped DataReaderto a Reader of your type 
