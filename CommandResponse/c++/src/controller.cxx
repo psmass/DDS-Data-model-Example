@@ -113,14 +113,9 @@ extern "C" int run_controller_application(int domain_id) {
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant, publisher); 
     DeviceStateRdr device_state_reader(participant, subscriber);
+    config_dev_writer.setDevStateRdr(&device_state_reader);
     config_dev_writer.RunThread();
     device_state_reader.RunThread();
-
-    // configure the request
-    MODULE::ConfigureDevice config_dev_topic;
-    config_dev_topic.targetDeviceId.resourceId=2;
-    config_dev_topic.targetDeviceId.id = 20;
-    config_dev_topic.deviceConfig.stateReq=ON;
 
     NDDSUtility::sleep(wait_period); // let entities get up and running
 
@@ -129,7 +124,8 @@ extern "C" int run_controller_application(int domain_id) {
         // If a devices device_state is UNITIALIZED then turn it on
         // A controller would likely track multiple devices and keep them in a vector
         if (device_state_reader.getCurrentState() == UNINITIALIZED) {
-            config_dev_writer.WriteData (config_dev_topic);
+            // turn it on once we recieve a device state of UNINITIALIZED
+            config_dev_writer.WriteData (ON);
         }
         std::cout << "." << std::flush;                 
         NDDSUtility::sleep(wait_period);

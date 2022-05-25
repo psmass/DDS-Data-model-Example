@@ -27,10 +27,13 @@ namespace MODULE
         //myReaderThreadInfo->dataSeqIndx = i;
         // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; //
 
-        setCurrentState((enum MODULE::DeviceStateEnum)data->state);
+        // collect the device information
+        this->read_topic.myDeviceId.id = data->myDeviceId.id;
+        this->read_topic.myDeviceId.resourceId = data->myDeviceId.resourceId;
+        this->read_topic.state=(enum MODULE::DeviceStateEnum)data->state; 
 
         std::cout << "Controller Tracking Device Current state to: ";
-        switch(getCurrentState()) {
+        switch(this->read_topic.state) {
             case UNINITIALIZED:     // aka MODULE::DeviceStateEnum::UNINITIALIZED:
                 std::cout << "UNITIALIZED";
                 break;
@@ -125,13 +128,13 @@ namespace MODULE
     }
 
 
-    void ConfigDevWtr::WriteData(MODULE::ConfigureDevice configDevReq) {
+    void ConfigDevWtr::WriteData(const enum MODULE::DeviceStateEnum state_req) {
         std::cout << "Writing Config Request to device " << std::endl; 
 
         // this is a straight copy so perhaps a more efficient way to do this
-        this->topicSample->targetDeviceId.id = configDevReq.targetDeviceId.id;
-        this->topicSample->targetDeviceId.resourceId = configDevReq.targetDeviceId.resourceId;
-        this->topicSample->deviceConfig.stateReq=configDevReq.deviceConfig.stateReq;
+        this->topicSample->targetDeviceId.id = this->getDevStateRdr()->getReadDevState()->myDeviceId.id;
+        this->topicSample->targetDeviceId.resourceId = this->getDevStateRdr()->getReadDevState()->myDeviceId.resourceId;
+        this->topicSample->deviceConfig.stateReq=state_req; // per state requested
         this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
     }   
 

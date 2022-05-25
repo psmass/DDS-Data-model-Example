@@ -64,33 +64,22 @@ class DeviceStateRdr : public TopicRdr<
                 )
             { // Keep state in the DevStateReader for each devie, init to ERROR so we
               // wait until we get the first state from the device before we initialize
-
-                this->previousState =  ERROR; 
-                this->currentState = ERROR;
+              this->read_topic.state = ERROR;
             }
         ~DeviceStateRdr(void){};
 
-        enum MODULE::DeviceStateEnum getPrevState(void) { return this->previousState; };
-        enum MODULE::DeviceStateEnum getCurrentState(void) { return this->currentState; };
-        void setPrevState(enum MODULE::DeviceStateEnum new_state){
-            this->previousState=new_state; 
-        }
-        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
-            this->currentState=new_state;
-        }
+        enum MODULE::DeviceStateEnum getCurrentState(void) { return this->read_topic.state; };
+
+        MODULE::DeviceState * getReadDevState(void) { return &read_topic; };
 
         void process_data(MODULE::DeviceState * data);
-
-        //void setTopicReader(MODULE::DeviceStateDataReader* topic_reader)
-           // { this->topicReader=topic_reader; };
 
     private:
         // Controller will track the devices state as well, note if there were more than one
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
         // state sent when a devie announces itself.
-        enum MODULE::DeviceStateEnum previousState;
-        enum MODULE::DeviceStateEnum currentState; 
+        MODULE::DeviceState read_topic; // for this device
 
 };
 
@@ -181,7 +170,7 @@ class ConfigDevRdr : public TopicRdr<
     private:
         // will need the associated devStateWtr when receive a new config command and have
         // to change the state of the device
-        DeviceStateWtr * devicesDevStateWtrPtr;  // hol
+        DeviceStateWtr * devicesDevStateWtrPtr; 
 
 };
 
@@ -198,10 +187,19 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
             { };
         ~ConfigDevWtr(void){};
 
-        void WriteData(MODULE::ConfigureDevice configDevReq);
+        void WriteData(const enum MODULE::DeviceStateEnum configDevReq);
 
         void Handler(void);
         // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
+
+        void setDevStateRdr (DeviceStateRdr * dev_state_reader_ptr) 
+            { devicesDevStateRdrPtr = dev_state_reader_ptr; };
+        DeviceStateRdr * getDevStateRdr(void) { return devicesDevStateRdrPtr; };
+
+        private:
+        // will need the associated devStateRdr which holds the device info regarding
+        // our request
+        DeviceStateRdr * devicesDevStateRdrPtr; 
 
 };
 
