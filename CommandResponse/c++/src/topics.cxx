@@ -121,6 +121,7 @@ namespace MODULE
     void ConfigDevRdr::process_data(MODULE::ConfigureDevice * data) {
             if (this->getDevStateWtr()!=NULL) {
                 this->getDevStateWtr()->setCurrentState((enum MODULE::DeviceStateEnum)data->deviceConfig.stateReq);
+                std::cout << "ConfigureDevice Command Received:" << std::endl;
                 MODULE::ConfigureDeviceTypeSupport::print_data(data); 
             } else {
                 std::cout << "ConfigDevReader had not loaded DevState Writer Pointer" << std::endl;

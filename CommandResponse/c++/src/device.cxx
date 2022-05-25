@@ -112,9 +112,22 @@ extern "C" int run_device_application(int domain_id) {
         return -1;
     }
 
-    // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, subscriber, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
+
+    // create the device writer first since this devices ID is loaded in the c'tor
     DeviceStateWtr device_state_writer(participant, publisher);
+
+    // Device filters ConfigureDeviceRequests to it's deviceID
+    std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
+    std::string s2 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.id);
+
+    DDS_StringSeq parameters(2);
+    const char *param_list[] = { s1.c_str(), s2.c_str() };
+    parameters.from_array(param_list, 2);
+    const char * TOPIC_CONFIGURE_FILTER_EXPR="targetDeviceId.resourceId = %0, targetDeviceId.id=%1";
+
+    // Instantiate Topic Readers and Writers w/threads
+    ConfigDevRdr config_dev_reader(participant, subscriber, TOPIC_CONFIGURE_FILTER_EXPR, parameters); 
+
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
     config_dev_reader.RunThread();

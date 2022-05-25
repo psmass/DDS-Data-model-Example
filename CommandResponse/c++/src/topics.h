@@ -53,11 +53,12 @@ class DeviceStateRdr : public TopicRdr<
     MODULE::DeviceStateDataReader,
     MODULE::DeviceStateSeq> {
     public:
-        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber) :
+        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, char * filter, DDS_StringSeq params) :
             TopicRdr(
                 participant, 
                 subscriber,
                 NULL, // no filter on controller reader 
+                params,
                 MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_DEVICE_STATE,
                 MODULE::DEVICE_STATE_READER
@@ -147,11 +148,12 @@ class ConfigDevRdr : public TopicRdr<
     MODULE::ConfigureDeviceDataReader,
     MODULE::ConfigureDeviceSeq> {
     public:
-        ConfigDevRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, const char* filter_name) :
+        ConfigDevRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, const char* filter, DDS_StringSeq filter_params) :
             TopicRdr(
                 participant, 
                 subscriber,
-                filter_name,
+                filter,
+                filter_params,
                 MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_CONFIGURE_DEVICE,
                 MODULE::CONFIGURE_DEVICE_READER

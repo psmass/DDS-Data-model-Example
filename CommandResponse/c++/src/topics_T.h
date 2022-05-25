@@ -34,7 +34,8 @@ class TopicRdr : public Reader {
         TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
-            const char* filter_name,
+            const char* filter,
+            DDS_StringSeq parameters,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name);
@@ -57,7 +58,8 @@ template<class T, class S, class R, class D>
 TopicRdr<T,S,R, D>::TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
-            const char* filter_name,
+            const char* filter,
+            DDS_StringSeq parameters,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name) 
@@ -87,17 +89,13 @@ TopicRdr<T,S,R, D>::TopicRdr(
             throw std::invalid_argument("Reader thread: create topic error");
         }
 
-        if (filter_name !=NULL) { // create a filter topic
-            // Device filters ConfigureDeviceRequests to it's deviceID
-            DDS_StringSeq parameters(2);
-            const char *param_list[] = { "2", "20" };
-            parameters.from_array(param_list, 2);
-
+        if (filter !=NULL) { // create a filter topic
+ 
             DDSContentFilteredTopic *cft = NULL;
             cft = participant->create_contentfilteredtopic(
                     "ContentFilteredTopic",
                     topic,
-                    "targetDeviceId.resourceId = %0, targetDeviceId.id=%2",
+                    filter,
                     parameters);
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
             untyped_reader = subscriber->create_datareader_with_profile(
