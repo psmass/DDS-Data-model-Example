@@ -62,7 +62,12 @@ class DeviceStateRdr : public TopicRdr<
                 MODULE::TOPIC_DEVICE_STATE,
                 MODULE::DEVICE_STATE_READER
                 )
-            {};
+            { // Keep state in the DevStateReader for each devie, init to ERROR so we
+              // wait until we get the first state from the device before we initialize
+
+                this->previousState =  ERROR; 
+                this->currentState = ERROR;
+            }
         ~DeviceStateRdr(void){};
 
         enum MODULE::DeviceStateEnum getPrevState(void) { return this->previousState; };
