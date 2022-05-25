@@ -23,18 +23,6 @@ extern bool application::shutdown_requested;
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(
-        DDSDomainParticipant * participant,
-        DDSSubscriber * subscriber) : 
-            Reader(participant, subscriber, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
-
-        this->previousState = ERROR; // aka MODULE::DeviceStateEnum::ERROR:
-        this-> currentState = ERROR; 
-        createReader<DeviceStateRdr, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataReader> 
-            (this, MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE, participant, subscriber);
-
-    }
-
     void DeviceStateRdr::process_data(MODULE::DeviceState * data) {
         //myReaderThreadInfo->dataSeqIndx = i;
         // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; //
@@ -60,11 +48,7 @@ namespace MODULE
         std::cout << std::endl;
         MODULE::DeviceStateTypeSupport::print_data(data); 
     }
-
-    void DeviceStateRdr::Handler() {
-        readerHandler<DeviceStateRdr, MODULE::DeviceStateSeq> (this);
-    }
-
+ 
 
     void DeviceStateWtr::WriteData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
@@ -137,8 +121,12 @@ namespace MODULE
 
 
     void ConfigDevRdr::process_data(MODULE::ConfigureDevice * data) {
-            this->devicesDevStateWtrPtr->setCurrentState((enum MODULE::DeviceStateEnum)data->deviceConfig.stateReq);
-            MODULE::ConfigureDeviceTypeSupport::print_data(data); 
+            if (this->getDevStateWtr()!=NULL) {
+                this->getDevStateWtr()->setCurrentState((enum MODULE::DeviceStateEnum)data->deviceConfig.stateReq);
+                MODULE::ConfigureDeviceTypeSupport::print_data(data); 
+            } else {
+                std::cout << "ConfigDevReader had not loaded DevState Writer Pointer" << std::endl;
+            }
     }
 
 

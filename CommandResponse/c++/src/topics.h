@@ -47,6 +47,7 @@ namespace MODULE
 */
 
 
+/*
 class DeviceStateRdr : public Reader {
     public:
         DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber);
@@ -80,6 +81,50 @@ class DeviceStateRdr : public Reader {
         enum MODULE::DeviceStateEnum previousState;
         enum MODULE::DeviceStateEnum currentState; 
 };
+*/
+
+class DeviceStateRdr : public TopicRdr<
+    MODULE::DeviceState,
+    MODULE::DeviceStateTypeSupport,
+    MODULE::DeviceStateDataReader,
+    MODULE::DeviceStateSeq> {
+    public:
+        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber) :
+            TopicRdr(
+                participant, 
+                subscriber,
+                NULL, // no filter on controller reader 
+                MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
+                MODULE::TOPIC_DEVICE_STATE,
+                MODULE::DEVICE_STATE_READER
+                )
+            {};
+        ~DeviceStateRdr(void){};
+
+        enum MODULE::DeviceStateEnum getPrevState(void) { return this->previousState; };
+        enum MODULE::DeviceStateEnum getCurrentState(void) { return this->currentState; };
+        void setPrevState(enum MODULE::DeviceStateEnum new_state){
+            this->previousState=new_state; 
+        }
+        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
+            this->currentState=new_state;
+        }
+
+        void process_data(MODULE::DeviceState * data);
+
+        //void setTopicReader(MODULE::DeviceStateDataReader* topic_reader)
+           // { this->topicReader=topic_reader; };
+
+    private:
+        // Controller will track the devices state as well, note if there were more than one
+        // device we should keep an array of state per deviceID
+        // initialize the same, but something other than UNITITIALIZED as that is the first
+        // state sent when a devie announces itself.
+        enum MODULE::DeviceStateEnum previousState;
+        enum MODULE::DeviceStateEnum currentState; 
+
+};
+
 
 class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> {
     public:
@@ -156,6 +201,9 @@ class ConfigDevRdr : public TopicRdr<
 
     void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = dev_state_writer_ptr; };
+    
+    DeviceStateWtr * getDevStateWtr (void) 
+            { return this->devicesDevStateWtrPtr; };
 
     void setTopicReader(MODULE::ConfigureDeviceDataReader* topic_reader)
             { this->topicReader=topic_reader; };
