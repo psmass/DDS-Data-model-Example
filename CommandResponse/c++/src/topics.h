@@ -47,42 +47,6 @@ namespace MODULE
 */
 
 
-/*
-class DeviceStateRdr : public Reader {
-    public:
-        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber);
-        ~DeviceStateRdr(void){};
-
-        void Handler(void);
-        void process_data(MODULE::DeviceState * data); // specific topic to process
-
-        enum MODULE::DeviceStateEnum getPrevState(void) { return previousState; };
-        enum MODULE::DeviceStateEnum getCurrentState(void) { return currentState; };
-        void setPrevState(enum MODULE::DeviceStateEnum new_state){
-            previousState=new_state; 
-        }
-        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
-            currentState=new_state; 
-        }
-
-        void setTopicReader(MODULE::DeviceStateDataReader* topic_reader)
-            { this->topicReader=topic_reader; };
-        MODULE::DeviceStateDataReader* getTopicReader(void) { return this->topicReader; };
-        
-        
-    private:
-        MODULE::DeviceStateDataReader * topicReader;
-
-
-        // Controller will track the devices state as well, note if there were more than one
-        // device we should keep an array of state per deviceID
-        // initialize the same, but something other than UNITITIALIZED as that is the first
-        // state sent when a devie announces itself.
-        enum MODULE::DeviceStateEnum previousState;
-        enum MODULE::DeviceStateEnum currentState; 
-};
-*/
-
 class DeviceStateRdr : public TopicRdr<
     MODULE::DeviceState,
     MODULE::DeviceStateTypeSupport,
