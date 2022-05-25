@@ -169,9 +169,6 @@ class ConfigDevRdr : public TopicRdr<
     DeviceStateWtr * getDevStateWtr (void) 
             { return this->devicesDevStateWtrPtr; };
 
-    void setTopicReader(MODULE::ConfigureDeviceDataReader* topic_reader)
-            { this->topicReader=topic_reader; };
-
     private:
         // will need the associated devStateWtr when receive a new config command and have
         // to change the state of the device
