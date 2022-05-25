@@ -103,6 +103,10 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
             // initialize previousState and current state different so device will publish on startup
             { this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
               this->currentState = UNINITIALIZED;
+              // not sure why I need to use the get vs. direct access as it's protected
+              // crash results if I don't
+              this->getTopicSample()->myDeviceId.resourceId=2;
+              this->getTopicSample()->myDeviceId.id=20;
             };
 
         ~DeviceStateWtr(void){};

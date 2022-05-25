@@ -53,10 +53,9 @@ namespace MODULE
     void DeviceStateWtr::WriteData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
         // Modify sample with current state as soon as I figure out how to load an enum
-        //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
-        //this->getMyDataSample()->value<int32_t>("state", current_state);
-        
+
         // load the current_state in to the sample to be written
+        // need to use get'rs for things in the template or derived class
         this->getTopicSample()->state=current_state; 
         //MODULE::DeviceStateTypeSupport::print_data(this->getTopicSample()); 
         this->getTopicWriter()->write(*this->getTopicSample(), DDS_HANDLE_NIL);
@@ -77,10 +76,6 @@ namespace MODULE
 
 
         std::cout << "Device State Writer Handler Executing" << std::endl; 
-        
-        // ERROR_CHECK
-        //this->topicSample->myDeviceId.resourceId=2;
-        //this->topicSample->myDeviceId.id=20;
  
         int sampleNumber = 1;
     
