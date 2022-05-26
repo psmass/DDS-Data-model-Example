@@ -111,7 +111,7 @@ extern "C" int run_controller_application(int domain_id) {
     }
 
     // Reader API take a filter, but controller does not need one
-    Cft dsr_cft;        // create a disabled filter for the ConfigureDeviceReader
+    Cft dsr_cft;        // create a disabled filter for the DeviceStatus Rdr
     dsr_cft.filter = false; 
 
     // Instantiate Topic Readers and Writers w/threads
