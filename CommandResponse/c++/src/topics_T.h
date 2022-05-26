@@ -21,7 +21,7 @@ namespace MODULE
 struct Cft {
     bool filter;                // enable filter
     DDS_StringSeq * parameters;
-    char * filter_expression;   
+    char filter_expression[MAX_FILTER_EXPRESSION_LEN];   
 };
 
 // These Class Templates are intended to replace the function remplates below

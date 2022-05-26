@@ -126,9 +126,7 @@ extern "C" int run_device_application(int domain_id) {
     cdr_cft.parameters = &parameters;
     const char *param_list[] = { s1.c_str(), s2.c_str() };
     parameters.from_array(param_list, 2);
-    char filter_expression[MAX_FILTER_EXPRESSION_LEN];
-    strcpy (filter_expression, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1");
-    cdr_cft.filter_expression = filter_expression;
+    strcpy (cdr_cft.filter_expression, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1");
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
