@@ -111,13 +111,15 @@ extern "C" int run_controller_application(int domain_id) {
     }
 
     // Readers take filters, NULL = no filter, but need to pass params even if none
+    Cft dsr_cft; // create a filter for the ConfigureDeviceReader
+    dsr_cft.filter = false;
     DDS_StringSeq no_parameters(1);
-    const char *param_list[] = { "0"};  
-    no_parameters.from_array(param_list, 1);
+    //const char *param_list[] = { "0"};  
+    //no_parameters.from_array(param_list, 1);
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant, publisher); 
-    DeviceStateRdr device_state_reader(participant, subscriber, NULL, no_parameters);
+    DeviceStateRdr device_state_reader(participant, subscriber, dsr_cft);
     config_dev_writer.setDevStateRdr(&device_state_reader);
     config_dev_writer.RunThread();
     device_state_reader.RunThread();

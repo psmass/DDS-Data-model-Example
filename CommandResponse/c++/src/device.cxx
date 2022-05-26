@@ -120,13 +120,19 @@ extern "C" int run_device_application(int domain_id) {
     std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
     std::string s2 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.id);
 
+    Cft cdr_cft; // create a filter for the ConfigureDeviceReader
+    cdr_cft.filter = true; 
     DDS_StringSeq parameters(2);
+    cdr_cft.parameters = &parameters;
     const char *param_list[] = { s1.c_str(), s2.c_str() };
     parameters.from_array(param_list, 2);
-    const char * TOPIC_CONFIGURE_FILTER_EXPR="targetDeviceId.resourceId = %0, targetDeviceId.id=%1";
+    char filter_expression[MAX_FILTER_EXPRESSION_LEN];
+    strcpy (filter_expression, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1");
+    cdr_cft.filter_expression = filter_expression;
+
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, subscriber, TOPIC_CONFIGURE_FILTER_EXPR, parameters); 
+    ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);

@@ -15,8 +15,14 @@
 
 #include <ndds/ndds_cpp.h>
 
+#define MAX_FILTER_EXPRESSION_LEN 120
 namespace MODULE
 {
+struct Cft {
+    bool filter;                // enable filter
+    DDS_StringSeq * parameters;
+    char * filter_expression;   
+};
 
 // These Class Templates are intended to replace the function remplates below
 // This allows the user to have type specific classes by inheriting from these
@@ -34,8 +40,7 @@ class TopicRdr : public Reader {
         TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
-            const char* filter,
-            DDS_StringSeq parameters,
+            Cft filter,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name);
@@ -58,8 +63,7 @@ template<class T, class S, class R, class D>
 TopicRdr<T,S,R, D>::TopicRdr(
             DDSDomainParticipant * participant,
             DDSSubscriber * subscriber,
-            const char* filter,
-            DDS_StringSeq parameters,
+            Cft filter,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name) 
@@ -89,14 +93,14 @@ TopicRdr<T,S,R, D>::TopicRdr(
             throw std::invalid_argument("Reader thread: create topic error");
         }
 
-        if (filter !=NULL) { // create a filter topic
+        if (filter.filter ==true) { // create a filter topic
  
             DDSContentFilteredTopic *cft = NULL;
             cft = participant->create_contentfilteredtopic(
                     "ContentFilteredTopic",
                     topic,
-                    filter,
-                    parameters);
+                    filter.filter_expression,
+                    *filter.parameters);
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
             untyped_reader = subscriber->create_datareader_with_profile(
                 cft,
