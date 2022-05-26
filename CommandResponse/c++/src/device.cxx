@@ -130,14 +130,13 @@ extern "C" int run_device_application(int domain_id) {
     strcpy (filter_expression, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1");
     cdr_cft.filter_expression = filter_expression;
 
-
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
     config_dev_reader.RunThread();
-    device_state_writer.RunThread();
+    device_state_writer.RunThread(); // comment out to disable event monitoring on wtr
 
     NDDSUtility::sleep(wait_period); // let entities get up and running
 

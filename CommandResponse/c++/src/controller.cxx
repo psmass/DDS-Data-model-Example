@@ -110,18 +110,15 @@ extern "C" int run_controller_application(int domain_id) {
          return -1;
     }
 
-    // Readers take filters, NULL = no filter, but need to pass params even if none
-    Cft dsr_cft; // create a filter for the ConfigureDeviceReader
-    dsr_cft.filter = false;
-    DDS_StringSeq no_parameters(1);
-    //const char *param_list[] = { "0"};  
-    //no_parameters.from_array(param_list, 1);
+    // Reader API take a filter, but controller does not need one
+    Cft dsr_cft;        // create a disabled filter for the ConfigureDeviceReader
+    dsr_cft.filter = false; 
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant, publisher); 
     DeviceStateRdr device_state_reader(participant, subscriber, dsr_cft);
     config_dev_writer.setDevStateRdr(&device_state_reader);
-    config_dev_writer.RunThread();
+    config_dev_writer.RunThread(); // comment out to disable event monitoring on wtr
     device_state_reader.RunThread();
 
     NDDSUtility::sleep(wait_period); // let entities get up and running
