@@ -16,6 +16,10 @@ CommandResponse/c++/.DS_Store
 CommandResponse/python/venv
 CommandResponse/python/.idea
 
+#emacs temp files
+.#*
+\#*
+
 
 __pycache__
 *.DS_Store

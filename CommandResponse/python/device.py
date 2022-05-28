@@ -12,19 +12,28 @@
 
 
 import sys
+import constants
 import argparse
 from os import path as osPath
 from time import sleep
 import rti.connextdds as dds
 import application
 
-QOS_URL = "file:../model/ConmandProject.xml"
-PARTICIPANT_NAME = "domain_participant_library::participant"
-
 filepath = osPath.dirname(osPath.realpath(__file__))
 
 def device_main(domain_id):
-    print("Device")
+    print("Device Powering up")
+
+    qos_provider = dds.QosProvider(constants.QOS_URL)
+    participant = qos_provider.create_participant_from_config(constants.DEVICE_PARTICIPANT_NAME)
+
+
+    #my_type = qos_provider.type(qos_provider.type_libraries[0], KVP_TYPE_NAME)
+
+    #writer = dds.DynamicData.DataWriter.find_by_name(participant, WRITER_NAME)
+
+    #reader = dds.DynamicData.DataReader.find_by_name(participant, READER_NAME)
+    #reader.bind_listener(MyDataReaderListener(), dds.StatusMask.DATA_AVAILABLE)
 
     while (application.run_flag):
         print(".", end='', flush=True)

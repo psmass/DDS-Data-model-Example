@@ -16,6 +16,7 @@ from os import path as osPath
 from time import sleep
 import rti.connextdds as dds
 import application
+import constants
 
 QOS_URL = "file:../model/ConmandProject.xml"
 PARTICIPANT_NAME = "domain_participant_library::participant"
@@ -24,6 +25,9 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 
 def device_main(domain_id):
     print("Controller")
+
+    qos_provider = dds.QosProvider(constants.QOS_URL)
+    participant = qos_provider.create_participant_from_config(constants.CONTROLLER_PARTICIPANT_NAME)
 
     while (application.run_flag):
         print(".", end='', flush=True)
