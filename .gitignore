@@ -12,6 +12,12 @@ CommandResponse/c++11/.DS_Store
 CommandResponse/c++/src/build
 CommandResponse/c++/.DS_Store
 
+# venv pycharm project files
+CommandResponse/python/venv
+CommandResponse/python/.idea
+
+
+__pycache__
 *.DS_Store
 *.vcxproj
 *.filters
