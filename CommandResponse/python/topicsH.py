@@ -1,4 +1,4 @@
-/*
+"""
  * (c) Copyright, Real-Time Innovations, 2022.  All rights reserved.
  * RTI grants Licensee a license to use, modify, compile, and create derivative
  * works of the software solely for use with RTI Connext DDS. Licensee may
@@ -8,19 +8,9 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
- */
+ """
 
-#ifndef TOPICS_HPP
-#define TOPICS_HPP
-
-#include <iostream>
-#include "ddsEntities.hpp"
-#include "CommandResp.hpp"
-
-
-namespace MODULE
-{
-
+ """
     /* How to use specific topic Readers and Writers:
 
     The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
@@ -42,11 +32,13 @@ namespace MODULE
     can be used for writer event status and sleep periodically with no write operation.
     A separate writeData(data) member funcstion can be added to the specific topic class to
     allow the main program to set data and write at will.
+"""
 
-*/
+import ddsEntitiesH
 
-class DeviceStateRdr : public Reader {
-    public:
+class DeviceStateRdr(ddsEntitiesH.Reader):
+    def __init__(self, participant):
+
         DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
@@ -68,10 +60,10 @@ class DeviceStateRdr : public Reader {
         // state sent when a devie announces itself.
         enum MODULE::DeviceStateEnum previousState {MODULE::DeviceStateEnum::ERROR}; 
         enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::ERROR}; 
-};
 
-class DeviceStateWtr : public Writer {
-    public:
+
+class DeviceStateWtr(ddsEntitiesH.Writer):
+
         DeviceStateWtr(const dds::domain::DomainParticipant participant);
         ~DeviceStateWtr(void){};
 
@@ -103,8 +95,8 @@ class DeviceStateWtr : public Writer {
 };
 
 
-class ConfigDevRdr : public Reader {
-    public:
+class ConfigDevRdr(ddsEntitiesH.Reader):
+
         ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
         ~ConfigDevRdr(void){};
 
@@ -118,8 +110,8 @@ class ConfigDevRdr : public Reader {
         DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
 };
 
-class ConfigDevWtr : public Writer {
-    public:
+class ConfigDevWtr(ddsEntitiesH.Writer):
+
         ConfigDevWtr(const dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};
 
@@ -131,10 +123,4 @@ class ConfigDevWtr : public Writer {
         // change request to the evice.
         void writeData(enum MODULE::DeviceStateEnum configReq); 
 
-    private:
-};
 
-} // namespace MODULE
-
-
-#endif // TOPICS_HPP

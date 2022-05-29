@@ -1,4 +1,4 @@
-/*
+"""
  * (c) Copyright, Real-Time Innovations, 2022.  All rights reserved.
  * RTI grants Licensee a license to use, modify, compile, and create derivative
  * works of the software solely for use with RTI Connext DDS. Licensee may
@@ -8,130 +8,114 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
- */
+"""
 
-#include "ddsEntities.hpp"
-
-namespace MODULE
-{
-
-    Writer::Writer(
-        dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
-        const std::string writer_name) {
-        // by setting period non-zero the topic will be a periodic topic
-        std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        topicName = topic_name;
-        writerName = writer_name;
-
-    }
-
-    void Writer::WriterThread(dds::domain::DomainParticipant participant) {
-        // Lookup the specific topic DeviceState as defined in the xml file.
-        // This will be needed to create samples of the correct type
-        std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
-
-        dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-
-        const dds::core::xtypes::DynamicType &thisTopicType =
-            qos_provider->type(this->topicName);
-
-        // rti::core::xtypes::print_idl(deviceStateType);
-
-        // Find the DataWriter defined in the xml by using the participant and the
-        // publisher::writer pair as the datawriter name.
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> thisTopicWriter =
-            rti::pub::find_datawriter_by_name<
-                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
-                participant,
-                this->writerName);
-
-        // Create one sample from the specified type and populate the id field.
-        // This sample will be used repeatedly in the loop below.
-        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
-
-        this->topicWriter=&thisTopicWriter; // These pointer stay around for the duration of
-        this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
-                                            // until thread exit.
-
-        this->Handler(); // call the topic specific Handler (Virtual)
-
-        std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
-
-    } // end Writer::WriterThread
-
-    void Writer::RunThread(dds::domain::DomainParticipant participant){
-        writerThread = std::thread(&Writer::WriterThread, this, participant);
-    }
-
-    Reader::Reader( 
-        dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
-        const std::string reader_name) {
-
-        std::cout << "Reader for topic " << topic_name << " created." << std::endl;
-        topicName = topic_name;
-        readerName = reader_name;
- 
-    }
+import threading
+from datetime import time
+from time import sleep
+import constants
+import application
+import rti.connextdds as dds
 
 
-    void Reader::ReaderThread(dds::domain::DomainParticipant participant) {
+class Writer(threading.Thread):
 
-        std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
+    def __init__(self, participant, topic_type_name, writer_name):
+        self._topic_type_name = topic_type_name
+        self._writer_name = writer_name
+        qos_provider = dds.QosProvider(constants.QOS_URL)
+        # get the topic type and writer for this topic
+        self._topic_type = qos_provider.type(qos_provider.type_library[0], self._topic_type_name)
+        self._writer = dds.DynamicData.DataWriter.find_by_name(participant, self._writer_name)
+        threading.Thread.__init__(self)
+        print("Writer Topic {w_name} created".format(w_name=self._writer_name))
 
-        // Find the DataReader defined in the xml by using the participant and the
-        // subscriber::reader pair as the datareader name.
-        dds::sub::DataReader<dds::core::xtypes::DynamicData> reader =
-            rti::sub::find_datareader_by_name<
-                dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
-                participant,
-                this->readerName);
+    # def __del__(self): # d'tor
 
-        // WaitSet will be woken when the attached condition is triggered
-        dds::core::cond::WaitSet waitset;
-        
-        // Create a ReadCondition for any data on this reader, and add to WaitSet
-        dds::sub::cond::ReadCondition read_condition(
-            reader,
-            dds::sub::status::DataState::any()
-         );
+    def run(self):  # Thread of execution Override to threading class
+        print("Writer Thread running for {w_name}".format(w_name=self._writer_name))
+        # handler() is implemented by concrete topic class and should
+        # not return until program exit. It's while loop periodicity should
+        # be set to 1 or more seconds or the rate of writing a peroidic topic
+        self.handler() # status handler is implemented by concrete topic class
 
-        waitset += read_condition;
+    # ********* MUST OVERLOAD TO SET CONCRETE TOPIC CLASS WRITER **********
+    def write(self):
+        print("DEFAULT {w_name} WRITER - OVERLOAD WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
 
-        while (!application::shutdown_requested) {
-            // Wait 4 seconds for data 
-            //waitset.dispatch(dds::core::Duration(4));
-            waitset.wait(dds::core::Duration(4));
-            // Take all samples
-            dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
+        for var, value in env.items():
+            sample["key"] = var
+            sample["value"] = value
+            writer.write(sample)
 
-            for (const auto sample : samples) {
+    def join(self):
+        super().join()
 
-                if (sample.info().valid()) {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
+    @classmethod
+    # *********  NEED TO OVERLOAD TO SET CONCRETE TOPIC SPECIFIC EVENT HANDLER **********
+    # *********  DEFAULT IS TO PRINT MATCHED SUBSCRIBERS
+    def handler(cls):  # overide handler in base class for specific topic
+        # do periodic writing here
+        print("*** GENERIC WRITER HANDLER")
+        while application.run_flag:
+            sleep(1)
 
-                    // map the sample to the specific dynamic data type
-                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-                    this->Handler(data); // call the topic specific Handler (Virtual) 
+    @classmethod
+    def enable(cls):
+        _enabled = True
 
-                    std::cout << std::endl;
+    @classmethod
+    def disable(cls):
+        _enabled = False
 
-                }
-                else {
-                    std::cout << "  Received metadata" << std::endl;
-                }
-            }
-        }
-        
-        std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
-    }
 
-   void Reader::RunThread(dds::domain::DomainParticipant participant){
-        readerThread = std::thread(&Reader::ReaderThread, this, participant);
-    }
+class Reader(threading.Thread):
 
-} // NAMESPACE MODULE
+    def __init__(self, participant, topic_type_name, reader_name):
+        self._topic_type_name = topic_type_name
+        self._reader_name = reader_name
+        qos_provider = dds.QosProvider(constants.QOS_URL)
+        # get the topic type and reader for this topic
+        self._topic_type = qos_provider.type(qos_provider.type_library[0], self._topic_type_name)
+        self._reader = dds.DynamicData.DataReader.find_by_name(participant, self._reader_name)
+        # Create a ReadCondition to get any data
+        self._read_condition = dds.ReadCondition(self._reader, dds.DataState.any_data)
+        # Create WaitSet and attach conditions
+        self._waitset = dds.WaitSet()
+        # self._waitset += status_condition
+        self._waitset += self._read_condition
+        threading.Thread.__init__(self)
+        print("Reader Topic {r_name} created".format(r_name=self._reader_name))
+
+        # def __del__(self): # d'tor
+
+    def run(self):  # Thread of execution Override to threading class
+        while application.run_flag:
+            print("Reader Thread running for {r_name}".format(r_name=self._reader_name))
+            # Get the StatusCondition associated with the reader and set the mask to get liveliness updates
+            # change Status condition for matched publishers
+            # status_condition.enabled_statuses = dds.StatusMask.LIVELINESS_CHANGED
+            active = self._waitset.wait(4.0)
+            # Check conditions after wait to see if anything triggered
+            # if self._status_condition in active:
+            #    self.status_handler(reader)
+            if self._read_condition in active:
+                for (data, info) in filter(lambda s: s.info.valid, self._reader.take()):
+                    self.handler(data) # execute the vitrual reader->specific topic reader
+                    #print(data)
+
+
+    def join(self):
+        super().join()
+
+    # ********* MUST OVERLOAD TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
+    def handler(self):  # overide handler in base class for specific topic
+        print("*** GENERIC READER HANDLER")
+
+
+
+
+
+
 
 

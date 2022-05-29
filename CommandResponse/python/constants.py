@@ -15,3 +15,5 @@ MODULE = "ExCmdRsp::" # IDL MODULE NAME SPACE- NOT USED WITH Python
 QOS_URL = "file://../model/CommandProject.xml"
 DEVICE_PARTICIPANT_NAME = "CmdRspParticipantLibrary::DeviceParticipant1"
 CONTROLLER_PARTICIPANT_NAME = "CmdRspParticipantLibrary::ControllerParticipant1"
+DEVICE_STATE_TYPE_NAME = "DeviceState"
+CONFIGURE_DEVICE_TYPE_NAME = "ConfigureDevice"

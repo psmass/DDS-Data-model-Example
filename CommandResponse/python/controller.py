@@ -18,13 +18,11 @@ import rti.connextdds as dds
 import application
 import constants
 
-QOS_URL = "file:../model/ConmandProject.xml"
-PARTICIPANT_NAME = "domain_participant_library::participant"
 
 filepath = osPath.dirname(osPath.realpath(__file__))
 
-def device_main(domain_id):
-    print("Controller")
+def controller_main(domain_id):
+    print("Controller Powering Up")
 
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.CONTROLLER_PARTICIPANT_NAME)
@@ -44,7 +42,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
-    device_main(args.domain)
+    try:
+        controller_main(args.domain)
+    except:
+        print("Exception Running Device")
+
 
 
 
@@ -93,29 +95,5 @@ void run_controller_application() {
     rti::util::sleep(dds::core::Duration(1));
     std::cout << "Controller main thread shutting down" << std::endl;
 
-}
-} // namespace MODULE
-
-int main(int argc, char *argv[]) {
-
-    using namespace application;
-
-    setup_signal_handlers();
-
-    try {
-        MODULE::run_controller_application();
-    }
-    catch (const std::exception &ex) {
-        // This will catch DDS exceptions
-        std::cerr << "Exception in run_controller_application(): " << ex.what()
-                  << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    // Releases the memory used by the participant factory.  Optional at
-    // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
-
-    return EXIT_SUCCESS;
 }
 """

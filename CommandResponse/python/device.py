@@ -21,25 +21,22 @@ import application
 
 filepath = osPath.dirname(osPath.realpath(__file__))
 
+
 def device_main(domain_id):
-    print("Device Powering up")
+    print("Device Powering Up")
 
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.DEVICE_PARTICIPANT_NAME)
 
 
-    #my_type = qos_provider.type(qos_provider.type_libraries[0], KVP_TYPE_NAME)
 
-    #writer = dds.DynamicData.DataWriter.find_by_name(participant, WRITER_NAME)
-
-    #reader = dds.DynamicData.DataReader.find_by_name(participant, READER_NAME)
-    #reader.bind_listener(MyDataReaderListener(), dds.StatusMask.DATA_AVAILABLE)
-
-    while (application.run_flag):
+    while application.run_flag:
         print(".", end='', flush=True)
+        #f.func_b(1)
         sleep(1)
 
     print("Device Exiting")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -50,8 +47,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
-    device_main(args.domain)
-
+    try:
+        device_main(args.domain)
+    except:
+        print("Exception Running Device")
 
 
 """
@@ -93,63 +92,34 @@ void run_device_application() {
     rti::util::sleep(dds::core::Duration(1));
     std::cout << "Device main thread shutting down" << std::endl;
 }
-} // namespace MODULE
-
-
-int main(int argc, char *argv[])
-{
-
-    using namespace application;
-
-    setup_signal_handlers();
-
-    try  {
-        MODULE::run_device_application();
-    }
-    catch (const std::exception &ex)  {
-        // This will catch DDS exceptions
-        std::cerr<< "Exception in run_device_application(): " << ex.what()
-                  << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    // Releases the memory used by the participant factory.  Optional at
-    // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
-
-    return EXIT_SUCCESS;
-}
 """
 
-"""
-import threading
 
-class MyThread (threading.Thread):
-    die = False
-    def __init__(self, name):
-        threading.Thread.__init__(self)
-        self.name = name
+# f = B()
 
-    def run (self):
-        while not self.die:
-            time.sleep(1)
-            print (self.name)
+class A:
+    def __init__(self):
+        print("A C't'r")
 
-    def join(self):
-        self.die = True
-        super().join()
+    def func_a(self, a):
+        print("func_a Default {aN}".format(aN=a))
+        self.func_c(a+1)
 
-if __name__ == '__main__':
-    f = MyThread('first')
-    f.start()
-    s = MyThread('second')
-    s.start()
-    try:
-        while True:
-            time.sleep(2)
-    except KeyboardInterrupt:
-        print('Device Exiting')
-        f.join()
-        s.join()
 
-"""
+class B(A):
+    def __init__(self):
+        super().__init__()
+        print("B C'tor")
+
+    def func_b(self, b):
+        print("func_b {bN}".format(bN=b))
+        self.func_a(b+1)
+
+    """
+    def func_a(self, a):
+        print("func_a override {aON}".format(aON=a))
+        self.func_c(4)
+    """
+    @classmethod
+    def func_c(cls, c):
+        print("fun_c {cN}".format(cN = c))
