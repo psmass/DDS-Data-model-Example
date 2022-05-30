@@ -113,6 +113,7 @@ class DeviceStateWtr(ddsEntities.Writer):
         while application.run_flag:
             #  if periodic data handler should set the sleep duration
             #  to topic write periode and call write() here
+            self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
             sleep(1)
 
     def write_data(self, state):
@@ -166,12 +167,13 @@ class ConfigDevWtr(ddsEntities.Writer):
         print("Configure Device Writer Handler Executing")
         # if there were mulitple devices we'd want to index by device
         # number to get the target devive ID for the request
-        self._sample["targetDeviceId.resourceId"] = self._device_state_rdr.get_device_resource_id()
-        self._sample["targetDeviceId.id"] = self._device_state_rdr.get_device_id()
+        self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
+        self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
 
         while application.run_flag:
             #  if periodic data handler should set the sleep duration
-            #  to topic write periode and call write() here
+            #  to topic write period and call write() here
+            self.writeData(constants.DeviceStateEnum.ON)
             sleep(1)
 
     def writeData(self, request):

@@ -92,8 +92,8 @@ class Reader(threading.Thread):
         # def __del__(self): # d'tor
 
     def run(self):  # Thread of execution Override to threading class
+        print("Reader Thread running for {r_name}".format(r_name=self._reader_name))
         while application.run_flag:
-            print("Reader Thread running for {r_name}".format(r_name=self._reader_name))
             # Get the StatusCondition associated with the reader and set the mask to get liveliness updates
             # change Status condition for matched publishers
             # status_condition.enabled_statuses = dds.StatusMask.LIVELINESS_CHANGED

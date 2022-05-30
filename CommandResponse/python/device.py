@@ -34,6 +34,8 @@ def device_main(domain_id):
     # The ConfigureDevRdr object instance needs to have the corresponding DeviceStateWriter
     # object reference to access the devices DeviceID and state.
     controller_cdr.set_device_state_writer(controller_dsw)
+    controller_dsw.start()
+    controller_cdr.start()
 
     while application.run_flag:
         print(".", end='', flush=True)

@@ -33,6 +33,8 @@ def controller_main(domain_id):
     # The ConfigureDevWrt object instance needs to have the corresponding DeviceState Object
     # reference to access target DeviceID and track state.
     controller_cdw.set_device_state_reader(controller_dsr)
+    controller_dsr.start()
+    controller_cdw.start()
 
 
     while application.run_flag:

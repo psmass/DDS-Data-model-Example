@@ -15,7 +15,7 @@
 
 """
 
-from enum import Enum
+from enum import IntEnum
 
 MODULE = "ExCmdRsp::"  # IDL MODULE NAME SPACE NOT USED WITH Python
 QOS_URL = "file://../model/CommandProject.xml"
@@ -29,7 +29,7 @@ CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader"
 CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter"
 
 
-class DeviceStateEnum (Enum):
+class DeviceStateEnum (IntEnum):
     UNINITIALIZED = 1
     OFF = 2
     ON = 3
