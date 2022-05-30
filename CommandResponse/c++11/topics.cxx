@@ -131,7 +131,8 @@ namespace MODULE
 
     void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
-         // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
+         // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state
+         // to the requested state
         devicesDevStateWtrPtr->setCurrentState(
             (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
 

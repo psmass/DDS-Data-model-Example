@@ -18,6 +18,7 @@ from os import path as osPath
 from time import sleep
 import rti.connextdds as dds
 import application
+import topics
 
 filepath = osPath.dirname(osPath.realpath(__file__))
 
@@ -29,12 +30,19 @@ def device_main(domain_id):
     participant = qos_provider.create_participant_from_config(constants.DEVICE_PARTICIPANT_NAME)
 
 
+    # spin up DeviceStateWtr first since ConfigDevRdr needs a reference to it.
+    topics.DeviceStateWtr(participant)
+    topics.ConfigDevRdr(participant)
 
     while application.run_flag:
         print(".", end='', flush=True)
+        topics.ConfigDevRdr.join()
+        topics.DeviceStateRdr.join()
         #f.func_b(1)
         sleep(1)
 
+    topics.ConfigDevRdr.join()
+    topics.DeviceStateWtr.join()
     print("Device Exiting")
 
 

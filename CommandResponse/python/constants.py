@@ -9,11 +9,28 @@
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
 
+ Note: For other language bindings these constants are defined with the data
+ module (in the idl). RtiCodeGenerator is used to create a project header file
+ to ascertain these constants.
+
 """
 
-MODULE = "ExCmdRsp::" # IDL MODULE NAME SPACE- NOT USED WITH Python
+from enum import Enum
+
+MODULE = "ExCmdRsp::" # IDL MODULE NAME SPACE NOT USED WITH Python
 QOS_URL = "file://../model/CommandProject.xml"
 DEVICE_PARTICIPANT_NAME = "CmdRspParticipantLibrary::DeviceParticipant1"
 CONTROLLER_PARTICIPANT_NAME = "CmdRspParticipantLibrary::ControllerParticipant1"
 DEVICE_STATE_TYPE_NAME = "DeviceState"
 CONFIGURE_DEVICE_TYPE_NAME = "ConfigureDevice"
+DEVICE_STATE_READER = "CmdRspParticipantLibrary::DeviceStateReader"
+DEVICE_STATE_WRITER = "CmdRspParticipantLibrary::DeviceStateWriter"
+CONFIGURE_DEVICE_READER = "CmdRspParticipantLibrary::ConfigureDeviceReader"
+CONFIGURE_DEVICE_WRITER = "CmdRspParticipantLibrary::ConfigureDeviceWriter"
+
+
+class DeviceStateEnum (Enum):
+    UNINITIALIZED = 1
+    OFF = 2
+    ON = 3
+    ERROR = 4

@@ -17,9 +17,10 @@ from time import sleep
 import rti.connextdds as dds
 import application
 import constants
-
+import topics
 
 filepath = osPath.dirname(osPath.realpath(__file__))
+
 
 def controller_main(domain_id):
     print("Controller Powering Up")
@@ -27,11 +28,24 @@ def controller_main(domain_id):
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.CONTROLLER_PARTICIPANT_NAME)
 
-    while (application.run_flag):
+    # spin up DeviceStateRdr first since ConfigDevWrt needs a reference to it.
+    topics.DeviceStateRdr(participant)
+    topics.ConfigDevWtr(participant)
+
+    while application.run_flag:
+        """
+        if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
+            config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
+        }
+        """
         print(".", end='', flush=True)
         sleep(1)
 
+    topics.ConfigDevWtr.join()
+    topics.DeviceStateRdr.join()
+
     print("Controller Exiting")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

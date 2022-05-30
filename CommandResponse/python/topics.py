@@ -1,4 +1,4 @@
-/*
+"""
  * (c) Copyright, Real-Time Innovations, 2022.  All rights reserved.
  * RTI grants Licensee a license to use, modify, compile, and create derivative
  * works of the software solely for use with RTI Connext DDS. Licensee may
@@ -8,185 +8,168 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
- */
+ """
 
-#include "topics.hpp"
-#include "CommandResp.hpp"
-#include <dds/dds.hpp>
+ """
+    /* How to use specific topic Readers and Writers:
 
-namespace MODULE
-{
+    The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
+     - e.g. in the case of a device Reader, it should register for myTopic - i.e.
+     commands directed specifically to it from a controller.
 
-    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
-      : Reader(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
-    };
+    The controller readers likely would not want to filter for a specific deviceID,
+    as generally controllers handle all the data sent to them. Controllers typically
+    are not a specific target ID either.
 
-    void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
-        std::cout << "Device State Reader Handler Executing" << std::endl; 
-       
-        setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
+    The Topic specific Writer member functions. 
 
-        std::cout << "Controller Tracking Device Current state to: ";
-        switch(getCurrentState()) {
-            case MODULE::DeviceStateEnum::UNINITIALIZED:
-                std::cout << "UNITIALIZED";
-                break;
-            case MODULE::DeviceStateEnum::OFF:
-                std::cout << "OFF";
-                break;
-            case MODULE::DeviceStateEnum::ON:
-                std::cout << "ON";
-                break;
-            case MODULE::DeviceStateEnum::ERROR:
-                std::cout << "ERROR";
-                break;
-            default: std::cout << "OOPS - not a valid value";
-        }
-    }    
+    Specific Writer Handlers have two parts, the Initial Setup and the Handler Loop.
+    The user may want add code  in the Initial Setup (prior to the Handler Loop) to
+    statically set the source ID (in the case of a device) or any other static data. 
+    This is done once and is topic specific.
 
-    DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
-      : Writer(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER) {
-        // Update Static Topic Data parameters in the beginning of the handler
-        // prior to the loop, but after the entity base class creates the sample.
-        //std::cout << "Device State C'Tor" << std::endl; 
+    Code can be added in the loop write the topic periodically. If non periodic, the loop
+    can be used for writer event status and sleep periodically with no write operation.
+    A separate writeData(data) member funcstion can be added to the specific topic class to
+    allow the main program to set data and write at will.
+"""
 
+import application
+import ddsEntities
+import constants
+import rti.connextdds as dds
+from time import sleep
 
-    };
+class DeviceStateRdr(ddsEntities.Reader):
+    # The DeviceStateReader is used by the controller to
+    # track the current device state of the device(s).
+    # If there is more than one device, we should keep an
+    # array of devices
+    #
+    # The controller state machine looks to receive an
+    # UNINITIALIZED Device state to know a new device has
+    # announced itself, causing the controller to issue
+    # a configuration command. So we need to initialize
+    # the current state to something other tha UNINITIALIZED
+    def __init__(self, participant):
+        ddsEntities.Reader.__init__(self, participant,
+                                    constants.DEVICE_STATE_TYPE_NAME,
+                                    constants.DEVICE_STATE_READER)
+        self._current_state = constants.DeviceStateEnum.ERROR
+        self._device_id = 0
+        self._device_resource_id = 0
 
-    void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
-        std::cout << "Writing DeviceState Sample " << std::endl;
-        // Modify sample with current state as soon as I figure out how to load an enum
-        //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
-        //this->getMyDataSample()->value<int32_t>("state", current_state);
-        this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
-        this->getMyWriter()->write(*this->getMyDataSample());
-    }
+    # def __del__(self): # d'tor
 
-    void DeviceStateWtr::Handler() {
+    def get_device_resource_id(self):
+        return self._device_resource_id
 
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
-        std::cout << "Device State Writer Handler Executing" << std::endl; 
+    def get_device_id(self):
+        return self._device_id
 
+    def handler(self, data):
+        print ("Device State Reader Handler Executing")
 
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        self._current_state = data["state"]
+        self._device_resource_id = data["myDeviceId.resourceId"]
+        self._device_id = data["myDeviceId.id"]
 
-        auto sampleNumber = 1;
-    
-        while (!application::shutdown_requested)
-        {
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written periodically here and uncomment the write
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            //Writer::getMyWriter()->write(*Writer::getMyDataSample());
-            
-            //std::cout
-            //<< "Writing Sample: " << sampleNumber 
-            //<< "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
-            //<< ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
-            //<< std::endl;
-
-            // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
-            //sampleNumber++;
-        }
-
-        // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
-
-    }    
+        print("Controller Tracking Device Current state to: ", end='')
+        # could use the new 3.10 match / case (switch)
+        if self._current_state == constants.DeviceStateEnum.UNINITIALIZED:
+                print("UNINITIALIZED", flush=True)
+        elif self._current_state == constants.DeviceStateEnum.ON:
+                print("ON", flush=True)
+        elif self._current_state == constants.DeviceStateEnum.OFF:
+            print("OFF", flush=True)
+        elif self._current_state == constants.DeviceStateEnum.ERROR:
+            print("ERROR", flush=True)
+        else:
+            print("Oops the CurrentState is not a valid value ")
 
 
-    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
-      : Reader(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
-        // std::cout << "Config Dev Reader C'tor " << std::endl; 
-        // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
-        // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
- 
-        //rti::topic::CustomFilter<MODULE::ConfigureDevice> configDevReaderCft=rti::topic::find_content_filter (participant, filter_name);
-        /*
-        // Find the Topic
-        dds::topic::Topic<dds::topic::AnyTopic> topic = dds::topic::find(participant, _TOPIC_CONFIGURE_DEVICE);
-        // Create the parameter list
-        std::vector<std::string> cft_parameters(1);
-        cft_parameters[0] = "20"; // myDeviceID number - redefine as a const at the start of the program vs. hardcode
+class DeviceStateWtr(ddsEntities.Writer):
+    # The DeviceStateWriter is used by each Device to
+    # track and send the current device state when it changes.
+    #
+    # Initialize the current_state as UNINITIALIZED, make
+    # the previous state something different to force the
+    # initial publication (Durably) which notifies the
+    # controller of the device.
+    def __init__(self, participant):
+        ddsEntities.Writer.__init__(self, participant,
+                                constants.DEVICE_STATE_TYPE_NAME,
+                                constants.DEVICE_STATE_WRITER)
+        self._previous_state = constants.DeviceStateEnum.ERROR
+        self._current_state = constants.DeviceStateEnum.UNINITIALIZED
+        self._sample = dds.DynamicData(constants.DEVICE_STATE_TYPE_NAME)
+        self._sample["myDeviceId.resourceId"] = 2
+        self._sample["myDeviceId.Id"] = 20
 
-        // Create the ContentFilteredTopic
-        dds::topic::ContentFilteredTopic<ExCmdRsp::ConfigureDevice> cft(
-            topic, // related topic
-            "MyFilter", // local name for the CFT
-            dds::topic::Filter(         // filter (constructed in-line in this example)
-                "targetDeviceId.id=%0", // expression
-                cft_parameters));       // parameter vector
-        */
+    def handler(self):
+        # The topic specific writer handler, sits only on events
+        # you may want to handle for this topic
+        print("Device State Writer Handler Executing")
+        # in a real device these would be dug out of EPROM somewhere
 
-    };
+        while application.run_flag:
+            #  if periodic data handler should set the sleep duration
+            #  to topic write periode and call write() here
+            sleep(1)
 
-    void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
-        std::cout << "Configure Device Reader Handler Executing" << std::endl; 
-         // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state = to the sent state
-        devicesDevStateWtrPtr->setCurrentState(
-            (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
+    def write_data(self, state):
+        print("Writing DeviceState Sample")
+        self._sample["state"] = state
+        self._writer.write(self._sample)
 
-    }  
-
-
-    ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
-      : Writer(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
-          // std::cout << "Config Device Writer C'tor" << std::endl;             
-    };
-
-    void ConfigDevWtr::Handler() {
-
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
-        std::cout << "Configure Device Writer Handler Executing" << std::endl; 
-
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", 20);
-
-        auto sampleNumber = 1;
-    
-        while (!application::shutdown_requested)
-        {
-
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written here
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            // Writer::getMyWriter()->write(*Writer::getMyDataSample());
-
-            //std::cout << "Writing Sample: " << sampleNumber 
-            //<< "{'targetDeviceId': {'resourceId': " << configDeviceSample.value<int32_t>("targetDeviceId.resourceId") 
-            //<< ", 'id': " << configDeviceSample.value<int32_t>("targetDeviceId.id") << "}"
-            //<< std::endl;
-
-            // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
-            //sampleNumber++;
-        }
-    }
+    def set_current_state(self, state):
+        self._previous_state = self._current_state
+        self._current_state = state
 
 
-    void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
-        std::cout << "Writing Config Request to device " << std::endl; 
+class ConfigDevRdr(ddsEntities.Reader):
+    def __init__(self, participant):
+        ddsEntities.Reader.__init__(self, participant,
+                                    constants.CONFIGURE_DEVICE_TYPE_NAME,
+                                    constants.CONFIGURE_DEVICE_READER)
+        # need associated writer to change state where state is kept
+        self._device_state_writer = DeviceStateWtr.get_writer_handle()
 
-        Writer::getMyDataSample()->value<int32_t>("deviceConfig.stateReq", (int32_t)configReq);
-        Writer::getMyWriter()->write(*Writer::getMyDataSample());
+        # def __del__(self): # d'tor
 
-    }   
+    def handler(self, data):
+        print("Configure Device Reader Handler Executing")
+        # If we get a CONFIGURE_DEVICE_TOPIC then set the device
+        # current state to the requested state
+        self._device_state_writer.set_current_state(data["deviceConfig.stateReq"])
 
-} // namespace
+class ConfigDevWtr(ddsEntities.Writer):
+    def __init__(self, participant):
+        ddsEntities.Writer.__init__(self, participant,
+                                    constants.CONFIGURE_DEVICE_TYPE_NAME,
+                                    constants.CONFIGURE_DEVICE_WRITER)
+        self._sample = dds.DynamicData(constants.ONFIGURE_DEVICE_TYPE_NAME)
+        self._device_state_rdr = DeviceStateRdr.get_reader_handle()
+
+        # def __del__(self): # d'tor
+
+    def handler(self):
+        # The topic specific writer handler, initializes the targeted
+        # device id and monitors events you may want to handle for this topic
+        print("Configure Device Writer Handler Executing")
+        # if there were mulitple devices we'd want to index by device
+        # number to get the target devive ID for the request
+        self._sample["targetDeviceId.resourceId"] = self._device_state_rdr.get_device_resource_id()
+        self._sample["targetDeviceId.id"] = self._device_state_rdr.get_device_id()
+
+        while application.run_flag:
+            #  if periodic data handler should set the sleep duration
+            #  to topic write periode and call write() here
+            sleep(1)
+
+    def writeData(self, request):
+        print("Writing Config Request to device ")
+
+        self._sample["deviceConfig.stateReq"] = request
+        self._writer.write(self._sample)
+        

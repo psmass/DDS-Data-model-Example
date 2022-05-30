@@ -15,6 +15,7 @@ from datetime import time
 from time import sleep
 import constants
 import application
+import topics
 import rti.connextdds as dds
 
 
@@ -39,24 +40,25 @@ class Writer(threading.Thread):
         # be set to 1 or more seconds or the rate of writing a peroidic topic
         self.handler() # status handler is implemented by concrete topic class
 
-    # ********* MUST OVERLOAD TO SET CONCRETE TOPIC CLASS WRITER **********
-    def write(self):
-        print("DEFAULT {w_name} WRITER - OVERLOAD WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
+    # ********* MUST OVERRIDE TO SET CONCRETE TOPIC CLASS WRITER **********
+    def write_data(self, sample):
+        print("DEFAULT {w_name} WRITER - OVERRIDE WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
 
-        for var, value in env.items():
-            sample["key"] = var
-            sample["value"] = value
-            writer.write(sample)
+    def get_writer_handle(self):
+        return self._writer
+
 
     def join(self):
         super().join()
 
-    @classmethod
-    # *********  NEED TO OVERLOAD TO SET CONCRETE TOPIC SPECIFIC EVENT HANDLER **********
-    # *********  DEFAULT IS TO PRINT MATCHED SUBSCRIBERS
-    def handler(cls):  # overide handler in base class for specific topic
+    # ***  NEED TO OVERRIDE TO SET CONCRETE TOPIC SPECIFIC EVENT HANDLER
+    # ***  DEFAULT IS TO PRINT MATCHED SUBSCRIBERS
+    # ***  IF A TOPIC IS PERIODIC YOU WOULD ALSO SET THE WAIT IN THE HANDLER TO
+    # ***  THE PERIODICITY OF THE TOPIC AND CALL write() from the handler
+    def handler(self):
         # do periodic writing here
-        print("*** GENERIC WRITER HANDLER")
+        print("WRITER HANDLER FOR {w_name} NOT SET ".format(w_name=self._writer_name))
+        print("*** OVERRIDE TO SET STATIC TOPIC VALUES")
         while application.run_flag:
             sleep(1)
 
@@ -101,16 +103,19 @@ class Reader(threading.Thread):
             #    self.status_handler(reader)
             if self._read_condition in active:
                 for (data, info) in filter(lambda s: s.info.valid, self._reader.take()):
-                    self.handler(data) # execute the vitrual reader->specific topic reader
+                    self.handler(data) # execute the reader specific handler to parse topic
                     #print(data)
-
 
     def join(self):
         super().join()
 
     # ********* MUST OVERLOAD TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
-    def handler(self):  # overide handler in base class for specific topic
-        print("*** GENERIC READER HANDLER")
+    def handler(self, data):  # override handler in base class for specific topic
+        print("READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
+        print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
+
+    def get_reader_handle(self):
+        return self._reader
 
 
 
