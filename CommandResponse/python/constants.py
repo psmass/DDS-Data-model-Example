@@ -17,16 +17,16 @@
 
 from enum import Enum
 
-MODULE = "ExCmdRsp::" # IDL MODULE NAME SPACE NOT USED WITH Python
+MODULE = "ExCmdRsp::"  # IDL MODULE NAME SPACE NOT USED WITH Python
 QOS_URL = "file://../model/CommandProject.xml"
 DEVICE_PARTICIPANT_NAME = "CmdRspParticipantLibrary::DeviceParticipant1"
 CONTROLLER_PARTICIPANT_NAME = "CmdRspParticipantLibrary::ControllerParticipant1"
-DEVICE_STATE_TYPE_NAME = "DeviceState"
-CONFIGURE_DEVICE_TYPE_NAME = "ConfigureDevice"
-DEVICE_STATE_READER = "CmdRspParticipantLibrary::DeviceStateReader"
-DEVICE_STATE_WRITER = "CmdRspParticipantLibrary::DeviceStateWriter"
-CONFIGURE_DEVICE_READER = "CmdRspParticipantLibrary::ConfigureDeviceReader"
-CONFIGURE_DEVICE_WRITER = "CmdRspParticipantLibrary::ConfigureDeviceWriter"
+DEVICE_STATE_TYPE_NAME = MODULE+"DeviceState"
+CONFIGURE_DEVICE_TYPE_NAME = MODULE+"ConfigureDevice"
+DEVICE_STATE_READER = "ControllerSubscriber::DeviceStateReader"
+DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter"
+CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader"
+CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter"
 
 
 class DeviceStateEnum (Enum):

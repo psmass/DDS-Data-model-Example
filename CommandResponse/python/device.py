@@ -29,16 +29,14 @@ def device_main(domain_id):
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.DEVICE_PARTICIPANT_NAME)
 
-
-    # spin up DeviceStateWtr first since ConfigDevRdr needs a reference to it.
-    topics.DeviceStateWtr(participant)
-    topics.ConfigDevRdr(participant)
+    controller_dsw = topics.DeviceStateWtr(participant)
+    controller_cdr = topics.ConfigDevRdr(participant)
+    # The ConfigureDevRdr object instance needs to have the corresponding DeviceStateWriter
+    # object reference to access the devices DeviceID and state.
+    controller_cdr.set_device_state_writer(controller_dsw)
 
     while application.run_flag:
         print(".", end='', flush=True)
-        topics.ConfigDevRdr.join()
-        topics.DeviceStateRdr.join()
-        #f.func_b(1)
         sleep(1)
 
     topics.ConfigDevRdr.join()
@@ -55,79 +53,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
+    # device_main(args.domain) # uncomment for debug
+
     try:
         device_main(args.domain)
     except:
         print("Exception Running Device")
 
 
-"""
-{
-
-void run_device_application() {  
-    // Create the participant
-    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    dds::domain::DomainParticipant participant =
-        qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
-
-    // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
-    DeviceStateWtr device_state_writer(participant);
-    config_dev_reader.RunThread(participant);
-    device_state_writer.RunThread(participant);
-
-    // config_dev_reader needs the devices state writer to update the currentState
-    config_dev_reader.setDevStateWtr(&device_state_writer);
-
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
-
-    while (!application::shutdown_requested)  {
-        //Device State Machine goes here;
-        // In this case, we simply publish current deviceState upon change.
-        if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
-            device_state_writer.writeData(device_state_writer.getCurrentState());
-            // then set them equal.
-            device_state_writer.setPrevState(device_state_writer.getCurrentState());
-        }
-        std::cout << "." << std::flush;        
-        //device_state_writer.writeData(device_state_writer.getCurrentState());
-        rti::util::sleep(dds::core::Duration(1));
-    }
-
-    config_dev_reader.Reader::getThreadHndl()->join();
-    device_state_writer.Writer::getThreadHndl()->join();
-    // give threads a second to shut down
-    rti::util::sleep(dds::core::Duration(1));
-    std::cout << "Device main thread shutting down" << std::endl;
-}
-"""
-
-
-# f = B()
-
-class A:
-    def __init__(self):
-        print("A C't'r")
-
-    def func_a(self, a):
-        print("func_a Default {aN}".format(aN=a))
-        self.func_c(a+1)
-
-
-class B(A):
-    def __init__(self):
-        super().__init__()
-        print("B C'tor")
-
-    def func_b(self, b):
-        print("func_b {bN}".format(bN=b))
-        self.func_a(b+1)
-
-    """
-    def func_a(self, a):
-        print("func_a override {aON}".format(aON=a))
-        self.func_c(4)
-    """
-    @classmethod
-    def func_c(cls, c):
-        print("fun_c {cN}".format(cN = c))

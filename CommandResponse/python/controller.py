@@ -28,9 +28,12 @@ def controller_main(domain_id):
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.CONTROLLER_PARTICIPANT_NAME)
 
-    # spin up DeviceStateRdr first since ConfigDevWrt needs a reference to it.
-    topics.DeviceStateRdr(participant)
-    topics.ConfigDevWtr(participant)
+    controller_dsr = topics.DeviceStateRdr(participant)
+    controller_cdw = topics.ConfigDevWtr(participant)
+    # The ConfigureDevWrt object instance needs to have the corresponding DeviceState Object
+    # reference to access target DeviceID and track state.
+    controller_cdw.set_device_state_reader(controller_dsr)
+
 
     while application.run_flag:
         """
@@ -55,6 +58,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     assert 0 <= args.domain < 233
+
+    # controller_main(args.domain) # uncomment for debug
 
     try:
         controller_main(args.domain)

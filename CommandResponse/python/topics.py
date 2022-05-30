@@ -8,9 +8,7 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
- """
 
- """
     /* How to use specific topic Readers and Writers:
 
     The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
@@ -102,9 +100,9 @@ class DeviceStateWtr(ddsEntities.Writer):
                                 constants.DEVICE_STATE_WRITER)
         self._previous_state = constants.DeviceStateEnum.ERROR
         self._current_state = constants.DeviceStateEnum.UNINITIALIZED
-        self._sample = dds.DynamicData(constants.DEVICE_STATE_TYPE_NAME)
+        self._sample = dds.DynamicData(self._topic_type)
         self._sample["myDeviceId.resourceId"] = 2
-        self._sample["myDeviceId.Id"] = 20
+        self._sample["myDeviceId.id"] = 20
 
     def handler(self):
         # The topic specific writer handler, sits only on events
@@ -132,10 +130,14 @@ class ConfigDevRdr(ddsEntities.Reader):
         ddsEntities.Reader.__init__(self, participant,
                                     constants.CONFIGURE_DEVICE_TYPE_NAME,
                                     constants.CONFIGURE_DEVICE_READER)
-        # need associated writer to change state where state is kept
-        self._device_state_writer = DeviceStateWtr.get_writer_handle()
+        self._device_state_writer = None
 
-        # def __del__(self): # d'tor
+    # def __del__(self): # d'tor
+
+    # Associated the Device State writer with this topic since it's
+    # where the Device keeps its Id and State info.
+    def set_device_state_writer(self, device_state_writer):
+        self._device_state_writer = device_state_writer
 
     def handler(self, data):
         print("Configure Device Reader Handler Executing")
@@ -148,10 +150,15 @@ class ConfigDevWtr(ddsEntities.Writer):
         ddsEntities.Writer.__init__(self, participant,
                                     constants.CONFIGURE_DEVICE_TYPE_NAME,
                                     constants.CONFIGURE_DEVICE_WRITER)
-        self._sample = dds.DynamicData(constants.ONFIGURE_DEVICE_TYPE_NAME)
-        self._device_state_rdr = DeviceStateRdr.get_reader_handle()
+        self._sample = dds.DynamicData(self._topic_type)
+        self._device_state_reader = None
 
-        # def __del__(self): # d'tor
+    # def __del__(self): # d'tor
+
+    # Associated the Device State writer with this topic since it's
+    # where the Device keeps its Id and State info.
+    def set_device_state_reader(self, device_state_reader):
+        self._device_state_reader = device_state_reader
 
     def handler(self):
         # The topic specific writer handler, initializes the targeted
