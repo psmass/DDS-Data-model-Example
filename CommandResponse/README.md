@@ -4,7 +4,10 @@
 
 # **THIS DIRECTORY CONTAINS:**
 
-1. An implementation of a the Master / Slave model using the Objective State pattern. 
+1. Three example implementations of a simple Master / Slave model using the Objective State pattern. 
+ 	 - C++11 (modern C++) w/XML Application Creation & Dynamic Data
+ 	 - C++98 (Traditional C++) with Programatic Entitiy creation and typed data (non-XML Application Creation)
+ 	 - Python w/SML Application Creation & Dynamic Data	
 2. Discussion
 	 - Objective State pattern.
  	 - Controller / Device and Consumer / Service data command/Response Models.
