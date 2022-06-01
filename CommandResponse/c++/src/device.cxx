@@ -146,7 +146,6 @@ extern "C" int run_device_application(int domain_id) {
             device_state_writer.WriteData(device_state_writer.getCurrentState());
             // then set them equal.
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
-            ;
         }
         
         std::cout << "." << std::flush;        
@@ -154,8 +153,8 @@ extern "C" int run_device_application(int domain_id) {
         NDDSUtility::sleep(wait_period); // let entities get up and running
     }
     
-    //pthread_cancel(config_dev_reader.Reader::getThreadId());
-    //pthread_cancel(device_state_writer.Writer::getThreadId());
+    pthread_cancel(config_dev_reader.Reader::getThreadId());
+    pthread_cancel(device_state_writer.Writer::getThreadId());
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
 
