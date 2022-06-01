@@ -8,6 +8,8 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
+ * 
+ *  YOUR TOPICS GO HERE -  See notes in header file
  */
 
 #include <string.h>

@@ -8,6 +8,14 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
+
+ GENERALLY, CODE IN THIS FILE SHOULD NOT BE MODIFIED AS IT HANDLES THE TYPE
+ SPECIFIC DDS INFRASTRUCTURE AND CREATES THREADS (and dds Waitsets)
+
+ User Code (Topics in topics.h/cxx) Should Inherit from a TopicReader or 
+ TopicWriter and extend the class memberfunction handler to set/read topic 
+ specific data type fields.  The user topic specific classes can also add data
+ members and member functions as needed.
  */
 
 #ifndef TOPICS_T_H
@@ -24,9 +32,9 @@ struct Cft {
     char filter_expression[MAX_FILTER_EXPRESSION_LEN];   
 };
 
-// These Class Templates are intended to replace the function remplates below
+// These Class Templates are intended to replace the function templates below
 // This allows the user to have type specific classes by inheriting from these
-// TopicRdr and TopicWtr and exent them as wll as add specficic handlers or
+// TopicRdr and TopicWtr and exend them as wll as add specficic handlers or
 // data_processing routines for the concrete class. (Likely we can remove the
 // higher level Reader/Writer classes as they don't add much - as they did for
 // XML Application creation).

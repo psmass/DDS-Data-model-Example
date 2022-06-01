@@ -149,7 +149,6 @@ extern "C" int run_device_application(int domain_id) {
         }
         
         std::cout << "." << std::flush;        
-        //device_state_writer.writeData(device_state_writer.getCurrentState());
         NDDSUtility::sleep(wait_period); // let entities get up and running
     }
     
@@ -184,11 +183,5 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Releases the memory used by the participant factory.  Optional at
-    // application exit
-    // dds::domain::DomainParticipant::finalize_participant_factory();
-
     return EXIT_SUCCESS;
 }
-
-
