@@ -8,6 +8,15 @@
  * obligation to maintain or support the software. RTI shall not be liable for
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
+
+ GENERALLY, CODE IN THIS FILE SHOULD NOT BE MODIFIED AS IT HANDLES ALL OF THE
+ GENERIC DDS INFRASTRUCTURE AND CREATES THREADS (and dds Waitsets)
+
+ User Code (Topics in topics.py) Should Inherit a Reader or Writer and extend
+ the class memberfunction handler to set/read topic specific data type fields.
+ The user topic specific classes can also add data members and member functions
+ as needed.
+
 """
 
 import threading
@@ -37,8 +46,8 @@ class Writer(threading.Thread):
         print("Writer Thread running for {w_name}".format(w_name=self._writer_name))
         # handler() is implemented by concrete topic class and should
         # not return until program exit. It's while loop periodicity should
-        # be set to 1 or more seconds or the rate of writing a peroidic topic
-        self.handler() # status handler is implemented by concrete topic class
+        # be set to 1 or more seconds or the rate of writing a periodic topic
+        self.handler()
 
     # ********* MUST OVERRIDE TO SET CONCRETE TOPIC CLASS WRITER **********
     def write_data(self, sample):
@@ -109,8 +118,8 @@ class Reader(threading.Thread):
     def join(self):
         super().join()
 
-    # ********* MUST OVERLOAD TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
-    def handler(self, data):  # override handler in base class for specific topic
+    # ********* MUST OVERRIDE TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
+    def handler(self, data):
         print("READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
         print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
 

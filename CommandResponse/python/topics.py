@@ -9,27 +9,29 @@
  * any incidental or consequential damages arising out of the use or inability
  * to use the software.
 
-    /* How to use specific topic Readers and Writers:
+ INSTANTIATE YOUR TOPICS IN THIS FILE
 
-    The Topic specific Reader Constructor -  can be used to update Topic Specific Content filters 
-     - e.g. in the case of a device Reader, it should register for myTopic - i.e.
-     commands directed specifically to it from a controller.
+ Your topics must inherit either a ddsEntities.Reader or ddsEnities.Writer
+ They MUST implement / override the handler() member functions to deal with
+ topic specific fields (read/write) and will likely need extended member functions
+ and data members to do specific functions based on application and specific
+ topic status/state.
 
-    The controller readers likely would not want to filter for a specific deviceID,
-    as generally controllers handle all the data sent to them. Controllers typically
-    are not a specific target ID either.
+ You may also set filters and DDS event conditions as those may be topic dependent.
+ Example, the a device application instance only needs concern itself with commands
+ directed to it's target device ID. As such, code should be included in the configuration
+ command to filter on the targetId fields that match this devices id.
 
-    The Topic specific Writer member functions. 
+ Filtering on controller bound topics is probably not desired as the controller usually
+ needs to see all status and responses from a device unless there are multiple controllers
+ where some topic field values are used to load balance.
 
-    Specific Writer Handlers have two parts, the Initial Setup and the Handler Loop.
-    The user may want add code  in the Initial Setup (prior to the Handler Loop) to
-    statically set the source ID (in the case of a device) or any other static data. 
-    This is done once and is topic specific.
+ If you don't which to run writer threads for event or a periodic topics you may omit
+ calling the writer.start(). If you would prefer to use a listener to montior events
+ you will need to modify the ddsEntities.py infrastructure file.
 
-    Code can be added in the loop write the topic periodically. If non periodic, the loop
-    can be used for writer event status and sleep periodically with no write operation.
-    A separate writeData(data) member funcstion can be added to the specific topic class to
-    allow the main program to set data and write at will.
+ Periodic writers may be created by placing a call to a topic handler while loop.
+
 """
 
 import application

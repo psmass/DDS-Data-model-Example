@@ -21,5 +21,5 @@ def signal_handler(sig, frame):
     run_flag = False
 
 signal.signal(signal.SIGINT, signal_handler)
-run_flag=True
+run_flag = True
 print("Enter Ctrl+C to quit")

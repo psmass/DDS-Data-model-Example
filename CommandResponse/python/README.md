@@ -8,6 +8,8 @@ The example code was built with the following environment.
 
 ## Running Example:
 Device and Controller must be executed from the build directory.
+> python Device or python3 device
+> python Controller or python3 controller
 
 ## ToDo:
 - Add Writer and Reader Sub/pub events (track subs/pubs)- 
