@@ -29,20 +29,24 @@ def device_main(domain_id):
     qos_provider = dds.QosProvider(constants.QOS_URL)
     participant = qos_provider.create_participant_from_config(constants.DEVICE_PARTICIPANT_NAME)
 
-    controller_dsw = topics.DeviceStateWtr(participant)
-    controller_cdr = topics.ConfigDevRdr(participant)
+    device_dsw = topics.DeviceStateWtr(participant)
+    device_cdr = topics.ConfigDevRdr(participant)
     # The ConfigureDevRdr object instance needs to have the corresponding DeviceStateWriter
     # object reference to access the devices DeviceID and state.
-    controller_cdr.set_device_state_writer(controller_dsw)
-    controller_dsw.start()
-    controller_cdr.start()
+    device_cdr.set_device_state_writer(device_dsw)
+    device_dsw.start()
+    device_cdr.start()
 
     while application.run_flag:
+        if device_dsw.get_current_state() != device_dsw.get_previous_state():
+            device_dsw.write_data(device_dsw.get_current_state())
+            # then set them equal.
+            device_dsw.set_previous_state(device_dsw.get_current_state())
         print(".", end='', flush=True)
         sleep(1)
 
-    topics.ConfigDevRdr.join()
-    topics.DeviceStateWtr.join()
+    device_cdr.join()
+    device_dsw.join()
     print("Device Exiting")
 
 
@@ -55,7 +59,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
-    # device_main(args.domain) # uncomment for debug
+    device_main(args.domain)  # uncomment for debug
 
     try:
         device_main(args.domain)

@@ -38,6 +38,7 @@ import constants
 import rti.connextdds as dds
 from time import sleep
 
+
 class DeviceStateRdr(ddsEntities.Reader):
     # The DeviceStateReader is used by the controller to
     # track the current device state of the device(s).
@@ -65,8 +66,12 @@ class DeviceStateRdr(ddsEntities.Reader):
     def get_device_id(self):
         return self._device_id
 
+    def get_current_state(self):
+        return self._current_state
+
     def handler(self, data):
-        print ("Device State Reader Handler Executing")
+        print("Device State Reader Handler Executing")
+        print(data)
 
         self._current_state = data["state"]
         self._device_resource_id = data["myDeviceId.resourceId"]
@@ -75,9 +80,9 @@ class DeviceStateRdr(ddsEntities.Reader):
         print("Controller Tracking Device Current state to: ", end='')
         # could use the new 3.10 match / case (switch)
         if self._current_state == constants.DeviceStateEnum.UNINITIALIZED:
-                print("UNINITIALIZED", flush=True)
+            print("UNINITIALIZED", flush=True)
         elif self._current_state == constants.DeviceStateEnum.ON:
-                print("ON", flush=True)
+            print("ON", flush=True)
         elif self._current_state == constants.DeviceStateEnum.OFF:
             print("OFF", flush=True)
         elif self._current_state == constants.DeviceStateEnum.ERROR:
@@ -96,11 +101,11 @@ class DeviceStateWtr(ddsEntities.Writer):
     # controller of the device.
     def __init__(self, participant):
         ddsEntities.Writer.__init__(self, participant,
-                                constants.DEVICE_STATE_TYPE_NAME,
-                                constants.DEVICE_STATE_WRITER)
+                                    constants.DEVICE_STATE_TYPE_NAME,
+                                    constants.DEVICE_STATE_WRITER)
         self._previous_state = constants.DeviceStateEnum.ERROR
-        self._current_state = constants.DeviceStateEnum.UNINITIALIZED
         self._sample = dds.DynamicData(self._topic_type)
+        # Preload sample with this devices static ID
         self._sample["myDeviceId.resourceId"] = 2
         self._sample["myDeviceId.id"] = 20
 
@@ -113,7 +118,7 @@ class DeviceStateWtr(ddsEntities.Writer):
         while application.run_flag:
             #  if periodic data handler should set the sleep duration
             #  to topic write periode and call write() here
-            self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
+            # self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
             sleep(1)
 
     def write_data(self, state):
@@ -122,8 +127,17 @@ class DeviceStateWtr(ddsEntities.Writer):
         self._writer.write(self._sample)
 
     def set_current_state(self, state):
-        self._previous_state = self._current_state
-        self._current_state = state
+        # print("device setting state to requested state of: {m_state}".format(m_state=state))
+        self._sample["state"] = state
+
+    def get_current_state(self):
+        return self._sample["state"]
+
+    def set_previous_state(self, state):
+        self._previous_state = state
+
+    def get_previous_state(self):
+        return self._previous_state
 
 
 class ConfigDevRdr(ddsEntities.Reader):
@@ -142,9 +156,11 @@ class ConfigDevRdr(ddsEntities.Reader):
 
     def handler(self, data):
         print("Configure Device Reader Handler Executing")
+        print(data)
         # If we get a CONFIGURE_DEVICE_TOPIC then set the device
         # current state to the requested state
         self._device_state_writer.set_current_state(data["deviceConfig.stateReq"])
+
 
 class ConfigDevWtr(ddsEntities.Writer):
     def __init__(self, participant):
@@ -167,18 +183,16 @@ class ConfigDevWtr(ddsEntities.Writer):
         print("Configure Device Writer Handler Executing")
         # if there were mulitple devices we'd want to index by device
         # number to get the target devive ID for the request
-        self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
-        self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
 
         while application.run_flag:
             #  if periodic data handler should set the sleep duration
             #  to topic write period and call write() here
-            self.writeData(constants.DeviceStateEnum.ON)
+            # self.writeData(constants.DeviceStateEnum.ON)
             sleep(1)
 
     def writeData(self, request):
         print("Writing Config Request to device ")
-
+        self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
+        self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
         self._sample["deviceConfig.stateReq"] = request
         self._writer.write(self._sample)
-        

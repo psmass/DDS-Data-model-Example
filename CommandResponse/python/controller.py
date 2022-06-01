@@ -36,18 +36,14 @@ def controller_main(domain_id):
     controller_dsr.start()
     controller_cdw.start()
 
-
     while application.run_flag:
-        """
-        if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
-            config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
-        }
-        """
+        if controller_dsr.get_current_state() == constants.DeviceStateEnum.UNINITIALIZED:
+            controller_cdw.writeData(constants.DeviceStateEnum.ON)
         print(".", end='', flush=True)
         sleep(1)
 
-    topics.ConfigDevWtr.join()
-    topics.DeviceStateRdr.join()
+    controller_cdw.join()
+    controller_dsr.join()
 
     print("Controller Exiting")
 
@@ -69,52 +65,3 @@ if __name__ == "__main__":
         print("Exception Running Device")
 
 
-
-
-"""
-#include <algorithm>
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <dds/dds.hpp>
-#include <rti/util/util.hpp> // for sleep
-#include "CommandResp.hpp"   // rti generated file from idl to use model const Topics
-#include "ddsEntities.hpp"
-#include "topics.hpp"
-#include "application.hpp"
-
-namespace MODULE
-{
-
-void run_controller_application() {
-   // Create the participant
-    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    dds::domain::DomainParticipant participant =
-        qos_provider->create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
-
-    // Instantiate Topic Readers and Writers w/threads
-    ConfigDevWtr config_dev_writer(participant); 
-    DeviceStateRdr device_state_reader(participant);
-    config_dev_writer.RunThread(participant);
-    device_state_reader.RunThread(participant);
-
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
-
-    while (!application::shutdown_requested) {
-        //Controller State Machine goes here;
-        // If a devices device_state is UNITIALIZED then turn it on
-        if (device_state_reader.getCurrentState() == MODULE::DeviceStateEnum::UNINITIALIZED) {
-            config_dev_writer.writeData (MODULE::DeviceStateEnum::ON);
-        }
-        std::cout << "." << std::flush;                 
-        rti::util::sleep(dds::core::Duration(1));
-    }
-
-    config_dev_writer.Writer::getThreadHndl()->join();
-    device_state_reader.Reader::getThreadHndl()->join();
-    // give threads a second to shut down
-    rti::util::sleep(dds::core::Duration(1));
-    std::cout << "Controller main thread shutting down" << std::endl;
-
-}
-"""

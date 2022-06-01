@@ -30,7 +30,7 @@ CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter"
 
 
 class DeviceStateEnum (IntEnum):
-    UNINITIALIZED = 1
-    OFF = 2
-    ON = 3
-    ERROR = 4
+    UNINITIALIZED = 0
+    OFF = 1
+    ON = 2
+    ERROR = 3
