@@ -24,9 +24,9 @@ or consult the Code Generator User's Manual.
 
 namespace ExCmdRsp {
     static const DDS_Char * const MODULE_EX_CMD_RSP= "ExCmdRsp";
-    static const DDS_Char * const TOPIC_CONFIGURE_DEVICE= "ExCmdRsp::ConfigureDevice";
+    static const DDS_Char * const TOPIC_CONFIGURE_DEVICE= "ConfigureDevice";
     static const DDS_Char * const TOPIC_CONFIGURE_DEV_CFT= "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
-    static const DDS_Char * const TOPIC_DEVICE_STATE= "ExCmdRsp::DeviceState";
+    static const DDS_Char * const TOPIC_DEVICE_STATE= "DeviceState";
     static const DDS_Char * const CONTROLLER1_PARTICIPANT= "CmdRspParticipantLibrary::ControllerParticipant1";
     static const DDS_Char * const DEVICE1_PARTICIPANT= "CmdRspParticipantLibrary::DeviceParticipant1";
     static const DDS_Char * const DEVICE_STATE_WRITER= "DevicePublisher::DeviceStateWriter";
