@@ -33,6 +33,11 @@ void run_controller_application() {
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevWtr config_dev_writer(participant); 
     DeviceStateRdr device_state_reader(participant);
+
+    // Associate devices_state_reader with the config_dev_writer since the
+    // device_state_reader holds the targetId of the request and current device state
+    config_dev_writer.setDevStateRdr(&device_state_reader);
+
     config_dev_writer.RunThread(participant);
     device_state_reader.RunThread(participant);
 

@@ -31,18 +31,20 @@ void run_device_application() {
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
-    config_dev_reader.RunThread(participant);
-    device_state_writer.RunThread(participant);
+    ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
+    config_dev_reader.RunThread(participant);
+    device_state_writer.RunThread(participant);
+
+
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
     while (!application::shutdown_requested)  {
-        //Device State Machine goes here;
+        // Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
         if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
             device_state_writer.writeData(device_state_writer.getCurrentState());
@@ -50,7 +52,7 @@ void run_device_application() {
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
         }
         std::cout << "." << std::flush;        
-        //device_state_writer.writeData(device_state_writer.getCurrentState());
+
         rti::util::sleep(dds::core::Duration(1));
     }
 

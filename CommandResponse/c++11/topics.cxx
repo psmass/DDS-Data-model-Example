@@ -24,7 +24,9 @@ namespace MODULE
     void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
        
-        setCurrentState((MODULE::DeviceStateEnum)data.value<int32_t>("state"));
+        this->currentState=(MODULE::DeviceStateEnum)data.value<int32_t>("state");
+        this->id = data.value<int32_t>("myDeviceId.id");
+        this->resourceId = data.value<int32_t>("myDeviceId.resourceId");
 
         std::cout << "Controller Tracking Device Current state to: ";
         switch(getCurrentState()) {
@@ -49,13 +51,11 @@ namespace MODULE
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         //std::cout << "Device State C'Tor" << std::endl; 
-
-
     };
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
-        // Modify sample with current state as soon as I figure out how to load an enum
+        //test filter since we are deviceId.id =20 and will filter requests for 20 not 30
         //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
         //this->getMyDataSample()->value<int32_t>("state", current_state);
         this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
@@ -69,7 +69,10 @@ namespace MODULE
         // Here we can write periodically, or on change or any other condition
         std::cout << "Device State Writer Handler Executing" << std::endl; 
 
-
+        // Assign Topic Static Data here (so we do it only once)
+        // Preload the Device Writer with the device ID ("read out of EEPROM:-)"
+        // Ideally this would be done in the DeviceStateWtr C'tor but the
+        // Object is not quite ready until the C'tor completes
         Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
         Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
 
@@ -133,7 +136,7 @@ namespace MODULE
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
          // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state
          // to the requested state
-        devicesDevStateWtrPtr->setCurrentState(
+        this->devicesDevStateWtr->setCurrentState(
             (MODULE::DeviceStateEnum)data.value<int32_t>("deviceConfig.stateReq")); 
 
     }  
@@ -150,9 +153,6 @@ namespace MODULE
         // The handler loads up the specific data fields and writes the sample
         // Here we can write periodically, or on change or any other condition
         std::cout << "Configure Device Writer Handler Executing" << std::endl; 
-
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", 20);
 
         auto sampleNumber = 1;
     
@@ -184,6 +184,10 @@ namespace MODULE
 
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
+
+
+        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", this->deviceDevStateRdr->getDeviceResourceId());
+        Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", this->deviceDevStateRdr->getDeviceId());
 
         Writer::getMyDataSample()->value<int32_t>("deviceConfig.stateReq", (int32_t)configReq);
         Writer::getMyWriter()->write(*Writer::getMyDataSample());
