@@ -46,11 +46,13 @@ namespace MODULE
         }
     }    
 
-    DeviceStateWtr::DeviceStateWtr(const dds::domain::DomainParticipant participant)
-      : Writer(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER) {
+    DeviceStateWtr::DeviceStateWtr(
+        const dds::domain::DomainParticipant participant,
+        dds::core::Duration period)
+      : Writer(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, period) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
-        //std::cout << "Device State C'Tor" << std::endl; 
+        // std::cout << "Device State C'Tor" << std::endl; 
     };
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
@@ -58,54 +60,25 @@ namespace MODULE
         //test filter since we are deviceId.id =20 and will filter requests for 20 not 30
         //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
         //this->getMyDataSample()->value<int32_t>("state", current_state);
-        this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
-        this->getMyWriter()->write(*this->getMyDataSample());
-    }
-
-    void DeviceStateWtr::handler() {
-
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
-        std::cout << "Device State Writer Handler Executing" << std::endl; 
-
+        
         // Assign Topic Static Data here (so we do it only once)
         // Preload the Device Writer with the device ID ("read out of EEPROM:-)"
         // Ideally this would be done in the DeviceStateWtr C'tor but the
         // Object is not quite ready until the C'tor completes
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
-        Writer::getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        this->getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
+        this->getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
+        this->getMyWriter()->write(*this->getMyDataSample());
+    }
 
-        auto sampleNumber = 1;
-    
-        while (!application::shutdown_requested)
-        {
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written periodically here and uncomment the write
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            //Writer::getMyWriter()->write(*Writer::getMyDataSample());
-            
-            //std::cout
-            //<< "Writing Sample: " << sampleNumber 
-            //<< "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
-            //<< ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
-            //<< std::endl;
-
-            // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
-            //sampleNumber++;
-        }
-
-        // std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
-
+    /*  
+    // Uncomment to put handle writer events or periodic data uniquely
+    void DeviceStateWtr::handler() {
+        // The handler gets called periodically  loads up the specific data fields and writes the sample
+        // Here we can write periodically, or on change or any other condition
+        std::cout << "Device State Writer Handler Executing" << std::endl; 
     }    
-
+    */
 
     ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
       : Reader(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
@@ -142,49 +115,23 @@ namespace MODULE
     }  
 
 
-    ConfigDevWtr::ConfigDevWtr(const dds::domain::DomainParticipant participant)
-      : Writer(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER) {
+    ConfigDevWtr::ConfigDevWtr(
+        const dds::domain::DomainParticipant participant,
+        dds::core::Duration period)
+      : Writer(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, period) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
+    /*  
+    // Uncomment to put handle writer events or periodic data uniquely
     void ConfigDevWtr::handler() {
-
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
+        // Used to modify sent data or to handle specific events per Topic
         std::cout << "Configure Device Writer Handler Executing" << std::endl; 
-
-        auto sampleNumber = 1;
-    
-        while (!application::shutdown_requested)
-        {
-
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            auto duration = now.time_since_epoch();
-            auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written here
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            // Writer::getMyWriter()->write(*Writer::getMyDataSample());
-
-            //std::cout << "Writing Sample: " << sampleNumber 
-            //<< "{'targetDeviceId': {'resourceId': " << configDeviceSample.value<int32_t>("targetDeviceId.resourceId") 
-            //<< ", 'id': " << configDeviceSample.value<int32_t>("targetDeviceId.id") << "}"
-            //<< std::endl;
-
-            // Send once every second
-            rti::util::sleep(dds::core::Duration(1));
-            //sampleNumber++;
-        }
     }
-
+    */
 
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
-
 
         Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", this->deviceDevStateRdr->getDeviceResourceId());
         Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", this->deviceDevStateRdr->getDeviceId());

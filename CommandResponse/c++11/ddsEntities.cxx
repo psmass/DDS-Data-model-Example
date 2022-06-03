@@ -18,12 +18,13 @@ namespace MODULE
     Writer::Writer(
         dds::domain::DomainParticipant participant, 
         const std::string topic_name, 
-        const std::string writer_name) {
+        const std::string writer_name,
+        dds::core::Duration period) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        topicName = topic_name;
-        writerName = writer_name;
-
+        this->topicName = topic_name;
+        this->writerName = writer_name;
+        this->period = period;// default is 4 sec, if a periodic writer set to send-period 
     }
 
     void Writer::writerThread(dds::domain::DomainParticipant participant) {
@@ -40,7 +41,7 @@ namespace MODULE
 
         // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> thisTopicWriter =
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
             rti::pub::find_datawriter_by_name<
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
                 participant,
@@ -50,11 +51,46 @@ namespace MODULE
         // This sample will be used repeatedly in the loop below.
         dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
 
-        this->topicWriter=&thisTopicWriter; // These pointer stay around for the duration of
-        this->topicSample=&thisTopicSample; // the thead, as the virtual handler does not shut down 
-                                            // until thread exit.
+        this->topicWriter=&writer; 
+        this->topicSample=&thisTopicSample;  
 
-        this->handler(); // call the topic specific Handler (Virtual)
+        // WaitSet will be woken when the attached condition is triggered
+        dds::core::cond::WaitSet waitset;
+
+        dds::core::cond::StatusCondition status_condition (writer);
+
+        status_condition.enabled_statuses (
+            dds::core::status::StatusMask::publication_matched());
+
+        // attatch the status condition to the topic's waitset
+        waitset += status_condition;
+
+
+        while (!application::shutdown_requested)
+        {
+            // writers sit waiting for events (defaut 4 sec or period to send data)
+            dds::core::cond::WaitSet::ConditionSeq active_conditions = waitset.wait(this->period);
+
+            for (uint32_t i = 0; i < active_conditions.size(); i++) {
+                //if (active_conditions[i] == guard_cond) {
+                //    std::cout << "guard_cond was triggered\n";
+                if (active_conditions[i] == status_condition) {
+                    // only one status condition set so we don't really need to d'mux
+                    dds::core::status::StatusMask triggered_mask = writer.status_changes();
+
+                    if ((triggered_mask & dds::core::status::StatusMask::publication_matched()).any()){
+                        dds::core::status::PublicationMatchedStatus st =
+                            writer.publication_matched_status();
+                        std::cout << "Writer Subs: " << st.current_count()
+                        << " " << st.current_count_change() << std::endl;
+                    }
+                }
+            }
+
+            // User may Override default and process topic specific Handler for any periodic 
+            // topic or specific event handling
+            this->handler(); 
+        }
 
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
 
@@ -108,7 +144,7 @@ namespace MODULE
 
         while (!application::shutdown_requested) {
             // Wait 4 seconds for data 
-            //waitset.dispatch(dds::core::Duration(4));
+            // waitset.dispatch(dds::core::Duration(4));
             dds::core::cond::WaitSet::ConditionSeq active_conditions = waitset.wait(dds::core::Duration(4));
 
             for (uint32_t i = 0; i < active_conditions.size(); i++) {

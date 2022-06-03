@@ -33,7 +33,8 @@ namespace MODULE
             Writer(
                 dds::domain::DomainParticipant participant,
                 const std::string topic_name,
-                const std::string writer_name);
+                const std::string writer_name,
+                dds::core::Duration period);
             ~Writer(void) {}; 
 
             void writerThread(dds::domain::DomainParticipant participant);
@@ -56,7 +57,7 @@ namespace MODULE
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
             dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
-            int period;
+            dds::core::Duration period;
             std::thread myWtrThread;
     };
 

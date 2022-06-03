@@ -73,10 +73,12 @@ class DeviceStateRdr : public Reader {
 
 class DeviceStateWtr : public Writer {
     public:
-        DeviceStateWtr(const dds::domain::DomainParticipant participant);
+        DeviceStateWtr(
+            const dds::domain::DomainParticipant participant, 
+            dds::core::Duration period =std::chrono::seconds(4));
         ~DeviceStateWtr(void){};
 
-        void handler(void);
+        // void handler();
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
@@ -121,10 +123,12 @@ class ConfigDevRdr : public Reader {
 
 class ConfigDevWtr : public Writer {
     public:
-        ConfigDevWtr(const dds::domain::DomainParticipant participant);
+        ConfigDevWtr(
+            const dds::domain::DomainParticipant participant, 
+            dds::core::Duration period = std::chrono::seconds(4));
         ~ConfigDevWtr(void){};
 
-        void handler(void);
+        // void handler(void);
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
