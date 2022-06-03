@@ -36,17 +36,17 @@ namespace MODULE
                 const std::string writer_name);
             ~Writer(void) {}; 
 
-            void WriterThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            void writerThread(dds::domain::DomainParticipant participant);
+            void runThread(dds::domain::DomainParticipant participant);
 
-            virtual void Handler(void) 
+            virtual void handler(void) 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
             dds::core::xtypes::DynamicData * getMyDataSample(void)
                 {return topicSample;};
-            std::thread* getThreadHndl(void) { return &writerThread; };
+            std::thread* getThreadHndl(void) { return &myWtrThread; };
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
         
@@ -57,7 +57,7 @@ namespace MODULE
             dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
             int period;
-            std::thread writerThread;
+            std::thread myWtrThread;
     };
 
     class Reader {
@@ -68,18 +68,18 @@ namespace MODULE
                 const std::string reader_name);
             ~Reader(void){};
 
-            void ReaderThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            void readerThread(dds::domain::DomainParticipant participant);
+            void runThread(dds::domain::DomainParticipant participant);
 
-            virtual void Handler(dds::core::xtypes::DynamicData& data)
+            virtual void handler(dds::core::xtypes::DynamicData& data)
                 { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
-            std::thread * getThreadHndl(void) { return &readerThread; };
+            std::thread * getThreadHndl(void) { return &myRdrThread; };
 
         protected:
             std::string topicName;
             std::string readerName;
-            std::thread readerThread;
+            std::thread myRdrThread;
 
     };
 

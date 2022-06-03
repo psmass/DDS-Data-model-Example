@@ -38,8 +38,8 @@ void run_controller_application() {
     // device_state_reader holds the targetId of the request and current device state
     config_dev_writer.setDevStateRdr(&device_state_reader);
 
-    config_dev_writer.RunThread(participant);
-    device_state_reader.RunThread(participant);
+    config_dev_writer.runThread(participant);
+    device_state_reader.runThread(participant);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 

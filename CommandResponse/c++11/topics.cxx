@@ -21,7 +21,7 @@ namespace MODULE
       : Reader(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
     };
 
-    void DeviceStateRdr::Handler(dds::core::xtypes::DynamicData& data) {
+    void DeviceStateRdr::handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Device State Reader Handler Executing" << std::endl; 
        
         this->currentState=(MODULE::DeviceStateEnum)data.value<int32_t>("state");
@@ -62,7 +62,7 @@ namespace MODULE
         this->getMyWriter()->write(*this->getMyDataSample());
     }
 
-    void DeviceStateWtr::Handler() {
+    void DeviceStateWtr::handler() {
 
         // Writer Handlers run in thread and don't return until exit
         // The handler loads up the specific data fields and writes the sample
@@ -132,7 +132,7 @@ namespace MODULE
 
     };
 
-    void ConfigDevRdr::Handler(dds::core::xtypes::DynamicData& data) {
+    void ConfigDevRdr::handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 
          // if we get a CONFIGURE_DEVICE_TOPIC then set the device current state
          // to the requested state
@@ -147,7 +147,7 @@ namespace MODULE
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
-    void ConfigDevWtr::Handler() {
+    void ConfigDevWtr::handler() {
 
         // Writer Handlers run in thread and don't return until exit
         // The handler loads up the specific data fields and writes the sample

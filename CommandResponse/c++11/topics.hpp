@@ -50,7 +50,7 @@ class DeviceStateRdr : public Reader {
         DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
+        void handler(dds::core::xtypes::DynamicData& data);
 
         int32_t getDeviceResourceId(void) { return this->resourceId; };
         int32_t getDeviceId(void) { return this->id; };
@@ -76,7 +76,7 @@ class DeviceStateWtr : public Writer {
         DeviceStateWtr(const dds::domain::DomainParticipant participant);
         ~DeviceStateWtr(void){};
 
-        void Handler(void);
+        void handler(void);
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
@@ -109,7 +109,7 @@ class ConfigDevRdr : public Reader {
         ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
         ~ConfigDevRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
+        void handler(dds::core::xtypes::DynamicData& data);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer) 
             { this->devicesDevStateWtr = dev_state_writer; };
 
@@ -124,7 +124,7 @@ class ConfigDevWtr : public Writer {
         ConfigDevWtr(const dds::domain::DomainParticipant participant);
         ~ConfigDevWtr(void){};
 
-        void Handler(void);
+        void handler(void);
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function

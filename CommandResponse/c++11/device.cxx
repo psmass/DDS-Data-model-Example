@@ -37,8 +37,8 @@ void run_device_application() {
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
-    config_dev_reader.RunThread(participant);
-    device_state_writer.RunThread(participant);
+    config_dev_reader.runThread(participant);
+    device_state_writer.runThread(participant);
 
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
