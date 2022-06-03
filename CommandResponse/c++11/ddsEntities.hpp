@@ -19,7 +19,7 @@
 #include <rti/domain/find.hpp>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
+#define MAX_FILTER_EXPRESSION_LEN 120
 namespace application {
     extern bool shutdown_requested;
 }

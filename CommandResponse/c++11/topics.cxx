@@ -57,16 +57,7 @@ namespace MODULE
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
-        //test filter since we are deviceId.id =20 and will filter requests for 20 not 30
-        //this->getMyDataSample()->value<int32_t>("myDeviceId.id", 30); // this works
-        //this->getMyDataSample()->value<int32_t>("state", current_state);
-        
-        // Assign Topic Static Data here (so we do it only once)
-        // Preload the Device Writer with the device ID ("read out of EEPROM:-)"
-        // Ideally this would be done in the DeviceStateWtr C'tor but the
-        // Object is not quite ready until the C'tor completes
-        this->getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
-        this->getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        // sample already has our devieID
         this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
         this->getMyWriter()->write(*this->getMyDataSample());
     }
@@ -104,6 +95,20 @@ namespace MODULE
         */
 
     };
+
+    void ConfigDevRdr::installIdCft() {
+        // Device filters ConfigureDeviceRequests to it's deviceID, deviceID was "dug out of eeprom" and saved"
+        // in the device_state_writer object sample data member. We need to retreive that and covert it to str.
+        // XML app create file already installed a content filter w/ expression, but it's generic with
+        // an id of 0, we need to upate the parameters of the filter to this devices id.
+        // Configure our deviceID - "dug out of EERPOM", unfortunately we have to 
+        // wait for the device writer thread to run as that's when the sample is allocated
+        this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
+        this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
+        std::vector<std::string> parameters(2);
+        parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
+        parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
+    }
 
     void ConfigDevRdr::handler(dds::core::xtypes::DynamicData& data) {
         std::cout << "Configure Device Reader Handler Executing" << std::endl; 

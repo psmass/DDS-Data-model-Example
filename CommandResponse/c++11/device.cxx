@@ -33,14 +33,20 @@ void run_device_application() {
     // Instantiate Topic Readers and Writers w/threads
     DeviceStateWtr device_state_writer(participant);
     ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
-
-    // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
+    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+ 
     config_dev_reader.runThread(participant);
     device_state_writer.runThread(participant);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+
+    // Install the deviceID and upate the filter for the config_dev_reader so we only get config
+    // commands directed to our deviceID. It also loads the sample with static data (deviceID)
+    // This must be done after the writer thread has run to as the deviceID is stored in the 
+    // sample that must be created within the device_state_writer thread.
+    config_dev_reader.installIdCft();
 
     while (!application::shutdown_requested)  {
         // Device State Machine goes here;

@@ -33,6 +33,7 @@ namespace MODULE
 
     The Topic specific Writer member functions. 
 
+    Topic Writer have the topic specific 
     Specific Writer Handlers have two parts, the Initial Setup and the Handler Loop.
     The user may want add code  in the Initial Setup (prior to the Handler Loop) to
     statically set the source ID (in the case of a device) or any other static data. 
@@ -114,6 +115,8 @@ class ConfigDevRdr : public Reader {
         void handler(dds::core::xtypes::DynamicData& data);
         void setDevStateWtr (DeviceStateWtr * dev_state_writer) 
             { this->devicesDevStateWtr = dev_state_writer; };
+
+        void installIdCft(void);  //ConfigDevRdr is on the device and only needs commands directed to it.
 
     private:
         // will need the associated devStateWtr when receive a new config command and have
