@@ -73,7 +73,7 @@ namespace MODULE
 
     /*  
     // Uncomment to put handle writer events or periodic data uniquely
-    void DeviceStateWtr::handler() {
+    void DeviceStateWtr::handler(dds::core::status::StatusMask triggered_mask) {
         // The handler gets called periodically  loads up the specific data fields and writes the sample
         // Here we can write periodically, or on change or any other condition
         std::cout << "Device State Writer Handler Executing" << std::endl; 
@@ -124,7 +124,7 @@ namespace MODULE
 
     /*  
     // Uncomment to put handle writer events or periodic data uniquely
-    void ConfigDevWtr::handler() {
+    void ConfigDevWtr::handler(dds::core::status::StatusMask triggered_mask) {
         // Used to modify sent data or to handle specific events per Topic
         std::cout << "Configure Device Writer Handler Executing" << std::endl; 
     }

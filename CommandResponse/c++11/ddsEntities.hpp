@@ -40,7 +40,9 @@ namespace MODULE
             void writerThread(dds::domain::DomainParticipant participant);
             void runThread(dds::domain::DomainParticipant participant);
 
-            virtual void handler(void) 
+            virtual void handler(dds::core::status::StatusMask triggered_mask)
+                // well pass the triggered mask to the concrete topic function in case
+                // the user wants to do something specific with an event 
                 { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)

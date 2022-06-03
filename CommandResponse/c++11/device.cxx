@@ -40,7 +40,6 @@ void run_device_application() {
     config_dev_reader.runThread(participant);
     device_state_writer.runThread(participant);
 
-
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
     while (!application::shutdown_requested)  {

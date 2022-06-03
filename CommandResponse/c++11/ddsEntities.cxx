@@ -65,18 +65,19 @@ namespace MODULE
         // attatch the status condition to the topic's waitset
         waitset += status_condition;
 
-
         while (!application::shutdown_requested)
         {
             // writers sit waiting for events (defaut 4 sec or period to send data)
             dds::core::cond::WaitSet::ConditionSeq active_conditions = waitset.wait(this->period);
+
+            dds::core::status::StatusMask triggered_mask; // declare outside for loop
 
             for (uint32_t i = 0; i < active_conditions.size(); i++) {
                 //if (active_conditions[i] == guard_cond) {
                 //    std::cout << "guard_cond was triggered\n";
                 if (active_conditions[i] == status_condition) {
                     // only one status condition set so we don't really need to d'mux
-                    dds::core::status::StatusMask triggered_mask = writer.status_changes();
+                    triggered_mask = writer.status_changes();
 
                     if ((triggered_mask & dds::core::status::StatusMask::publication_matched()).any()){
                         dds::core::status::PublicationMatchedStatus st =
@@ -89,7 +90,7 @@ namespace MODULE
 
             // User may Override default and process topic specific Handler for any periodic 
             // topic or specific event handling
-            this->handler(); 
+            this->handler(triggered_mask); 
         }
 
         std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
@@ -193,5 +194,3 @@ namespace MODULE
     }
 
 } // NAMESPACE MODULE
-
-
