@@ -92,35 +92,59 @@ namespace MODULE
         dds::core::cond::WaitSet waitset;
         
         // Create a ReadCondition for any data on this reader, and add to WaitSet
-        dds::sub::cond::ReadCondition read_condition(
+        dds::sub::cond::ReadCondition read_condition (
             reader,
             dds::sub::status::DataState::any()
          );
 
+        dds::core::cond::StatusCondition status_condition (reader);
+
+        status_condition.enabled_statuses (
+            dds::core::status::StatusMask::subscription_matched());
+
+        // attatch conditions to this topics waitset
         waitset += read_condition;
+        waitset += status_condition;
 
         while (!application::shutdown_requested) {
             // Wait 4 seconds for data 
             //waitset.dispatch(dds::core::Duration(4));
-            waitset.wait(dds::core::Duration(4));
-            // Take all samples
-            dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
+            dds::core::cond::WaitSet::ConditionSeq active_conditions = waitset.wait(dds::core::Duration(4));
 
-            for (const auto sample : samples) {
+            for (uint32_t i = 0; i < active_conditions.size(); i++) {
+                //if (active_conditions[i] == guard_cond) {
+                //    std::cout << "guard_cond was triggered\n";
+                if (active_conditions[i] == status_condition) {
+                    // only one status condition set so we don't really need to d'mux
+                    dds::core::status::StatusMask triggered_mask = reader.status_changes();
 
-                if (sample.info().valid()) {
-                    std::cout << "Read sample for topic: " << topicName << std::endl;
-                    std::cout << sample.data() << std::endl;
+                    if ((triggered_mask & dds::core::status::StatusMask::subscription_matched()).any()){
+                        dds::core::status::SubscriptionMatchedStatus st =
+                            reader.subscription_matched_status();
+                        std::cout << "Reader Pubs: " << st.current_count()
+                        << " " << st.current_count_change() << std::endl;
+                    }
 
-                    // map the sample to the specific dynamic data type
-                    dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
-                    this->handler(data); // call the topic specific Handler (Virtual) 
+                } else if (active_conditions[i] == read_condition) {
+                    // Take all samples            
+                    dds::sub::LoanedSamples<dds::core::xtypes::DynamicData> samples = reader.take();
+                    for (const auto sample : samples) {
 
-                    std::cout << std::endl;
+                        if (sample.info().valid()) {
+                            std::cout << "Read sample for topic: " << topicName << std::endl;
+                            std::cout << sample.data() << std::endl;
 
-                }
-                else {
-                    std::cout << "  Received metadata" << std::endl;
+                            // map the sample to the specific dynamic data type
+                            dds::core::xtypes::DynamicData& data = const_cast<dds::core::xtypes::DynamicData&>(sample.data());
+                            this->handler(data); // call the topic specific Handler (Virtual) 
+
+                            std::cout << std::endl;
+
+                        }
+                        else {
+                            std::cout << "Received metadata" << std::endl;
+                        }
+                    }
                 }
             }
         }
