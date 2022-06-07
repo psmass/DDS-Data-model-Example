@@ -116,7 +116,7 @@ class ConfigDevRdr : public Reader {
         void setDevStateWtr (DeviceStateWtr * dev_state_writer) 
             { this->devicesDevStateWtr = dev_state_writer; };
 
-        void installIdCft(void);  //ConfigDevRdr is on the device and only needs commands directed to it.
+        void installIdCft(const dds::domain::DomainParticipant participant);  //ConfigDevRdr is on the device and only needs commands directed to it.
 
     private:
         // will need the associated devStateWtr when receive a new config command and have
