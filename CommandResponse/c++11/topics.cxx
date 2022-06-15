@@ -85,9 +85,10 @@ namespace MODULE
         // wait for the device writer thread to run as that's when the sample is allocated
         this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
         this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
-        std::vector<std::string> parameters(1);
-        //parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
+        std::vector<std::string> parameters(2);
         parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
+        parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
+
 
     
         dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData> cft_topic = 
