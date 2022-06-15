@@ -37,6 +37,10 @@ class Writer(threading.Thread):
         # get the topic type and writer for this topic
         self._topic_type = qos_provider.type(qos_provider.type_libraries[0], self._topic_type_name)
         self._writer = dds.DynamicData.DataWriter.find_by_name(participant, self._writer_name)
+        self._status_condition = dds.StatusCondition(self._writer)
+        self._status_condition.enabled_statuses = dds.StatusMask.PUBLICATION_MATCHED
+        self._waitset = dds.WaitSet()
+        self._waitset += self._status_condition
         threading.Thread.__init__(self)
         print("Writer Topic {w_name} created".format(w_name=self._writer_name))
 
@@ -47,7 +51,16 @@ class Writer(threading.Thread):
         # handler() is implemented by concrete topic class and should
         # not return until program exit. It's while loop periodicity should
         # be set to 1 or more seconds or the rate of writing a periodic topic
-        self.handler()
+        while application.run_flag:
+            active = self._waitset.wait(4.0)
+            if self._status_condition in active:
+                status_mask = self._writer.status_changes
+                c_count = self._writer.publication_matched_status.current_count
+                count_delta = self._writer.publication_matched_status.current_count_change
+                if dds.StatusMask.PUBLICATION_MATCHED in status_mask:
+                    print("Writer Subs= {0} {1}".format(c_count, count_delta))
+
+            self.handler() # Override to handle any actions or events
 
     # ********* MUST OVERRIDE TO SET CONCRETE TOPIC CLASS WRITER **********
     def write_data(self, sample):
@@ -55,7 +68,6 @@ class Writer(threading.Thread):
 
     def get_writer_handle(self):
         return self._writer
-
 
     def join(self):
         super().join()
@@ -66,10 +78,9 @@ class Writer(threading.Thread):
     # ***  THE PERIODICITY OF THE TOPIC AND CALL write() from the handler
     def handler(self):
         # do periodic writing here
-        print("WRITER HANDLER FOR {w_name} NOT SET ".format(w_name=self._writer_name))
-        print("*** OVERRIDE TO SET STATIC TOPIC VALUES")
-        while application.run_flag:
-            sleep(1)
+        # print("DEFAULT WRITER HANDLER FOR {w_name} NOT SET ".format(w_name=self._writer_name))
+        # print("*** OVERRIDE TO SET STATIC TOPIC VALUES")
+        print ("DWH", end='', flush=True)
 
     @classmethod
     def enable(cls):
@@ -91,9 +102,11 @@ class Reader(threading.Thread):
         self._reader = dds.DynamicData.DataReader.find_by_name(participant, self._reader_name)
         # Create a ReadCondition to get any data
         self._read_condition = dds.ReadCondition(self._reader, dds.DataState.any_data)
+        self._status_condition = dds.StatusCondition(self._reader)
+        self._status_condition.enabled_statuses = dds.StatusMask.SUBSCRIPTION_MATCHED
         # Create WaitSet and attach conditions
         self._waitset = dds.WaitSet()
-        # self._waitset += status_condition
+        self._waitset += self._status_condition
         self._waitset += self._read_condition
         threading.Thread.__init__(self)
         print("Reader Topic {r_name} created".format(r_name=self._reader_name))
@@ -105,25 +118,30 @@ class Reader(threading.Thread):
         while application.run_flag:
             # Get the StatusCondition associated with the reader and set the mask to get liveliness updates
             # change Status condition for matched publishers
-            # status_condition.enabled_statuses = dds.StatusMask.LIVELINESS_CHANGED
             active = self._waitset.wait(4.0)
             # Check conditions after wait to see if anything triggered
-            # if self._status_condition in active:
-            #    self.status_handler(reader)
+            # default status condition set to SUBSCRIPTION_MATCHED
+            if self._status_condition in active:
+                status_mask = self._reader.status_changes
+                c_count = self._reader.subscription_matched_status.current_count
+                count_delta = self._reader.subscription_matched_status.current_count_change
+                if dds.StatusMask.SUBSCRIPTION_MATCHED in status_mask:
+                    print( "Reader Pubs:= {0} {1}".format(c_count, count_delta))
+
             if self._read_condition in active:
                 for (data, info) in filter(lambda s: s.info.valid, self._reader.take()):
                     self.handler(data) # execute the reader specific handler to parse topic
                     #print(data)
+
 
     def join(self):
         super().join()
 
     # ********* MUST OVERRIDE TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
     def handler(self, data):
-        print("READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
-        print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
-        while application.run_flag:
-            sleep(1)
+        # print("DEFAULT READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
+        # print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
+        print("DRH", end='', flush=True)
 
     def get_reader_handle(self):
         return self._reader
