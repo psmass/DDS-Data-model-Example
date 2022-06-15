@@ -111,18 +111,6 @@ class DeviceStateWtr(ddsEntities.Writer):
         self._sample["myDeviceId.resourceId"] = 2
         self._sample["myDeviceId.id"] = 20
 
-    def handler(self):
-        # The topic specific writer handler, sits only on events
-        # you may want to handle for this topic
-        print("Device State Writer Handler Executing")
-        # in a real device these would be dug out of EPROM somewhere
-
-        while application.run_flag:
-            #  if periodic data handler should set the sleep duration
-            #  to topic write periode and call write() here
-            # self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
-            sleep(1)
-
     def write_data(self, state):
         print("Writing DeviceState Sample")
         self._sample["state"] = state
@@ -141,6 +129,19 @@ class DeviceStateWtr(ddsEntities.Writer):
     def get_previous_state(self):
         return self._previous_state
 
+    '''
+    def handler(self):
+        # The topic specific writer handler, sits only on events
+        # you may want to handle for this topic
+        print("Device State Writer Handler Executing")
+        # in a real device these would be dug out of EPROM somewhere
+
+        while application.run_flag:
+            #  if periodic data handler should set the sleep duration
+            #  to topic write periode and call write() here
+            # self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
+            sleep(1)
+    '''
 
 class ConfigDevRdr(ddsEntities.Reader):
     def __init__(self, participant):
@@ -179,6 +180,16 @@ class ConfigDevWtr(ddsEntities.Writer):
     def set_device_state_reader(self, device_state_reader):
         self._device_state_reader = device_state_reader
 
+
+    def writeData(self, request):
+        print("Writing Config Request to device ")
+        self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
+        self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
+        self._sample["deviceConfig.stateReq"] = request
+        self._writer.write(self._sample)
+
+
+'''
     def handler(self):
         # The topic specific writer handler, initializes the targeted
         # device id and monitors events you may want to handle for this topic
@@ -191,10 +202,4 @@ class ConfigDevWtr(ddsEntities.Writer):
             #  to topic write period and call write() here
             # self.writeData(constants.DeviceStateEnum.ON)
             sleep(1)
-
-    def writeData(self, request):
-        print("Writing Config Request to device ")
-        self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
-        self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
-        self._sample["deviceConfig.stateReq"] = request
-        self._writer.write(self._sample)
+'''

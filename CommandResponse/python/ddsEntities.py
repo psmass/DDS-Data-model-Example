@@ -122,6 +122,8 @@ class Reader(threading.Thread):
     def handler(self, data):
         print("READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
         print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
+        while application.run_flag:
+            sleep(1)
 
     def get_reader_handle(self):
         return self._reader
