@@ -71,28 +71,8 @@ namespace MODULE
     }    
     */
 
-    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name)
+    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant)
       : Reader(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
-        // std::cout << "Config Dev Reader C'tor " << std::endl; 
-        // Find and install a filter for myDeviceID on the targetID (Device Reads Config Device 
-        // commands, andonly wants the commands directed to it.) - THIS SHOULD BE A BUILT IN TOPIC
- 
-        //rti::topic::CustomFilter<MODULE::ConfigureDevice> configDevReaderCft=rti::topic::find_content_filter (participant, filter_name);
-        /*
-        // Find the Topic
-        dds::topic::Topic<dds::topic::AnyTopic> topic = dds::topic::find(participant, _TOPIC_CONFIGURE_DEVICE);
-        // Create the parameter list
-        std::vector<std::string> cft_parameters(1);
-        cft_parameters[0] = "20"; // myDeviceID number - redefine as a const at the start of the program vs. hardcode
-
-        // Create the ContentFilteredTopic
-        dds::topic::ContentFilteredTopic<ExCmdRsp::ConfigureDevice> cft(
-            topic, // related topic
-            "MyFilter", // local name for the CFT
-            dds::topic::Filter(         // filter (constructed in-line in this example)
-                "targetDeviceId.id=%0", // expression
-                cft_parameters));       // parameter vector
-        */
 
     };
 

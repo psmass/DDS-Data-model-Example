@@ -41,9 +41,9 @@ namespace MODULE
             void runThread(dds::domain::DomainParticipant participant);
 
             virtual void handler(dds::core::status::StatusMask triggered_mask)
-                // well pass the triggered mask to the concrete topic function in case
+                // should pass the triggered mask to the concrete topic function in case
                 // the user wants to do something specific with an event 
-                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+                { std::cout << "DWH";}; // Default Writer Handler 
 
             dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
                  {return topicWriter;};  // needed for Requests to get the response writer
@@ -75,7 +75,8 @@ namespace MODULE
             void runThread(dds::domain::DomainParticipant participant);
 
             virtual void handler(dds::core::xtypes::DynamicData& data)
-                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+                // Default Reader Handler - Needs to be overriden to parse out specific topic
+                { std::cout << "DRH";};
 
             std::thread * getThreadHndl(void) { return &myRdrThread; };
 

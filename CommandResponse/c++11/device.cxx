@@ -32,7 +32,7 @@ void run_device_application() {
 
     // Instantiate Topic Readers and Writers w/threads
     DeviceStateWtr device_state_writer(participant);
-    ConfigDevRdr config_dev_reader(participant, MODULE::TOPIC_CONFIGURE_DEV_CFT); 
+    ConfigDevRdr config_dev_reader(participant); 
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running

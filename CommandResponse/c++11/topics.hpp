@@ -109,7 +109,7 @@ class DeviceStateWtr : public Writer {
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
+        ConfigDevRdr(const dds::domain::DomainParticipant participant);
         ~ConfigDevRdr(void){};
 
         void handler(dds::core::xtypes::DynamicData& data);
