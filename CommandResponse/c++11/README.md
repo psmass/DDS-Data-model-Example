@@ -24,10 +24,3 @@ OR if you want to see the build output
 
 ## Running Example:
 Device and Controller must be executed from the build directory.
-
-## ToDo:
-- Check how to load an Dynamic data value enum (currently casting)
-- Use and load an array of octets for deviceID
-- Set deviceID Filter programatically so that xml is not unique per Partipant
-
-

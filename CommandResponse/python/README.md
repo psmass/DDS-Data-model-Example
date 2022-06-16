@@ -11,9 +11,7 @@ Device and Controller must be executed from the build directory.
 > python Device or python3 device
 > python Controller or python3 controller
 
-## ToDo:
-- Check how to load an Dynamic data value enum (currently casting)
-- Use and load an array of octets for deviceID
+
 
 
 

@@ -12,7 +12,3 @@ The example code was built with the following environment.
 
 ## Running Example:
 Device and Controller must be executed from the build directory.
-
-## ToDo:
-- Use and load an array of octets for deviceID vs current int_32
-
