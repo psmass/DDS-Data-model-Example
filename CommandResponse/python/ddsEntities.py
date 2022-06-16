@@ -55,10 +55,9 @@ class Writer(threading.Thread):
             active = self._waitset.wait(4.0)
             if self._status_condition in active:
                 status_mask = self._writer.status_changes
-                c_count = self._writer.publication_matched_status.current_count
-                count_delta = self._writer.publication_matched_status.current_count_change
+                st = self._writer.publication_matched_status
                 if dds.StatusMask.PUBLICATION_MATCHED in status_mask:
-                    print("Writer Subs= {0} {1}".format(c_count, count_delta))
+                    print("Writer Subs= {0} {1}".format(st.current_count, st.current_count_change))
 
             self.handler() # Override to handle any actions or events
 
@@ -119,14 +118,11 @@ class Reader(threading.Thread):
             # Get the StatusCondition associated with the reader and set the mask to get liveliness updates
             # change Status condition for matched publishers
             active = self._waitset.wait(4.0)
-            # Check conditions after wait to see if anything triggered
-            # default status condition set to SUBSCRIPTION_MATCHED
             if self._status_condition in active:
                 status_mask = self._reader.status_changes
-                c_count = self._reader.subscription_matched_status.current_count
-                count_delta = self._reader.subscription_matched_status.current_count_change
+                st = self._reader.subscription_matched_status
                 if dds.StatusMask.SUBSCRIPTION_MATCHED in status_mask:
-                    print( "Reader Pubs:= {0} {1}".format(c_count, count_delta))
+                    print( "Reader Pubs:= {0} {1}".format(st.current_count, st.current_count_change))
 
             if self._read_condition in active:
                 for (data, info) in filter(lambda s: s.info.valid, self._reader.take()):
