@@ -89,9 +89,6 @@ namespace MODULE
         parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
         parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
 
-
-
-    
         dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData> cft_topic = 
             dds::topic::find<dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData>> (participant, "ConfigureDevice::MyFilter");
         if (cft_topic == dds::core::null)

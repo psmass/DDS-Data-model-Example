@@ -26,6 +26,7 @@ CONFIGURE_DEVICE_TYPE_NAME = MODULE+"ConfigureDevice"
 DEVICE_STATE_READER = "ControllerSubscriber::DeviceStateReader"
 DEVICE_STATE_WRITER = "DevicePublisher::DeviceStateWriter"
 CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader"
+CONFIGURE_DEVICE_CFT = "ConfigureDevice::MyFilter"
 CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter"
 
 

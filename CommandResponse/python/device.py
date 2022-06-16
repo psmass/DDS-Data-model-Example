@@ -73,8 +73,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
-    device_main(args.domain)  # uncomment for debug
-
+    # device_main(args.domain)  # uncomment for debug
 
     try:
         device_main(args.domain)

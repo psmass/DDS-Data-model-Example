@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.1/rti_dds_profiles.xsd" version="6.1.1">
     <types>
       <module name="ExCmdRsp">
         <!--Start_Header_File_Const-Block 
@@ -8,7 +8,7 @@
       -->
         <const name="MODULE_EX_CMD_RSP" type="string" value="ExCmdRsp"/>
         <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ExCmdRsp::ConfigureDevice"/>
-        <const name="TOPIC_CONFIGURE_DEV_CFT" type="string" value="DeviceSubscriber::ConfigureDeviceReader::MyFilter"/>
+        <const name="TOPIC_CONFIGURE_DEV_CFT" type="string" value="ConfigureDevice::MyFilter"/>
         <const name="TOPIC_DEVICE_STATE" type="string" value="ExCmdRsp::DeviceState"/>
         <const name="CONTROLLER1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant1"/>
         <const name="DEVICE1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::DeviceParticipant1"/>
@@ -95,7 +95,7 @@
             <content_filter name="MyFilter" kind="builtin.sql">
               <expression>targetDeviceId.resourceId = %0, targetDeviceId.id=%1</expression>
               <expression_parameters>
-		<element>0</element>
+                <element>0</element>
                 <element>0</element>
               </expression_parameters>
             </content_filter>

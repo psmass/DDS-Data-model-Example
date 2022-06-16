@@ -169,7 +169,7 @@ class ConfigDevRdr(ddsEntities.Reader):
         self._device_state_writer.set_current_state(data["deviceConfig.stateReq"])
 
     def install_id_cft(self, participant):
-        cft_topic = dds.DynamicData.ContentFilteredTopic.find(participant, "ConfigureDevice::MyFilter")
+        cft_topic = dds.DynamicData.ContentFilteredTopic.find(participant, constants.CONFIGURE_DEVICE_CFT)
         dw_sample = self._device_state_writer.get_data_sample()
         cft_topic.filter_parameters = [str(dw_sample["myDeviceId.resourceId"]), str(dw_sample["myDeviceId.id"])]
         print("CFT ID installed")
