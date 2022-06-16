@@ -4,14 +4,14 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.1.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433127_h
-#define CommandResp_2073433127_h
+#ifndef CommandResp_2073433103_h
+#define CommandResp_2073433103_h
 
 #ifndef NDDS_STANDALONE_TYPE
 #ifndef ndds_cpp_h
@@ -24,9 +24,9 @@ or consult the Code Generator User's Manual.
 
 namespace ExCmdRsp {
     static const DDS_Char * const MODULE_EX_CMD_RSP= "ExCmdRsp";
-    static const DDS_Char * const TOPIC_CONFIGURE_DEVICE= "ConfigureDevice";
-    static const DDS_Char * const TOPIC_CONFIGURE_DEV_CFT= "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
-    static const DDS_Char * const TOPIC_DEVICE_STATE= "DeviceState";
+    static const DDS_Char * const TOPIC_CONFIGURE_DEVICE= "ExCmdRsp::ConfigureDevice";
+    static const DDS_Char * const TOPIC_CONFIGURE_DEV_CFT= "ConfigureDevice::MyFilter";
+    static const DDS_Char * const TOPIC_DEVICE_STATE= "ExCmdRsp::DeviceState";
     static const DDS_Char * const CONTROLLER1_PARTICIPANT= "CmdRspParticipantLibrary::ControllerParticipant1";
     static const DDS_Char * const DEVICE1_PARTICIPANT= "CmdRspParticipantLibrary::DeviceParticipant1";
     static const DDS_Char * const DEVICE_STATE_WRITER= "DevicePublisher::DeviceStateWriter";
@@ -41,10 +41,10 @@ namespace ExCmdRsp {
     static const DDS_UnsignedLong LEN_STR_BAR= 16UL;
     typedef enum DeviceStateEnum
     {
-        UNINITIALIZED ,      
-        OFF ,      
-        ON ,      
-        ERROR      
+        UNINITIALIZED , 
+        OFF , 
+        ON , 
+        ERROR 
     } DeviceStateEnum;
     #if (defined(RTI_WIN32) || defined (RTI_WINCE) || defined(RTI_INTIME)) && defined(NDDS_USER_DLL_EXPORT)
     /* If the code is building on Windows, start exporting symbols.

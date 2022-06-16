@@ -4,14 +4,14 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.1.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433127_hpp
-#define CommandResp_2073433127_hpp
+#ifndef CommandResp_2073433103_hpp
+#define CommandResp_2073433103_hpp
 
 #include <iosfwd>
 
@@ -63,7 +63,7 @@ namespace ExCmdRsp {
 
     static const std::string TOPIC_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
 
-    static const std::string TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
+    static const std::string TOPIC_CONFIGURE_DEV_CFT = "ConfigureDevice::MyFilter";
 
     static const std::string TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
@@ -639,5 +639,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // CommandResp_2073433127_hpp
+#endif // CommandResp_2073433103_hpp
 

@@ -7,7 +7,7 @@ module ExCmdRsp {
 
   const string TOPIC_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
 
-  const string TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
+  const string TOPIC_CONFIGURE_DEV_CFT = "ConfigureDevice::MyFilter";
 
   const string TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
