@@ -86,8 +86,9 @@ namespace MODULE
         this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId", 2);
         this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id", 20);
         std::vector<std::string> parameters(2);
-        parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
-        parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
+        parameters[0] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.resourceId"));
+        parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
+
 
 
     

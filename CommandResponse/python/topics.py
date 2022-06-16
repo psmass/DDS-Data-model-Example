@@ -129,6 +129,10 @@ class DeviceStateWtr(ddsEntities.Writer):
     def get_previous_state(self):
         return self._previous_state
 
+    def get_data_sample(self):
+        return self._sample
+
+
     '''
     def handler(self):
         # The topic specific writer handler, sits only on events
@@ -165,12 +169,9 @@ class ConfigDevRdr(ddsEntities.Reader):
         self._device_state_writer.set_current_state(data["deviceConfig.stateReq"])
 
     def install_id_cft(self, participant):
-        #dds.DynamicData.ContentFilteredTopic cft_topic = \
-        #    dds.DynamicData.Topic.find(participant, "ConfigureDevice::MyFilter")
-
-        #dds.DynamicData.ContentFilteredTopic.topic cft_topic = dds.DynamicData.Topic.find(participant, "ConfigureDevice::MyFilter")
-
         cft_topic = dds.DynamicData.ContentFilteredTopic.find(participant, "ConfigureDevice::MyFilter")
+        dw_sample = self._device_state_writer.get_data_sample()
+        cft_topic.filter_parameters = [str(dw_sample["myDeviceId.resourceId"]), str(dw_sample["myDeviceId.id"])]
         print("CFT ID installed")
 
 

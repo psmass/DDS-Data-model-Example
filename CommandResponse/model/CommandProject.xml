@@ -93,9 +93,10 @@
         <subscriber name="DeviceSubscriber">
           <data_reader name="ConfigureDeviceReader" topic_ref="ConfigureDevice">
             <content_filter name="MyFilter" kind="builtin.sql">
-              <expression>targetDeviceId.id=%0</expression>
+              <expression>targetDeviceId.resourceId = %0, targetDeviceId.id=%1</expression>
               <expression_parameters>
-                <element>20</element>
+		<element>0</element>
+                <element>0</element>
               </expression_parameters>
             </content_filter>
             <datareader_qos base_name="CmdRspQoSLibrary::ConfigDevProfile">
