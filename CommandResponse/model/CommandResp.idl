@@ -5,9 +5,13 @@ module ExCmdRsp {
        */
   const string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
+  const string TYPE_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
+
   const string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
 
   const string TOPIC_CONFIGURE_DEV_CFT = "ConfigureDevice::MyFilter";
+
+  const string TYPE_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
   const string TOPIC_DEVICE_STATE = "DeviceState";
 
@@ -72,3 +76,4 @@ module ExCmdRsp {
   };
 
 };
+

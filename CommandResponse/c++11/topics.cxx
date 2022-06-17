@@ -18,7 +18,7 @@ namespace MODULE
 {
 
     DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
-      : Reader(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
+      : Reader(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
     };
 
     void DeviceStateRdr::handler(dds::core::xtypes::DynamicData& data) {
@@ -49,7 +49,7 @@ namespace MODULE
     DeviceStateWtr::DeviceStateWtr(
         const dds::domain::DomainParticipant participant,
         dds::core::Duration period)
-      : Writer(participant, MODULE::TOPIC_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, period) {
+      : Writer(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, period) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         // std::cout << "Device State C'Tor" << std::endl; 
@@ -72,7 +72,7 @@ namespace MODULE
     */
 
     ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant)
-      : Reader(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
+      : Reader(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
     };
 
@@ -111,7 +111,7 @@ namespace MODULE
     ConfigDevWtr::ConfigDevWtr(
         const dds::domain::DomainParticipant participant,
         dds::core::Duration period)
-      : Writer(participant, MODULE::TOPIC_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, period) {
+      : Writer(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, period) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
