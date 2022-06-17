@@ -26,11 +26,35 @@
 #define MAX_FILTER_EXPRESSION_LEN 120
 namespace MODULE
 {
-struct Cft {
-    bool filter;                // enable filter
-    DDS_StringSeq * parameters;
-    char filter_expression[MAX_FILTER_EXPRESSION_LEN];   
+
+// Content Filter Class
+class Cft {
+    public:
+        Cft(const char ** param_list=NULL, const char * filter_expression_p=NULL) {
+            if (param_list==NULL)
+                this->filter=false;
+            else {
+                // There should be a simpler way to get the length of param_list / # params
+                int a=0;
+                for ( ; param_list[a]!=NULL; a++){
+                        //std::cout << param_list[a] << " --- " << a
+                        ;
+                } 
+                std::cout << std::flush << std::endl;
+                this->filter=true;
+                this->parameters.maximum(a);
+                this->parameters.from_array(param_list, a);
+                strcpy (this->filter_expression, filter_expression_p);      
+            }
+        }
+
+   public:
+        bool filter;                // enable filter
+        DDS_StringSeq parameters;
+        char filter_expression[MAX_FILTER_EXPRESSION_LEN]; 
+
 };
+
 
 // These Class Templates are intended to replace the function templates below
 // This allows the user to have type specific classes by inheriting from these
@@ -108,7 +132,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
                     "ContentFilteredTopic",
                     topic,
                     filter.filter_expression,
-                    *filter.parameters);
+                    filter.parameters);
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
             untyped_reader = subscriber->create_datareader_with_profile(
                 cft,
