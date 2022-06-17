@@ -32,7 +32,7 @@ namespace MODULE
         public:
             Writer(
                 dds::domain::DomainParticipant participant,
-                const std::string topic_name,
+                const std::string topic_type,
                 const std::string writer_name,
                 dds::core::Duration period);
             ~Writer(void) {}; 
@@ -54,7 +54,7 @@ namespace MODULE
             void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
-            std::string topicName;
+            std::string topicType;
             std::string writerName;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
             dds::core::xtypes::DynamicData * topicSample; 
@@ -67,7 +67,7 @@ namespace MODULE
         public:
             Reader(
                 dds::domain::DomainParticipant participant,
-                const std::string topic_name, 
+                const std::string topic_type, 
                 const std::string reader_name);
             ~Reader(void){};
 
@@ -81,7 +81,7 @@ namespace MODULE
             std::thread * getThreadHndl(void) { return &myRdrThread; };
 
         protected:
-            std::string topicName;
+            std::string topicType;
             std::string readerName;
             std::thread myRdrThread;
 

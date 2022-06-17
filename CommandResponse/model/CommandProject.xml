@@ -7,8 +7,10 @@
        from a .cxx file. Unfortunately they cannot also be used within this XML file itself
       -->
         <const name="MODULE_EX_CMD_RSP" type="string" value="ExCmdRsp"/>
+        <const name="TYPE_CONFIGURE_DEVICE" type="string" value="ExCmdRsp::ConfigureDevice"/>
         <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
         <const name="TOPIC_CONFIGURE_DEV_CFT" type="string" value="ConfigureDevice::MyFilter"/>
+        <const name="TYPE_DEVICE_STATE" type="string" value="ExCmdRsp::DeviceState"/>
         <const name="TOPIC_DEVICE_STATE" type="string" value="DeviceState"/>
         <const name="CONTROLLER1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant1"/>
         <const name="DEVICE1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::DeviceParticipant1"/>

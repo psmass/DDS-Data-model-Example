@@ -17,12 +17,12 @@ namespace MODULE
 
     Writer::Writer(
         dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
+        const std::string topic_type, 
         const std::string writer_name,
         dds::core::Duration period) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        this->topicName = topic_name;
+        this->topicType = topic_type;
         this->writerName = writer_name;
         this->period = period;// default is 4 sec, if a periodic writer set to send-period 
     }
@@ -35,7 +35,7 @@ namespace MODULE
         dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
 
         const dds::core::xtypes::DynamicType &thisTopicType =
-            qos_provider->type(this->topicName);
+            qos_provider->type(this->topicType);
 
         // rti::core::xtypes::print_idl(deviceStateType);
 
@@ -93,7 +93,7 @@ namespace MODULE
             this->handler(triggered_mask); 
         }
 
-        std::cout << this->topicName << "Writer thread shutting down" << std::endl;  
+        std::cout << this->topicType << "Writer thread shutting down" << std::endl;  
 
     } // end Writer::WriterThread
 
@@ -103,11 +103,11 @@ namespace MODULE
 
     Reader::Reader( 
         dds::domain::DomainParticipant participant, 
-        const std::string topic_name, 
+        const std::string topic_type, 
         const std::string reader_name) {
 
-        std::cout << "Reader for topic " << topic_name << " created." << std::endl;
-        topicName = topic_name;
+        std::cout << "Reader for topic " << topic_type << " created." << std::endl;
+        topicType = topic_type;
         readerName = reader_name;
  
     }
@@ -168,7 +168,7 @@ namespace MODULE
                     for (const auto sample : samples) {
 
                         if (sample.info().valid()) {
-                            std::cout << "Read sample for topic: " << topicName << std::endl;
+                            std::cout << "Read sample for topic: " << this->topicType << std::endl;
                             std::cout << sample.data() << std::endl;
 
                             // map the sample to the specific dynamic data type
@@ -186,7 +186,7 @@ namespace MODULE
             }
         }
         
-        std::cout << this->topicName << "Reader thread shutting down" << std::endl;   
+        std::cout << this->topicType << "Reader thread shutting down" << std::endl;   
     }
 
    void Reader::runThread(dds::domain::DomainParticipant participant){
