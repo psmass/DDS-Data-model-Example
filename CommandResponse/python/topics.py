@@ -106,7 +106,6 @@ class DeviceStateWtr(ddsEntities.Writer):
                                     constants.DEVICE_STATE_TYPE_NAME,
                                     constants.DEVICE_STATE_WRITER)
         self._previous_state = constants.DeviceStateEnum.ERROR
-        self._sample = dds.DynamicData(self._topic_type)
         # Preload sample with this devices static ID
         self._sample["myDeviceId.resourceId"] = 2
         self._sample["myDeviceId.id"] = 20
@@ -180,7 +179,6 @@ class ConfigDevWtr(ddsEntities.Writer):
         ddsEntities.Writer.__init__(self, participant,
                                     constants.CONFIGURE_DEVICE_TYPE_NAME,
                                     constants.CONFIGURE_DEVICE_WRITER)
-        self._sample = dds.DynamicData(self._topic_type)
         self._device_state_reader = None
 
     # def __del__(self): # d'tor

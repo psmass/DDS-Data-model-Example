@@ -36,6 +36,7 @@ class Writer(threading.Thread):
         qos_provider = dds.QosProvider(constants.QOS_URL)
         # get the topic type and writer for this topic
         self._topic_type = qos_provider.type(qos_provider.type_libraries[0], self._topic_type_name)
+        self._sample = dds.DynamicData(self._topic_type)
         self._writer = dds.DynamicData.DataWriter.find_by_name(participant, self._writer_name)
         self._status_condition = dds.StatusCondition(self._writer)
         self._status_condition.enabled_statuses = dds.StatusMask.PUBLICATION_MATCHED
