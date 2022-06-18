@@ -57,7 +57,7 @@ namespace MODULE
         // WaitSet will be woken when the attached condition is triggered
         dds::core::cond::WaitSet waitset;
 
-        dds::core::cond::StatusCondition status_condition (writer);
+        dds::core::cond::StatusCondition status_condition (*this->topicWriter);
 
         status_condition.enabled_statuses (
             dds::core::status::StatusMask::publication_matched());
