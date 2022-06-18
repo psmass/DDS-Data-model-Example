@@ -33,11 +33,15 @@ namespace MODULE
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
         dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-
         const dds::core::xtypes::DynamicType &thisTopicType =
             qos_provider->type(this->topicType);
+        
+        // Create one sample from the specified type and populate the id field.
+        // This sample will be used repeatedly in the loop below.
+        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
 
         // rti::core::xtypes::print_idl(deviceStateType);
+        this->topicSample=&thisTopicSample;  
 
         // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
@@ -47,12 +51,7 @@ namespace MODULE
                 participant,
                 this->writerName);
 
-        // Create one sample from the specified type and populate the id field.
-        // This sample will be used repeatedly in the loop below.
-        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
-
         this->topicWriter=&writer; 
-        this->topicSample=&thisTopicSample;  
 
         // WaitSet will be woken when the attached condition is triggered
         dds::core::cond::WaitSet waitset;
