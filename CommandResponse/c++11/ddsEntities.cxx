@@ -28,7 +28,7 @@ namespace MODULE
     }
 
     void Writer::writerThread(dds::domain::DomainParticipant participant) {
-        // Lookup the specific topic DeviceState as defined in the xml file.
+        // Lookup the specific topic as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
