@@ -35,6 +35,8 @@ class Cft {
                 this->filter=false;
             else {
                 // There should be a simpler way to get the length of param_list / # params
+                // std::cout << "******S " << param_list << " " << sizeof(param_list) << " " << sizeof(param_list[0]) << std::endl;
+                // std::cout << "******S " << param_list[0] << " " << param_list[1] << std::endl;
                 int a=0;
                 for ( ; param_list[a]!=NULL; a++){
                         //std::cout << param_list[a] << " --- " << a

@@ -120,6 +120,7 @@ extern "C" int run_device_application(int domain_id) {
     std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
     std::string s2 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.id);
     const char *param_list[] = { s1.c_str(), s2.c_str(), NULL };
+    // std::cout << "****** " << param_list << " " << sizeof(param_list) << " " << sizeof(param_list[0]) << std::endl;
 
     Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
 

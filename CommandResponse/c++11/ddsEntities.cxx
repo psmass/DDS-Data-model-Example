@@ -77,11 +77,11 @@ namespace MODULE
                 //    std::cout << "guard_cond was triggered\n";
                 if (active_conditions[i] == status_condition) {
                     // only one status condition set so we don't really need to d'mux
-                    triggered_mask = writer.status_changes();
+                    triggered_mask = this->topicWriter->status_changes();
 
                     if ((triggered_mask & dds::core::status::StatusMask::publication_matched()).any()){
                         dds::core::status::PublicationMatchedStatus st =
-                            writer.publication_matched_status();
+                            this->topicWriter->publication_matched_status();
                         std::cout << "Writer Subs: " << st.current_count()
                         << " " << st.current_count_change() << std::endl;
                     }
