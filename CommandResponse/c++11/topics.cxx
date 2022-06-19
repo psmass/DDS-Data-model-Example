@@ -17,7 +17,7 @@
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
+    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant * participant )
       : Reader(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
     };
 
@@ -47,7 +47,7 @@ namespace MODULE
     }    
 
     DeviceStateWtr::DeviceStateWtr(
-        const dds::domain::DomainParticipant participant,
+        const dds::domain::DomainParticipant * participant,
         dds::core::Duration period)
       : Writer(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, period) {
         // Update Static Topic Data parameters in the beginning of the handler
@@ -71,7 +71,7 @@ namespace MODULE
     }    
     */
 
-    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant)
+    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant * participant)
       : Reader(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
     };
@@ -109,7 +109,7 @@ namespace MODULE
 
 
     ConfigDevWtr::ConfigDevWtr(
-        const dds::domain::DomainParticipant participant,
+        const dds::domain::DomainParticipant * participant,
         dds::core::Duration period)
       : Writer(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, period) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             

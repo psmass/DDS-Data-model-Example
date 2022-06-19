@@ -31,14 +31,14 @@ namespace MODULE
     class Writer {
         public:
             Writer(
-                dds::domain::DomainParticipant participant,
+                const dds::domain::DomainParticipant * participant,
                 const std::string topic_type,
                 const std::string writer_name,
                 dds::core::Duration period);
             ~Writer(void); 
 
-            void writerThread(dds::domain::DomainParticipant participant);
-            void runThread(dds::domain::DomainParticipant participant);
+            void writerThread(void);
+            void runThread(void);
 
             virtual void handler(dds::core::status::StatusMask triggered_mask)
                 // should pass the triggered mask to the concrete topic function in case
@@ -54,6 +54,7 @@ namespace MODULE
             void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
+            dds::domain::DomainParticipant * participant;
             std::string topicType;
             std::string writerName;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
@@ -66,13 +67,13 @@ namespace MODULE
     class Reader {
         public:
             Reader(
-                dds::domain::DomainParticipant participant,
+                const dds::domain::DomainParticipant * participant,
                 const std::string topic_type, 
                 const std::string reader_name);
             ~Reader(void){};
 
-            void readerThread(dds::domain::DomainParticipant participant);
-            void runThread(dds::domain::DomainParticipant participant);
+            void readerThread(void);
+            void runThread(void);
 
             virtual void handler(dds::core::xtypes::DynamicData& data)
                 // Default Reader Handler - Needs to be overriden to parse out specific topic
@@ -81,6 +82,7 @@ namespace MODULE
             std::thread * getThreadHndl(void) { return &myRdrThread; };
 
         protected:
+            dds::domain::DomainParticipant * participant;
             std::string topicType;
             std::string readerName;
             std::thread myRdrThread;

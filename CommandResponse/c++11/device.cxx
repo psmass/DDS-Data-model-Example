@@ -31,14 +31,14 @@ void run_device_application() {
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    DeviceStateWtr device_state_writer(participant);
-    ConfigDevRdr config_dev_reader(participant); 
+    DeviceStateWtr device_state_writer(&participant);
+    ConfigDevRdr config_dev_reader(&participant); 
     config_dev_reader.setDevStateWtr(&device_state_writer);
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
  
-    config_dev_reader.runThread(participant);
-    device_state_writer.runThread(participant);
+    config_dev_reader.runThread();
+    device_state_writer.runThread();
 
     rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 

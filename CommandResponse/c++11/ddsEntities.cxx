@@ -16,12 +16,13 @@ namespace MODULE
 {
 
     Writer::Writer(
-        dds::domain::DomainParticipant participant, 
+        const dds::domain::DomainParticipant * participant, 
         const std::string topic_type, 
         const std::string writer_name,
         dds::core::Duration period) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
+        this->participant = (dds::domain::DomainParticipant *) &(*participant);
         this->topicType = topic_type;
         this->writerName = writer_name;
         this->period = period;// default is 4 sec, if a periodic writer set to send-period 
@@ -39,7 +40,7 @@ namespace MODULE
         delete this->topicSample;
     }
 
-    void Writer::writerThread(dds::domain::DomainParticipant participant) {
+    void Writer::writerThread() {
         // Lookup the specific topic as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
@@ -49,7 +50,7 @@ namespace MODULE
         dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
             rti::pub::find_datawriter_by_name<
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
-                participant,
+                *(this->participant),
                 this->writerName);
 
         this->topicWriter=&writer; 
@@ -97,23 +98,24 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
-    void Writer::runThread(dds::domain::DomainParticipant participant){
-        this->myWtrThread = std::thread(&Writer::writerThread, this, participant);
+    void Writer::runThread(){
+        this->myWtrThread = std::thread(&Writer::writerThread, this);
     }
 
     Reader::Reader( 
-        dds::domain::DomainParticipant participant, 
+        const dds::domain::DomainParticipant * participant, 
         const std::string topic_type, 
         const std::string reader_name) {
 
         std::cout << "Reader for topic " << topic_type << " created." << std::endl;
+        this->participant = (dds::domain::DomainParticipant *) &(*participant);
         topicType = topic_type;
         readerName = reader_name;
  
     }
 
 
-    void Reader::readerThread(dds::domain::DomainParticipant participant) {
+    void Reader::readerThread() {
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
@@ -122,7 +124,7 @@ namespace MODULE
         dds::sub::DataReader<dds::core::xtypes::DynamicData> reader =
             rti::sub::find_datareader_by_name<
                 dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
-                participant,
+                *(this->participant),
                 this->readerName);
 
         // WaitSet will be woken when the attached condition is triggered
@@ -189,8 +191,8 @@ namespace MODULE
         std::cout << this->topicType << "Reader thread shutting down" << std::endl;   
     }
 
-   void Reader::runThread(dds::domain::DomainParticipant participant){
-        this->myRdrThread = std::thread(&Reader::readerThread, this, participant);
+   void Reader::runThread(){
+        this->myRdrThread = std::thread(&Reader::readerThread, this);
     }
 
 } // NAMESPACE MODULE
