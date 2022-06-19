@@ -35,7 +35,7 @@ namespace MODULE
                 const std::string topic_type,
                 const std::string writer_name,
                 dds::core::Duration period);
-            ~Writer(void) {}; 
+            ~Writer(void); 
 
             void writerThread(dds::domain::DomainParticipant participant);
             void runThread(dds::domain::DomainParticipant participant);

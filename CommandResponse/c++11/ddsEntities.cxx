@@ -25,23 +25,24 @@ namespace MODULE
         this->topicType = topic_type;
         this->writerName = writer_name;
         this->period = period;// default is 4 sec, if a periodic writer set to send-period 
+
+        // Create one sample from the specified type and populate the id field.
+        // This sample will be used repeatedly in the loop below.
+        dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
+        const dds::core::xtypes::DynamicType &thisTopicType =
+            qos_provider->type(this->topicType);
+        // rti::core::xtypes::print_idl(thisTopcType);
+        this->topicSample = new dds::core::xtypes::DynamicData(thisTopicType);
+    }
+
+    Writer::~Writer() {
+        delete this->topicSample;
     }
 
     void Writer::writerThread(dds::domain::DomainParticipant participant) {
         // Lookup the specific topic as defined in the xml file.
         // This will be needed to create samples of the correct type
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
-
-        dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-        const dds::core::xtypes::DynamicType &thisTopicType =
-            qos_provider->type(this->topicType);
-        
-        // Create one sample from the specified type and populate the id field.
-        // This sample will be used repeatedly in the loop below.
-        dds::core::xtypes::DynamicData thisTopicSample(thisTopicType);
-
-        // rti::core::xtypes::print_idl(deviceStateType);
-        this->topicSample=&thisTopicSample;  
 
         // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
