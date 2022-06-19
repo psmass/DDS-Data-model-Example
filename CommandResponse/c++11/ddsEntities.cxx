@@ -53,12 +53,10 @@ namespace MODULE
                 *(this->participant),
                 this->writerName);
 
-        this->topicWriter=&writer; 
-
         // WaitSet will be woken when the attached condition is triggered
         dds::core::cond::WaitSet waitset;
 
-        dds::core::cond::StatusCondition status_condition (*this->topicWriter);
+        dds::core::cond::StatusCondition status_condition(writer);
 
         status_condition.enabled_statuses (
             dds::core::status::StatusMask::publication_matched());
@@ -78,11 +76,11 @@ namespace MODULE
                 //    std::cout << "guard_cond was triggered\n";
                 if (active_conditions[i] == status_condition) {
                     // only one status condition set so we don't really need to d'mux
-                    triggered_mask = this->topicWriter->status_changes();
+                    triggered_mask = writer.status_changes();
 
                     if ((triggered_mask & dds::core::status::StatusMask::publication_matched()).any()){
                         dds::core::status::PublicationMatchedStatus st =
-                            this->topicWriter->publication_matched_status();
+                            writer.publication_matched_status();
                         std::cout << "Writer Subs: " << st.current_count()
                         << " " << st.current_count_change() << std::endl;
                     }

@@ -45,8 +45,6 @@ namespace MODULE
                 // the user wants to do something specific with an event 
                 { std::cout << "DWH";}; // Default Writer Handler 
 
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
-                 {return topicWriter;};  // needed for Requests to get the response writer
             dds::core::xtypes::DynamicData * getMyDataSample(void)
                 {return topicSample;};
             std::thread* getThreadHndl(void) { return &myWtrThread; };
@@ -57,7 +55,6 @@ namespace MODULE
             dds::domain::DomainParticipant * participant;
             std::string topicType;
             std::string writerName;
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
             dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
             dds::core::Duration period;

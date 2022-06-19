@@ -57,9 +57,18 @@ namespace MODULE
 
     void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
+
+        // Find the DataWriter defined in the xml by using the participant and the
+        // publisher::writer pair as the datawriter name.
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
+            rti::pub::find_datawriter_by_name<
+                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+                *(this->participant),
+                this->writerName);
+
         // sample already has our devieID
         this->getMyDataSample()->value<int32_t>("state", (int32_t)current_state);
-        this->getMyWriter()->write(*this->getMyDataSample());
+        writer.write(*this->getMyDataSample());
     }
 
     /*  
@@ -126,11 +135,19 @@ namespace MODULE
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
 
+       // Find the DataWriter defined in the xml by using the participant and the
+        // publisher::writer pair as the datawriter name.
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
+            rti::pub::find_datawriter_by_name<
+                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+                *(this->participant),
+                this->writerName);
+
         Writer::getMyDataSample()->value<int32_t>("targetDeviceId.resourceId", this->deviceDevStateRdr->getDeviceResourceId());
         Writer::getMyDataSample()->value<int32_t>("targetDeviceId.id", this->deviceDevStateRdr->getDeviceId());
 
         Writer::getMyDataSample()->value<int32_t>("deviceConfig.stateReq", (int32_t)configReq);
-        Writer::getMyWriter()->write(*Writer::getMyDataSample());
+        writer.write(*Writer::getMyDataSample());
 
     }   
 
