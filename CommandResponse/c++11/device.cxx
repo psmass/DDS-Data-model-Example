@@ -46,7 +46,7 @@ void run_device_application() {
     // commands directed to our deviceID. It also loads the sample with static data (deviceID)
     // This must be done after the writer thread has run to as the deviceID is stored in the 
     // sample that must be created within the device_state_writer thread.
-    config_dev_reader.installIdCft(participant);
+    config_dev_reader.installIdCft();
 
     while (!application::shutdown_requested)  {
         // Device State Machine goes here;

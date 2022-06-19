@@ -76,7 +76,7 @@ namespace MODULE
 
     };
 
-    void ConfigDevRdr::installIdCft(const dds::domain::DomainParticipant participant) {
+    void ConfigDevRdr::installIdCft(void) {
         // Device filters ConfigureDeviceRequests to it's deviceID, deviceID was "dug out of eeprom" and saved"
         // in the device_state_writer object sample data member. We need to retreive that and covert it to str.
         // XML app create file already installed a content filter w/ expression, but it's generic with
@@ -90,7 +90,7 @@ namespace MODULE
         parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
 
         dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData> cft_topic = 
-            dds::topic::find<dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData>> (participant, MODULE::TOPIC_CONFIGURE_DEV_CFT);
+            dds::topic::find<dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData>> (*(this->participant), MODULE::TOPIC_CONFIGURE_DEV_CFT);
         if (cft_topic == dds::core::null)
             throw std::invalid_argument("Reader Thread: cft_topic = NULL");
         else
