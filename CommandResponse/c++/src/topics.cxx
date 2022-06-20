@@ -67,58 +67,6 @@ namespace MODULE
     
     }
 
-    void DeviceStateWtr::Handler() {
-
-        // Writer Handlers run in the topic writerthread and don't return until exit
-        // The handler does three things:
-        //   1) Sets to static topic data fields such as deviceId 
-        //   2) Sets wait conditions to monitor writer events
-        //   3) can be used to write sample periodically
-
-        DDS_ReturnCode_t retcode;
-        DDSConditionSeq active_conditions_seq;
-        DDS_Duration_t send_period = {1,0}; // this topic send period, if periodic
-
-
-        std::cout << "Device State Writer Handler Executing" << std::endl; 
- 
-        int sampleNumber = 1;
-    
-        while (!application::shutdown_requested)  {
-
-            // Wait for event or timeout, if event call event handler
-            retcode = this->waitset->wait(active_conditions_seq, send_period);
-            if (retcode == DDS_RETCODE_TIMEOUT) {
-            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
-                continue;
-            } else if (retcode != DDS_RETCODE_OK) {
-                throw std::invalid_argument("Writer thread: wait returned error ");
-            }
-            this->WriterEventHandler(active_conditions_seq);
- 
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            std::chrono::high_resolution_clock::duration duration = now.time_since_epoch();
-            // std::chrono::high_resolution_clock::nanoseconds nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written periodically here and uncomment the write
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            //deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            //Writer::getMyWriter()->write(*Writer::getMyDataSample());
-            
-            //std::cout
-            //<< "Writing Sample: " << sampleNumber 
-            //<< "{'myDeviceId': {'resourceId': " << deviceStateSample.value<int32_t>("myDeviceId.resourceId") 
-            //<< ", 'id': " << deviceStateSample.value<int32_t>("myDeviceId.id") << "}"
-            //<< std::endl;
-
-            //sampleNumber++;
-        }
-        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
-
-    } 
-
 
     void ConfigDevRdr::process_data(MODULE::ConfigureDevice * data) {
             if (this->getDevStateWtr()!=NULL) {
@@ -140,53 +88,5 @@ namespace MODULE
         this->topicSample->deviceConfig.stateReq=state_req; // per state requested
         this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
     }   
-
-    void ConfigDevWtr::Handler() {
-        DDSConditionSeq active_conditions_seq;
-        DDS_ReturnCode_t retcode;
-        DDS_Duration_t send_period = {1,0}; 
-
-        // Writer Handlers run in thread and don't return until exit
-        // The handler loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
-        std::cout << "Configure Device Writer Handler Executing" << std::endl; 
-
-        this->topicSample->targetDeviceId.resourceId=2;
-        this->topicSample->targetDeviceId.id=20;
-
-        int sampleNumber = 1;
-    
-        while (!application::shutdown_requested)
-        {
-            // Wait for event or timeout, if event call event handler
-            retcode = this->waitset->wait(active_conditions_seq, send_period);
-            if (retcode == DDS_RETCODE_TIMEOUT) {
-            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
-                continue;
-            } else if (retcode != DDS_RETCODE_OK) {
-                throw std::invalid_argument("Writer thread: wait returned error");
-            }
-            this->WriterEventHandler(active_conditions_seq);
-            // this topic is not periodic, so we'll only use this thread to monitor writer events
-            // once we figure out the API more Modern C++
-
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            std::chrono::high_resolution_clock::duration duration = now.time_since_epoch();
-            //std::chrono::time_point<std::chrono::system_clock>  nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-
-            // Modify the data to be written here
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
-            // deviceStateSample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
-            // Writer::getMyWriter()->write(*Writer::getMyDataSample());
-
-            //std::cout << "Writing Sample: " << sampleNumber 
-            //<< "{'targetDeviceId': {'resourceId': " << configDeviceSample.value<int32_t>("targetDeviceId.resourceId") 
-            //<< ", 'id': " << configDeviceSample.value<int32_t>("targetDeviceId.id") << "}"
-            //<< std::endl;
-
-            //sampleNumber++;
-        }
-        std::cout << this->Writer::topicName << " Writer Handler shutting down" << std::endl; 
-    }
 
 } // namespace

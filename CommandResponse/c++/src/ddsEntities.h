@@ -51,7 +51,7 @@ namespace MODULE
             }
             void RunThread(void);
 
-            virtual void Handler(void) = 0;// implemented by the concrete topic class
+            virtual void writerEventHandler(DDSConditionSeq active_conditions_seq) = 0;// implemented by the concrete topic class
 
             const char* getTopicName(void) { return this->topicName; };
             void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };

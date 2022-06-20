@@ -35,8 +35,24 @@ namespace MODULE
         // Use the topic name to register the Topic Type, create the Topic 
         // Create the Writer and create the data sample
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
- 
-        this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
+
+        DDSConditionSeq active_conditions_seq;
+        DDS_ReturnCode_t retcode;
+        DDS_Duration_t send_period = {1,0}; // timeout wait to ensure running
+
+        while (!application::shutdown_requested) {
+
+                        // Wait for event or timeout, if event call event handler
+            retcode = this->waitset->wait(active_conditions_seq, send_period);
+            if (retcode == DDS_RETCODE_TIMEOUT) {
+            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
+                continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                throw std::invalid_argument("Writer thread: wait returned error ");
+            }
+            this->writerEventHandler(active_conditions_seq);
+
+        }
 
         std::cout << this->topicName << " Writer thread shutting down" << std::endl;  
         

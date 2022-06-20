@@ -251,10 +251,7 @@ class TopicWtr : public Writer {
             const char* topic_wtr_name);
         ~TopicWtr(void){};
 
-        virtual void Handler(void) 
-            { std::cout << "*** GENERIC WRITER HANDLER " << std::endl; };
-            
-        virtual void WriterEventHandler(DDSConditionSeq active_conditions_seq);
+        virtual void writerEventHandler(DDSConditionSeq active_conditions_seq);
 
         T * getTopicSample(void){ return this->topicSample; };
         W * getTopicWriter(void){ return this->topicWriter; };
@@ -344,7 +341,7 @@ TopicWtr<T,S,W>::TopicWtr(
 
 // Default Writer Event handler shows subscriber count
 template<class T, class S, class W> 
-void TopicWtr<T, S, W>::WriterEventHandler(DDSConditionSeq active_conditions_seq) {
+void TopicWtr<T, S, W>::writerEventHandler(DDSConditionSeq active_conditions_seq) {
         // uses this->topicWriter which is topic specific
         // Get the number of active conditions 
         int active_conditions = active_conditions_seq.length();
