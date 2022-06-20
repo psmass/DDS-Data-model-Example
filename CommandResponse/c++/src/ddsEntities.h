@@ -51,7 +51,7 @@ namespace MODULE
             }
             void RunThread(void);
 
-            virtual void Handler(void) { };// implemented by the concrete topic class
+            virtual void Handler(void) = 0;// implemented by the concrete topic class
 
             const char* getTopicName(void) { return this->topicName; };
             void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
@@ -103,8 +103,7 @@ namespace MODULE
 
             pthread_t getThreadId(void) { return this->tid; };
 
-            virtual void Handler(void) // implemented by the concrete topic class
-                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; 
+            virtual void Handler(DDSConditionSeq active_conditions_seq) = 0; // default impl in Template class
 
         protected:
             DDSDomainParticipant * topicParticipant;

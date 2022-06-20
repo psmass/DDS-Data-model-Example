@@ -69,8 +69,25 @@ namespace MODULE
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
-        this->Handler(); // call the topic specific Handler (Virtual) - does not return until ^C
+        DDSConditionSeq active_conditions_seq;
+        DDS_ReturnCode_t retcode;
+        DDS_Duration_t wait_duration = {1,0}; // timeout wait to ensure running
 
+        while (!application::shutdown_requested) {
+
+            // Wait 4 seconds for data 
+            retcode = this->waitset->wait(active_conditions_seq, wait_duration);
+            // waitset.wait(dds::core::Duration(4));
+            if (retcode == DDS_RETCODE_TIMEOUT) {  
+                // std::cout << "Reader thread: Wait timed out!! No conditions were triggered" << std::endl;
+                // put thead health check here since we verified we are running
+                continue;
+            } else if (retcode != DDS_RETCODE_OK) {
+                throw std::invalid_argument("Reader handler: wait returned error ");
+            }
+
+            this->Handler(active_conditions_seq); // call the topic specific Handler (Virtual)
+        }
         std::cout << this->topicName << " Reader thread shutting down" << std::endl;  
         return NULL;
     }

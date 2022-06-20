@@ -135,7 +135,7 @@ namespace MODULE
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
 
-       // Find the DataWriter defined in the xml by using the participant and the
+        // Find the DataWriter defined in the xml by using the participant and the
         // publisher::writer pair as the datawriter name.
         dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
             rti::pub::find_datawriter_by_name<
