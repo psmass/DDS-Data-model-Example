@@ -31,7 +31,7 @@ void run_device_application() {
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    DeviceStateWtr device_state_writer(&participant, true);
+    DeviceStateWtr device_state_writer(&participant);
     ConfigDevRdr config_dev_reader(&participant); 
     config_dev_reader.setDevStateWtr(&device_state_writer);
 

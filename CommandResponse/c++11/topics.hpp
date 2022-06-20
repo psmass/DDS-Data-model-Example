@@ -136,7 +136,10 @@ class ConfigDevWtr : public Writer {
             dds::core::Duration period = std::chrono::seconds(4));
         ~ConfigDevWtr(void){};
 
-        // void handler(void);
+        // write() is effectively a runtime down cast for periodic data
+        void write() {
+            this->writeData(this->deviceDevStateRdr->getCurrentState());
+        }
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
