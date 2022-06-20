@@ -34,16 +34,15 @@ namespace MODULE
                 const dds::domain::DomainParticipant * participant,
                 const std::string topic_type,
                 const std::string writer_name,
+                const bool periodic,
                 dds::core::Duration period);
             ~Writer(void); 
 
+            // override to write your specific data topic
+            virtual void write() { std::cout << "DWH";}; // Default Writer Handler ;
+
             void writerThread(void);
             void runThread(void);
-
-            virtual void handler(dds::core::status::StatusMask triggered_mask)
-                // should pass the triggered mask to the concrete topic function in case
-                // the user wants to do something specific with an event 
-                { std::cout << "DWH";}; // Default Writer Handler 
 
             dds::core::xtypes::DynamicData * getMyDataSample(void)
                 {return topicSample;};
@@ -57,6 +56,7 @@ namespace MODULE
             std::string writerName;
             dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
+            bool periodic;
             dds::core::Duration period;
             std::thread myWtrThread;
     };

@@ -48,8 +48,9 @@ namespace MODULE
 
     DeviceStateWtr::DeviceStateWtr(
         const dds::domain::DomainParticipant * participant,
+        bool periodic,
         dds::core::Duration period)
-      : Writer(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, period) {
+      : Writer(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, periodic, period) {
         // Update Static Topic Data parameters in the beginning of the handler
         // prior to the loop, but after the entity base class creates the sample.
         // std::cout << "Device State C'Tor" << std::endl; 
@@ -119,8 +120,9 @@ namespace MODULE
 
     ConfigDevWtr::ConfigDevWtr(
         const dds::domain::DomainParticipant * participant,
+        bool periodic,
         dds::core::Duration period)
-      : Writer(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, period) {
+      : Writer(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, periodic, period) {
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 

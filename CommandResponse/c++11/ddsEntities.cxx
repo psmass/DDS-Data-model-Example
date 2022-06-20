@@ -19,13 +19,15 @@ namespace MODULE
         const dds::domain::DomainParticipant * participant, 
         const std::string topic_type, 
         const std::string writer_name,
+        const bool periodic,
         dds::core::Duration period) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         this->participant = (dds::domain::DomainParticipant *) &(*participant);
         this->topicType = topic_type;
         this->writerName = writer_name;
-        this->period = period;// default is 4 sec, if a periodic writer set to send-period 
+        this->periodic = periodic; // defines if topic is to be written periodically 
+        this->period = period; // default is 4 sec, if a periodic writer set to send-period 
 
         // Create one sample from the specified type and populate the id field.
         // This sample will be used repeatedly in the loop below.
@@ -83,12 +85,11 @@ namespace MODULE
                         std::cout << "Writer Subs: " << st.current_count()
                         << " " << st.current_count_change() << std::endl;
                     }
+                } else if (i==0 && this->periodic) { // empty condition squence - timeout occured
+                    this->write(); // periodic write
                 }
             }
 
-            // User may Override default and process topic specific Handler for any periodic 
-            // topic or specific event handling
-            this->handler(triggered_mask); 
         }
 
         std::cout << this->topicType << "Writer thread shutting down" << std::endl;  

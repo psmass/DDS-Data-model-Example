@@ -76,6 +76,7 @@ class DeviceStateWtr : public Writer {
     public:
         DeviceStateWtr(
             const dds::domain::DomainParticipant * participant,
+            bool periodic = false,
             dds::core::Duration period =std::chrono::seconds(4));
         ~DeviceStateWtr(void){};
 
@@ -128,6 +129,7 @@ class ConfigDevWtr : public Writer {
     public:
         ConfigDevWtr(
             const dds::domain::DomainParticipant * participant,
+            bool periodic = false,
             dds::core::Duration period = std::chrono::seconds(4));
         ~ConfigDevWtr(void){};
 
