@@ -81,16 +81,17 @@ class DeviceStateRdr : public TopicRdr<
         // initialize the same, but something other than UNITITIALIZED as that is the first
         // state sent when a devie announces itself.
         MODULE::DeviceState read_topic; // for this device
-
 };
 
 
 class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> {
     public:
-        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher) :
+        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, bool periodic=false, int period = 4 ) :
             TopicWtr(
                 participant, 
-                publisher, 
+                publisher,
+                periodic,
+                period,
                 MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_DEVICE_STATE,
                 MODULE::DEVICE_STATE_WRITER
@@ -112,7 +113,7 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
        // void WriterEventHandler(DDSConditionSeq active_conditions_seq);
        
 
-        void WriteData(const enum MODULE::DeviceStateEnum current_state); 
+        void writeData(const enum MODULE::DeviceStateEnum current_state); 
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
@@ -134,7 +135,6 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
         MODULE::DeviceState * topicSample; 
         enum MODULE::DeviceStateEnum previousState; 
         enum MODULE::DeviceStateEnum currentState; 
-
 };
 
 
@@ -168,15 +168,16 @@ class ConfigDevRdr : public TopicRdr<
         // will need the associated devStateWtr when receive a new config command and have
         // to change the state of the device
         DeviceStateWtr * devicesDevStateWtrPtr; 
-
 };
 
 class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> {
     public:
-        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher) :
+        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, bool periodic=false, int period=4) :
             TopicWtr(
                 participant, 
                 publisher, 
+                periodic,
+                period,
                 MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_CONFIGURE_DEVICE,
                 MODULE::CONFIGURE_DEVICE_WRITER
@@ -184,7 +185,7 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
             { };
         ~ConfigDevWtr(void){};
 
-        void WriteData(const enum MODULE::DeviceStateEnum configDevReq);
+        void writeData(const enum MODULE::DeviceStateEnum configDevReq);
 
         void Handler(void);
         // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
@@ -197,7 +198,6 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
         // will need the associated devStateRdr which holds the device info regarding
         // our request
         DeviceStateRdr * devicesDevStateRdrPtr; 
-
 };
 
 } // namespace MODULE

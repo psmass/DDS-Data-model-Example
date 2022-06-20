@@ -40,9 +40,14 @@ namespace MODULE
             Writer(
                 DDSDomainParticipant * participant,
                 DDSPublisher * publisher,
+                bool periodic,
+                int period,
                 const char* topic_name,
                 const char* writer_name);
             ~Writer(void) {}; 
+
+            // override to write your specific data topic
+            virtual void writeData(void) { std::cout << "DWH"; };
 
             void * WriterThread(void);
             // pthred requires a static _f* so we need helper to convert
@@ -51,7 +56,7 @@ namespace MODULE
             }
             void RunThread(void);
 
-            virtual void writerEventHandler(DDSConditionSeq active_conditions_seq) = 0;// implemented by the concrete topic class
+            virtual void writerHandler(DDSConditionSeq active_conditions_seq) = 0;// implemented by the concrete topic class
 
             const char* getTopicName(void) { return this->topicName; };
             void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
@@ -68,6 +73,8 @@ namespace MODULE
         protected:
             DDSDomainParticipant * topicParticipant;
             DDSPublisher * topicPublisher;
+            bool periodic;
+            DDS_Duration_t period;
             DDSWaitSet *waitset;
             DDSStatusCondition *statusCondition;
             char * topicName;

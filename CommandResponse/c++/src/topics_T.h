@@ -246,12 +246,14 @@ class TopicWtr : public Writer {
         TopicWtr(
             DDSDomainParticipant * participant,
             DDSPublisher * publisher, 
+            bool periodic,
+            int period,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_wtr_name);
         ~TopicWtr(void){};
 
-        virtual void writerEventHandler(DDSConditionSeq active_conditions_seq);
+        virtual void writerHandler(DDSConditionSeq active_conditions_seq);
 
         T * getTopicSample(void){ return this->topicSample; };
         W * getTopicWriter(void){ return this->topicWriter; };
@@ -260,7 +262,7 @@ class TopicWtr : public Writer {
         // changing conditions require it). The writeData member function
         // is provided to allow the main loop of the controller reliably publish a configuration
         // change request to the evice.
-        void WriteData(T topic); 
+        void writeData(T topic); 
         
     protected:
         W * topicWriter;
@@ -270,11 +272,13 @@ class TopicWtr : public Writer {
 template<class T, class S, class W>
 TopicWtr<T,S,W>::TopicWtr(
     DDSDomainParticipant * participant, 
-    DDSPublisher * publisher, 
+    DDSPublisher * publisher,
+    bool periodic,
+    int period,
     const char* qos_profile,
     const char* topic_name,
     const char * topic_wtr_name) 
-        : Writer(participant, publisher, topic_name, topic_wtr_name) {
+        : Writer(participant, publisher, periodic, period, topic_name, topic_wtr_name) {
         // Register the specific datatype to use when creating the Topic
         // this calls a type specific type, so is required to be done in the specific
         // type Reader/Writer. The remaining work is done in the base class
@@ -341,7 +345,7 @@ TopicWtr<T,S,W>::TopicWtr(
 
 // Default Writer Event handler shows subscriber count
 template<class T, class S, class W> 
-void TopicWtr<T, S, W>::writerEventHandler(DDSConditionSeq active_conditions_seq) {
+void TopicWtr<T, S, W>::writerHandler(DDSConditionSeq active_conditions_seq) {
         // uses this->topicWriter which is topic specific
         // Get the number of active conditions 
         int active_conditions = active_conditions_seq.length();

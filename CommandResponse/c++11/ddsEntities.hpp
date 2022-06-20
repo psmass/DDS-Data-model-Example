@@ -39,7 +39,7 @@ namespace MODULE
             ~Writer(void); 
 
             // override to write your specific data topic
-            virtual void write() { std::cout << "DWH";}; // Default Writer Handler ;
+            virtual void write(void) { std::cout << "DWH";}; // Default Writer Handler ;
 
             void writerThread(void);
             void runThread(void);

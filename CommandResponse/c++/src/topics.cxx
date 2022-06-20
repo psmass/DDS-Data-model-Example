@@ -55,7 +55,7 @@ namespace MODULE
     }
  
 
-    void DeviceStateWtr::WriteData(const enum MODULE::DeviceStateEnum current_state) {
+    void DeviceStateWtr::writeData(const enum MODULE::DeviceStateEnum current_state) {
         std::cout << "Writing DeviceState Sample " << std::endl;
         // Modify sample with current state as soon as I figure out how to load an enum
 
@@ -79,7 +79,7 @@ namespace MODULE
     }
 
 
-    void ConfigDevWtr::WriteData(const enum MODULE::DeviceStateEnum state_req) {
+    void ConfigDevWtr::writeData(const enum MODULE::DeviceStateEnum state_req) {
         std::cout << "Writing Config Request to device " << std::endl; 
 
         // this is a straight copy so perhaps a more efficient way to do this

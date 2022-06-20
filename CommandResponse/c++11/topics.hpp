@@ -80,7 +80,10 @@ class DeviceStateWtr : public Writer {
             dds::core::Duration period =std::chrono::seconds(4));
         ~DeviceStateWtr(void){};
 
-        // void handler();
+        // write() is effectively a runtime down cast for periodic data
+        void write() {
+            this->writeData(this->getCurrentState());
+        }
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in

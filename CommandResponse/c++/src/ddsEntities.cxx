@@ -19,12 +19,16 @@ namespace MODULE
     Writer::Writer(
         DDSDomainParticipant * participant,
         DDSPublisher * publisher,
+        bool periodic,
+        int period,
         const char* topic_name, 
         const char* writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         this->topicParticipant = participant;
         this->topicPublisher = publisher;
+        this->periodic = periodic;
+        this->period.sec = period;
         this->topicName = (char *) topic_name;
         this->writerName = writer_name;
         this->waitset = new DDSWaitSet();;
@@ -38,19 +42,18 @@ namespace MODULE
 
         DDSConditionSeq active_conditions_seq;
         DDS_ReturnCode_t retcode;
-        DDS_Duration_t send_period = {1,0}; // timeout wait to ensure running
 
         while (!application::shutdown_requested) {
 
                         // Wait for event or timeout, if event call event handler
-            retcode = this->waitset->wait(active_conditions_seq, send_period);
+            retcode = this->waitset->wait(active_conditions_seq, this->period);
             if (retcode == DDS_RETCODE_TIMEOUT) {
-            //std::cerr << "Writer thread: Wait timed out!! No conditions were triggered" << std::endl;
-                continue;
+                if (this->periodic) 
+                    this->writeData();
             } else if (retcode != DDS_RETCODE_OK) {
                 throw std::invalid_argument("Writer thread: wait returned error ");
             }
-            this->writerEventHandler(active_conditions_seq);
+            this->writerHandler(active_conditions_seq);
 
         }
 

@@ -128,7 +128,7 @@ extern "C" int run_controller_application(int domain_id) {
         // A controller would likely track multiple devices and keep them in a vector
         if (device_state_reader.getCurrentState() == UNINITIALIZED) {
             // turn it on once we recieve a device state of UNINITIALIZED
-            config_dev_writer.WriteData (ON);
+            config_dev_writer.writeData (ON);
         }
         std::cout << "." << std::flush;                 
         NDDSUtility::sleep(wait_period);
