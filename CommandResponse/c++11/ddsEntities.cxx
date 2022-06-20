@@ -70,6 +70,9 @@ namespace MODULE
             // writers sit waiting for events (defaut 4 sec or period to send data)
             dds::core::cond::WaitSet::ConditionSeq active_conditions = waitset.wait(this->period);
 
+            // if action_conditions not set then timeout. write if topic is periodic
+            if (active_conditions.size()==0 && this->periodic) this->write();
+
             dds::core::status::StatusMask triggered_mask; // declare outside for loop
 
             for (uint32_t i = 0; i < active_conditions.size(); i++) {
@@ -85,9 +88,7 @@ namespace MODULE
                         std::cout << "Writer Subs: " << st.current_count()
                         << " " << st.current_count_change() << std::endl;
                     }
-                } else if (i==0 && this->periodic) { // empty condition squence - timeout occured
-                    this->write(); // periodic write
-                }
+                } 
             }
 
         }
