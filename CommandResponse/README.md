@@ -45,13 +45,13 @@ To keep things simple, there are two topics:
 	
 	                           Device                   |		      Controller
 								 | 
-  		DeviceState(INITIALIZED)(Key'd deviceDevID) --> |
-								 |(Controller sees new device in INITIALIZED STATE, 
+  	   DeviceState(UNINITIALIZED)(Key'd deviceDevID) -->|
+								 |(Controller sees new device in UNINITIALIZED STATE, 
 								 |  Issues a ConfigDevice command to turn ON)
 			                   	  	    	 | 
 		(content filter on target(my)DevId)		 | <--- ConfigDevice(targetDeviceID, ON)
 		(Device Sees Change of State, issues new State) | 
-					     DeviceState(ON) --> |  
+					      DeviceState(ON) -->|  
 								 | (Controller sees and registers device in ON STATE) 	      	
 	  					
 
