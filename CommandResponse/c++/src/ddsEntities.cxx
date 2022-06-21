@@ -49,7 +49,7 @@ namespace MODULE
             retcode = this->waitset->wait(active_conditions_seq, this->period);
             if (retcode == DDS_RETCODE_TIMEOUT) {
                 if (this->periodic) 
-                    this->writeData();
+                    this->write();
             } else if (retcode != DDS_RETCODE_OK) {
                 throw std::invalid_argument("Writer thread: wait returned error ");
             }

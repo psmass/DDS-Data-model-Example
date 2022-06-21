@@ -47,7 +47,7 @@ namespace MODULE
             ~Writer(void) {}; 
 
             // override to write your specific data topic
-            virtual void writeData(void) { std::cout << "DWH"; };
+            virtual void write(void) { std::cout << "DWH"; };
 
             void * WriterThread(void);
             // pthred requires a static _f* so we need helper to convert

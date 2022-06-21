@@ -108,11 +108,12 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
 
         ~DeviceStateWtr(void){};
 
-        void Handler(void);
-       // fine with the default writer event handler
-       // void WriterEventHandler(DDSConditionSeq active_conditions_seq);
-       
+        // write() is effectively a runtime down cast for periodic data
+        void write(void) {
+            this->writeData(this->currentState);
+        }
 
+       
         void writeData(const enum MODULE::DeviceStateEnum current_state); 
 
         // Device State is writen when ever it changes. The writeData member function
@@ -185,10 +186,12 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
             { };
         ~ConfigDevWtr(void){};
 
-        void writeData(const enum MODULE::DeviceStateEnum configDevReq);
+        // write() is effectively a runtime down cast for periodic data
+        void write(void) {
+            this->writeData(this->devicesDevStateRdrPtr->getCurrentState());
+        }
 
-        void Handler(void);
-        // void WriterEventHandler(DDSConditionSeq active_conditions_seq); // default is ok
+        void writeData(const enum MODULE::DeviceStateEnum configDevReq);
 
         void setDevStateRdr (DeviceStateRdr * dev_state_reader_ptr) 
             { devicesDevStateRdrPtr = dev_state_reader_ptr; };
