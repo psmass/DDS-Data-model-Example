@@ -72,15 +72,6 @@ namespace MODULE
         writer.write(*this->getMyDataSample());
     }
 
-    /*  
-    // Uncomment to put handle writer events or periodic data uniquely
-    void DeviceStateWtr::handler(dds::core::status::StatusMask triggered_mask) {
-        // The handler gets called periodically  loads up the specific data fields and writes the sample
-        // Here we can write periodically, or on change or any other condition
-        std::cout << "Device State Writer Handler Executing" << std::endl; 
-    }    
-    */
-
     ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant * participant)
       : Reader(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
@@ -126,13 +117,6 @@ namespace MODULE
           // std::cout << "Config Device Writer C'tor" << std::endl;             
     };
 
-    /*  
-    // Uncomment to put handle writer events or periodic data uniquely
-    void ConfigDevWtr::handler(dds::core::status::StatusMask triggered_mask) {
-        // Used to modify sent data or to handle specific events per Topic
-        std::cout << "Configure Device Writer Handler Executing" << std::endl; 
-    }
-    */
 
     void ConfigDevWtr::writeData(enum MODULE::DeviceStateEnum configReq) {
         std::cout << "Writing Config Request to device " << std::endl; 
