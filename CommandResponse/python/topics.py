@@ -101,14 +101,18 @@ class DeviceStateWtr(ddsEntities.Writer):
     # the previous state something different to force the
     # initial publication (Durably) which notifies the
     # controller of the device.
-    def __init__(self, participant):
-        ddsEntities.Writer.__init__(self, participant,
+    def __init__(self, participant, periodic=False, period=4.0):
+        ddsEntities.Writer.__init__(self, participant, periodic, period,
                                     constants.DEVICE_STATE_TYPE_NAME,
                                     constants.DEVICE_STATE_WRITER)
         self._previous_state = constants.DeviceStateEnum.ERROR
         # Preload sample with this devices static ID
         self._sample["myDeviceId.resourceId"] = 2
         self._sample["myDeviceId.id"] = 20
+
+    # write() is effectively a runtime down cast for periodic data
+    def write(self):
+        self.write_data(self._sample["state"])  # send in the current state
 
     def write_data(self, state):
         print("Writing DeviceState Sample")
@@ -131,20 +135,6 @@ class DeviceStateWtr(ddsEntities.Writer):
     def get_data_sample(self):
         return self._sample
 
-
-    '''
-    def handler(self):
-        # The topic specific writer handler, sits only on events
-        # you may want to handle for this topic
-        print("Device State Writer Handler Executing")
-        # in a real device these would be dug out of EPROM somewhere
-
-        while application.run_flag:
-            #  if periodic data handler should set the sleep duration
-            #  to topic write periode and call write() here
-            # self.write_data(constants.DeviceStateEnum.UNINITIALIZED)
-            sleep(1)
-    '''
 
 class ConfigDevRdr(ddsEntities.Reader):
     def __init__(self, participant):
@@ -175,39 +165,27 @@ class ConfigDevRdr(ddsEntities.Reader):
 
 
 class ConfigDevWtr(ddsEntities.Writer):
-    def __init__(self, participant):
-        ddsEntities.Writer.__init__(self, participant,
+    def __init__(self, participant, periodic=False, period=4.0):
+        ddsEntities.Writer.__init__(self, participant, periodic, period,
                                     constants.CONFIGURE_DEVICE_TYPE_NAME,
                                     constants.CONFIGURE_DEVICE_WRITER)
         self._device_state_reader = None
 
     # def __del__(self): # d'tor
 
+    # write() is effectively a runtime down cast for periodic data
+    def write(self):
+        self.write_data(self._device_state_reader.get_current_state())  # send in the current state
+
     # Associated the Device State writer with this topic since it's
     # where the Device keeps its Id and State info.
     def set_device_state_reader(self, device_state_reader):
         self._device_state_reader = device_state_reader
 
-
-    def writeData(self, request):
+    def write_data(self, request):
         print("Writing Config Request to device ")
         self._sample["targetDeviceId.resourceId"] = self._device_state_reader.get_device_resource_id()
         self._sample["targetDeviceId.id"] = self._device_state_reader.get_device_id()
         self._sample["deviceConfig.stateReq"] = request
         self._writer.write(self._sample)
 
-
-'''
-    def handler(self):
-        # The topic specific writer handler, initializes the targeted
-        # device id and monitors events you may want to handle for this topic
-        print("Configure Device Writer Handler Executing")
-        # if there were mulitple devices we'd want to index by device
-        # number to get the target devive ID for the request
-
-        while application.run_flag:
-            #  if periodic data handler should set the sleep duration
-            #  to topic write period and call write() here
-            # self.writeData(constants.DeviceStateEnum.ON)
-            sleep(1)
-'''

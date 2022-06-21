@@ -46,7 +46,7 @@ def controller_main(domain_id):
         # status message which is tracked by this controller, making the if condition below
         # false.
         if controller_dsr.get_current_state() == constants.DeviceStateEnum.UNINITIALIZED:
-            controller_cdw.writeData(constants.DeviceStateEnum.ON)
+            controller_cdw.write_data(constants.DeviceStateEnum.ON)
         print(".", end='', flush=True)
         sleep(1)
 

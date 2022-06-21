@@ -30,9 +30,11 @@ import rti.connextdds as dds
 
 class Writer(threading.Thread):
 
-    def __init__(self, participant, topic_type_name, writer_name):
+    def __init__(self, participant, periodic, period, topic_type_name, writer_name):
         self._topic_type_name = topic_type_name
         self._writer_name = writer_name
+        self._periodic = periodic
+        self._period = period
         qos_provider = dds.QosProvider(constants.QOS_URL)
         # get the topic type and writer for this topic
         self._topic_type = qos_provider.type(qos_provider.type_libraries[0], self._topic_type_name)
@@ -53,17 +55,19 @@ class Writer(threading.Thread):
         # not return until program exit. It's while loop periodicity should
         # be set to 1 or more seconds or the rate of writing a periodic topic
         while application.run_flag:
-            active = self._waitset.wait(4.0)
+            active = self._waitset.wait(self._period)
             if self._status_condition in active:
                 status_mask = self._writer.status_changes
                 st = self._writer.publication_matched_status
                 if dds.StatusMask.PUBLICATION_MATCHED in status_mask:
                     print("Writer Subs= {0} {1}".format(st.current_count, st.current_count_change))
+            elif self._periodic:  # no active condition, check if periodic
+                print(self._periodic)
+                self.write()
 
-            self.handler() # Override to handle any actions or events
 
     # ********* MUST OVERRIDE TO SET CONCRETE TOPIC CLASS WRITER **********
-    def write_data(self, sample):
+    def write(self):
         print("DEFAULT {w_name} WRITER - OVERRIDE WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
 
     def get_writer_handle(self):
@@ -80,7 +84,7 @@ class Writer(threading.Thread):
         # do periodic writing here
         # print("DEFAULT WRITER HANDLER FOR {w_name} NOT SET ".format(w_name=self._writer_name))
         # print("*** OVERRIDE TO SET STATIC TOPIC VALUES")
-        print ("DWH", end='', flush=True)
+        print("DWH", end='', flush=True)
 
     @classmethod
     def enable(cls):
