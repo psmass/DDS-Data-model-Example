@@ -30,12 +30,13 @@ namespace MODULE
 
     class Writer {
         public:
-            Writer(
+            explicit Writer(
                 const dds::domain::DomainParticipant * participant,
                 const std::string topic_type,
                 const std::string writer_name,
                 const bool periodic,
                 dds::core::Duration period);
+             
             ~Writer(void); 
 
             // override to write your specific data topic
@@ -52,6 +53,7 @@ namespace MODULE
         
         protected:
             dds::domain::DomainParticipant * participant;
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData> topicWriter;
             std::string topicType;
             std::string writerName;
             dds::core::xtypes::DynamicData * topicSample; 

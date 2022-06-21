@@ -20,7 +20,8 @@ namespace MODULE
         const std::string topic_type, 
         const std::string writer_name,
         const bool periodic,
-        dds::core::Duration period) {
+        dds::core::Duration period) : topicWriter {nullptr} {
+        
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
         this->participant = (dds::domain::DomainParticipant *) &(*participant);
@@ -36,6 +37,14 @@ namespace MODULE
             qos_provider->type(this->topicType);
         // rti::core::xtypes::print_idl(thisTopcType);
         this->topicSample = new dds::core::xtypes::DynamicData(thisTopicType);
+
+        // Find the DataWriter defined in the xml by using the participant and the
+        // publisher::writer pair as the datawriter name.
+        this->topicWriter =
+            rti::pub::find_datawriter_by_name<
+                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+                *(this->participant),
+                this->writerName);
     }
 
     Writer::~Writer() {
@@ -46,18 +55,9 @@ namespace MODULE
 
         std::cout <<  "Writer Thread " << this->writerName << " running " << std::endl;
 
-        // Find the DataWriter defined in the xml by using the participant and the
-        // publisher::writer pair as the datawriter name.
-        dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
-            rti::pub::find_datawriter_by_name<
-                dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
-                *(this->participant),
-                this->writerName);
-
-        // WaitSet will be woken when the attached condition is triggered
         dds::core::cond::WaitSet waitset;
 
-        dds::core::cond::StatusCondition status_condition(writer);
+        dds::core::cond::StatusCondition status_condition(this->topicWriter);
 
         status_condition.enabled_statuses (
             dds::core::status::StatusMask::publication_matched());
@@ -80,11 +80,11 @@ namespace MODULE
                 //    std::cout << "guard_cond was triggered\n";
                 if (active_conditions[i] == status_condition) {
                     // only one status condition set so we don't really need to d'mux
-                    triggered_mask = writer.status_changes();
+                    triggered_mask = this->topicWriter.status_changes();
 
                     if ((triggered_mask & dds::core::status::StatusMask::publication_matched()).any()){
                         dds::core::status::PublicationMatchedStatus st =
-                            writer.publication_matched_status();
+                            this->topicWriter.publication_matched_status();
                         std::cout << "Writer Subs: " << st.current_count()
                         << " " << st.current_count_change() << std::endl;
                     }
