@@ -4,17 +4,17 @@
 
 # **THIS DIRECTORY CONTAINS:**
 
-1. Three example implementations of a simple Master / Slave model using the Objective State pattern. 
+1. Three example implementations of a simple Controller/Responder model using the Objective State pattern. 
  	 - C++11 (modern C++) w/XML Application Creation & Dynamic Data
- 	 - C++98 (Traditional C++) with Programatic Entitiy creation and typed data (non-XML Application Creation)
+ 	 - C++98 (Traditional C++) with Programatic Entitiy creation and Compiled typed data (non-XML Application Creation)
  	 - Python w/SML Application Creation & Dynamic Data	
 2. Discussion
 	 - Objective State pattern.
  	 - Controller / Device and Consumer / Service data command/Response Models.
 
-## **Implementation Example of a Master / Slave Model using the Objective State Pattern**
+## **Implementation Example of a Controller / Responder Model using the Objective State Pattern**
 
-The example coded here, will have a Master Controller and a Slave Device (where there could be many devices, but one logical controller), and use the Objective State Pattern (see below).
+The example coded here, will have a Controller and a Responding Device (where there could be many devices, but one logical controller), and use the Objective State Pattern (see below).
 
 To keep things simple, there are two topics:
 
@@ -43,13 +43,13 @@ To keep things simple, there are two topics:
 	
 	**Device / Controller Topic Exchange:**
 	
-	                   Requesting Device                |		Responding Controller
+	                           Device                   |		      Controller
 								 | 
   		DeviceState(INITIALIZED)(Key'd deviceDevID) --> |
 								 |(Controller sees new device in INITIALIZED STATE, 
 								 |  Issues a ConfigDevice command to turn ON)
-			                   	  	    <--- | ConfigDevice(targetDeviceID, ON)
-		(content filter on target(my)DevId)		 | 
+			                   	  	    	 | 
+		(content filter on target(my)DevId)		 | <--- ConfigDevice(targetDeviceID, ON)
 		(Device Sees Change of State, issues new State) | 
 					     DeviceState(ON) --> |  
 								 | (Controller sees and registers device in ON STATE) 	      	
@@ -58,38 +58,38 @@ To keep things simple, there are two topics:
 ## **Discussion**
 ### **Objective State Pattern**
 
-Orthogonal to the Controller / Device or Consumer / Server models (discussed below) is the Objective State pattern. The Objective state pattern embodies the idea of issuing a command or Request with an Objective and then monitoring the associated topic(s) to verify the requesee is achieving the Objective. Independentlly, the system may also provide direct feedback on the command's state, indicating the command state (i.e.,  accepted, executing, aborted, or completed (with and without error)). Key to Objective State is that the system response determines if the Objective has been achieved and not the response to the command itself. The latter is typically used to clean up resources or ensure appropriate synchronization or blocking of requests from mulitiple sources. 
+Orthogonal to the Controller / Device or Consumer / Server models (discussed below) is the Objective State pattern. The Objective state pattern embodies the idea of issuing a command or Request with an Objective and then monitoring the associated topic(s) to verify the request is achieving the Objective. Independentlly, the system may also provide direct feedback on the command's state, indicating the command state (i.e.,  accepted, executing, aborted, or completed (with and without error)). Key to Objective State is that the system response determines if the Objective has been achieved and not the response to the command itself. The latter is typically used to clean up resources or ensure appropriate synchronization or blocking of requests from mulitiple sources. 
 
 An example of an Objective State Pattern is where a vehicle is commanded to a waypoint. The system may provide feedback as to the command state (accepted, executing etc.) but the GPS location topic is used to determine that the system is responding as commanded. 
 
 An example of a non-Objective state is where the correlated response to the command itself determines whether it has executed properly (e.g., Command Completed Sucess / Failure).
 
-### **Controller / Device Model ** 
+### **Controller / Responder Model ** 
 
-The Controller / Device Model has one or more slave devices, being commanded by a logical** Master Controller.
+The Controller / Responder Model has one or more responding devices, being commanded by a logical** Controller.
 
-In this model, the slave device must somehow 'Announce' itself on a topic the controller is monitoring. The Controller and Device may then handshake to ascertain capabilities. While the Device may request something of the Controller, usually the Controller is the 'Master' and directs the Device to activate itself for the given application. The specific interaction is implementation dependent. 
+Generally the device takes direction from the controller and responds to commands or status requests. The one exception to this is at startup. Here the device must somehow 'Announce' itself on a topic the controller is monitoring. The Controller and Device may then handshake to ascertain capabilities. While the Device may request something of the Controller, usually the Controller directs the Device to activate itself for the given application. The specific interaction is implementation dependent. 
 
 Here the use of Objective State may be used. In this case, rather than an explicit and correlated state response to a command, a periodic, or 'on-change' state topic is provided by the requestee that the requestor monitors. 
 
 ** note we use the term logical as the a Controller could be redundant but logically is one unit.
 
-Use-case for this example may be within the same system above but where the multiple devices are each, individually requesting something of the controller (e.g., approval to be accepted on the system).
+Use-case for this example may be within the same system above but where the multiple devices are each, individually providing the system with some sort of capability being monitored and coordinated by the controller.
 
 
-	              Requesting Device              	   |		Responding Controller
-    Foo Command Issued (Key'd (my)deviceDevID) ------> |
-							   |
-			                    <------------- | Foo Response(cmdReq reqDevID, Result / Status)
-	  (content filter on target(my)DevId)		   | 
+	                   Device              	        	 	|	     Controller
+    Status or AnnouncementIssued (Key'd (my)deviceDevID) ------> 	|
+								        |
+			                    	  		 	| <---- (cmdReq(targetDevID)
+	  	(content filter on target(my)DevId)		 	| 
 
 Use-case Single or redundant Controller to many devices (but one at a time), e.g., as a device 'Announces itself' the controller solicits the devices capacity or capabilities before commanding it.
 
 
-	                      Foo Consumer 		 	  |	             Foo Service
+	                      Foo Consumer 		 	  |	      	       Foo Service
 	      Foo Service Comnmand Issued (Key'd deviceID) -----> |
 	 	       		 	  	    	  	  |
-					           <------------- | Foo command_state (cmdReq reqDevID, cmd state)
+					           		  | <------------- Foo command_state (cmdReq reqDevID, cmd state)
 							  	  | (content filter on myDevId)
 
 The differences in the above two use-cases is whether the device puts the Content Filter on the command or the response, and how the devices Key'd ID (the one of many Identifier) is placed in the command dependent upon who is sending the command.
@@ -97,7 +97,7 @@ The differences in the above two use-cases is whether the device puts the Conten
 *Tactical Micro-grid standard(TMS)* is an example of this type model, and uses Objective State.  A response to a device or controller is generic and only provides feedback as to the commands acceptance or failure. The requestee (Controller or Device) then issues a status update on state change that is subscribed to by the requestor. Note: Since on-state-change is aperodic, if liveliness is used care should be taken by the application to periodically 'assert liveliness' manually to maintain good writer state while not sending actual data (refer to Asserting liveliness)
 ### **Consumer / Service Model**
 
-Sometimes referred to as a Client / Server model, this model has a well known Provider Service that one or more Clients are interested in Consuming.  Here the Client issues a command to the logical** Server and either gets a correlated response (non-Objective State) or monitors the appropriate topics to ensure the Objective has been / is being executed. In this model the Client is the 'Master' and the Service is the "Slave". Again, nothing precludes either the Consumer and/or the Service issuing requests of the other, but this is not typically the case.
+Sometimes referred to as a Client / Server model, this model has a well known Provider Service that one or more Clients are interested in Consuming.  Here the Client issues a command to the logical** Server and either gets a correlated response (non-Objective State) or monitors the appropriate topics to ensure the Objective has been / is being executed. In this model the Client initiates interaction from the service; either to command the service or to solicit information/status. Again, nothing precludes either the Consumer and/or the Service issuing requests of the other, but this is not typically the case.
   
 ** note we use the term logical as the service could be redundant but logically is one unit.
 
