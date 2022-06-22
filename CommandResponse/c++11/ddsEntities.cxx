@@ -16,15 +16,15 @@ namespace MODULE
 {
 
     Writer::Writer(
-        const dds::domain::DomainParticipant * participant, 
+        const dds::domain::DomainParticipant participant, 
         const std::string topic_type, 
         const std::string writer_name,
         const bool periodic,
-        dds::core::Duration period) : topicWriter {nullptr} {
+        dds::core::Duration period) {
         
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        this->participant = (dds::domain::DomainParticipant *) &(*participant);
+        this->participant = participant;
         this->topicType = topic_type;
         this->writerName = writer_name;
         this->periodic = periodic; // defines if topic is to be written periodically 
@@ -43,7 +43,7 @@ namespace MODULE
         this->topicWriter =
             rti::pub::find_datawriter_by_name<
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
-                *(this->participant),
+                this->participant,
                 this->writerName);
     }
 
@@ -102,12 +102,12 @@ namespace MODULE
     }
 
     Reader::Reader( 
-        const dds::domain::DomainParticipant * participant, 
+        const dds::domain::DomainParticipant participant, 
         const std::string topic_type, 
         const std::string reader_name) {
 
         std::cout << "Reader for topic " << topic_type << " created." << std::endl;
-        this->participant = (dds::domain::DomainParticipant *) &(*participant);
+        this->participant = participant;
         topicType = topic_type;
         readerName = reader_name;
  
@@ -123,7 +123,7 @@ namespace MODULE
         dds::sub::DataReader<dds::core::xtypes::DynamicData> reader =
             rti::sub::find_datareader_by_name<
                 dds::sub::DataReader<dds::core::xtypes::DynamicData>>(
-                *(this->participant),
+                this->participant,
                 this->readerName);
 
         // WaitSet will be woken when the attached condition is triggered

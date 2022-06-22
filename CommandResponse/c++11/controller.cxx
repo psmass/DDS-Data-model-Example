@@ -31,8 +31,8 @@ void run_controller_application() {
         qos_provider->create_participant_from_config(MODULE::CONTROLLER1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevWtr config_dev_writer(&participant); 
-    DeviceStateRdr device_state_reader(&participant);
+    ConfigDevWtr config_dev_writer(participant); 
+    DeviceStateRdr device_state_reader(participant);
 
     // Associate devices_state_reader with the config_dev_writer since the
     // device_state_reader holds the targetId of the request and current device state

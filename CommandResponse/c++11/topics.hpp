@@ -48,7 +48,7 @@ namespace MODULE
 
 class DeviceStateRdr : public Reader {
     public:
-        DeviceStateRdr(const dds::domain::DomainParticipant * participant);
+        DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
         void handler(dds::core::xtypes::DynamicData& data);
@@ -75,7 +75,7 @@ class DeviceStateRdr : public Reader {
 class DeviceStateWtr : public Writer {
     public:
         DeviceStateWtr(
-            const dds::domain::DomainParticipant * participant,
+            const dds::domain::DomainParticipant participant,
             bool periodic = false,
             dds::core::Duration period =std::chrono::seconds(4));
         ~DeviceStateWtr(void){};
@@ -113,7 +113,7 @@ class DeviceStateWtr : public Writer {
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(const dds::domain::DomainParticipant * participant);
+        ConfigDevRdr(const dds::domain::DomainParticipant participant);
         ~ConfigDevRdr(void){};
 
         void handler(dds::core::xtypes::DynamicData& data);
@@ -131,7 +131,7 @@ class ConfigDevRdr : public Reader {
 class ConfigDevWtr : public Writer {
     public:
         ConfigDevWtr(
-            const dds::domain::DomainParticipant * participant,
+            const dds::domain::DomainParticipant participant,
             bool periodic = false,
             dds::core::Duration period = std::chrono::seconds(4));
         ~ConfigDevWtr(void){};

@@ -17,7 +17,7 @@
 namespace MODULE
 {
 
-    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant * participant )
+    DeviceStateRdr::DeviceStateRdr(const dds::domain::DomainParticipant participant )
       : Reader(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_READER) {
     };
 
@@ -47,7 +47,7 @@ namespace MODULE
     }    
 
     DeviceStateWtr::DeviceStateWtr(
-        const dds::domain::DomainParticipant * participant,
+        const dds::domain::DomainParticipant participant,
         bool periodic,
         dds::core::Duration period)
       : Writer(participant, MODULE::TYPE_DEVICE_STATE, MODULE::DEVICE_STATE_WRITER, periodic, period) {
@@ -64,7 +64,7 @@ namespace MODULE
         this->topicWriter.write(*this->getMyDataSample());
     }
 
-    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant * participant)
+    ConfigDevRdr::ConfigDevRdr(const dds::domain::DomainParticipant participant)
       : Reader(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_READER) {
 
     };
@@ -83,7 +83,7 @@ namespace MODULE
         parameters[1] = std::to_string(this->devicesDevStateWtr->getMyDataSample()->value<int32_t>("myDeviceId.id"));
 
         dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData> cft_topic = 
-            dds::topic::find<dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData>> (*(this->participant), MODULE::TOPIC_CONFIGURE_DEV_CFT);
+            dds::topic::find<dds::topic::ContentFilteredTopic<dds::core::xtypes::DynamicData>> (this->participant, MODULE::TOPIC_CONFIGURE_DEV_CFT);
         if (cft_topic == dds::core::null)
             throw std::invalid_argument("Reader Thread: cft_topic = NULL");
         else
@@ -102,7 +102,7 @@ namespace MODULE
 
 
     ConfigDevWtr::ConfigDevWtr(
-        const dds::domain::DomainParticipant * participant,
+        const dds::domain::DomainParticipant participant,
         bool periodic,
         dds::core::Duration period)
       : Writer(participant, MODULE::TYPE_CONFIGURE_DEVICE, MODULE::CONFIGURE_DEVICE_WRITER, periodic, period) {
