@@ -117,8 +117,8 @@ extern "C" int run_controller_application(int domain_id) {
     ConfigDevWtr config_dev_writer(participant, publisher); 
     DeviceStateRdr device_state_reader(participant, subscriber, dsr_cft);
     config_dev_writer.setDevStateRdr(&device_state_reader);
-    config_dev_writer.RunThread(); // comment out to disable event monitoring on wtr
-    device_state_reader.RunThread();
+    config_dev_writer.runThread(); // comment out to disable event monitoring on wtr
+    device_state_reader.runThread();
 
     NDDSUtility::sleep(wait_period); // let entities get up and running
 

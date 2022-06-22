@@ -129,8 +129,8 @@ extern "C" int run_device_application(int domain_id) {
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
-    config_dev_reader.RunThread();
-    device_state_writer.RunThread(); // comment out to disable event monitoring on wtr
+    config_dev_reader.runThread();
+    device_state_writer.runThread(); // comment out to disable event monitoring on wtr
 
     NDDSUtility::sleep(wait_period); // let entities get up and running
 

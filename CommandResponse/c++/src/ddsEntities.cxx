@@ -17,16 +17,16 @@ extern bool application::shutdown_requested;
 namespace MODULE
 {
     Writer::Writer(
-        DDSDomainParticipant * participant,
-        DDSPublisher * publisher,
+        const DDSDomainParticipant * participant,
+        const DDSPublisher * publisher,
         const bool periodic,
         const int period,
         const char* topic_name, 
         const char* writer_name) {
         // by setting period non-zero the topic will be a periodic topic
         std::cout << "Writer Topic " <<  writer_name << " Created." <<std::endl;
-        this->topicParticipant = participant;
-        this->topicPublisher = publisher;
+        this->topicParticipant = (DDSDomainParticipant *)participant;
+        this->topicPublisher = (DDSPublisher * )publisher;
         this->periodic = periodic;
         this->period.sec = period;
         this->topicName = (char *) topic_name;
@@ -34,7 +34,7 @@ namespace MODULE
         this->waitset = new DDSWaitSet();;
     }
 
-    void * Writer::WriterThread() {
+    void * Writer::writerThread() {
         
         // Use the topic name to register the Topic Type, create the Topic 
         // Create the Writer and create the data sample
@@ -53,7 +53,7 @@ namespace MODULE
             } else if (retcode != DDS_RETCODE_OK) {
                 throw std::invalid_argument("Writer thread: wait returned error ");
             }
-            this->writerHandler(active_conditions_seq);
+            this->handler(active_conditions_seq);
 
         }
 
@@ -63,20 +63,20 @@ namespace MODULE
 
     } // end Writer::WriterThread
 
-    void Writer::RunThread(){
-        pthread_create(&this->tid, NULL, &Writer::WriterThreadHelper, this);
+    void Writer::runThread(){
+        pthread_create(&this->tid, NULL, &Writer::writerThreadHelper, this);
     }
 
 
     Reader::Reader( 
-        DDSDomainParticipant * participant,
-        DDSSubscriber * subscriber,
+        const DDSDomainParticipant * participant,
+        const DDSSubscriber * subscriber,
         const char* topic_name, 
         const char* reader_name) {
 
         std::cout << "Reader for topic " << topic_name << " created." << std::endl;
-        this->topicParticipant=participant;
-        this->topicSubscriber=subscriber;
+        this->topicParticipant=(DDSDomainParticipant *)participant;
+        this->topicSubscriber=(DDSSubscriber *)subscriber;
         this->topicName = (char *) topic_name;
         this->readerName = reader_name;
         this->waitset = new DDSWaitSet();;
@@ -84,7 +84,7 @@ namespace MODULE
     }
 
 
-    void * Reader::ReaderThread(void) {
+    void * Reader::readerThread(void) {
 
         std::cout <<  "Reader Thread " << this->readerName << " running " << std::endl;
 
@@ -111,8 +111,8 @@ namespace MODULE
         return NULL;
     }
 
-    void Reader::RunThread(){
-        pthread_create(&this->tid, NULL, &Reader::ReaderThreadHelper, this);
+    void Reader::runThread(){
+        pthread_create(&this->tid, NULL, &Reader::readerThreadHelper, this);
     }
 
 

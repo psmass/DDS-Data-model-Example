@@ -38,8 +38,8 @@ namespace MODULE
     class Writer {
         public:
             Writer(
-                DDSDomainParticipant * participant,
-                DDSPublisher * publisher,
+                const DDSDomainParticipant * participant,
+                const DDSPublisher * publisher,
                 const bool periodic,
                 const int period,
                 const char* topic_name,
@@ -49,20 +49,21 @@ namespace MODULE
             // override to write your specific data topic
             virtual void write(void) { std::cout << "DWH"; };
 
-            void * WriterThread(void);
+            void * writerThread(void);
             // pthred requires a static _f* so we need helper to convert
-            static void * WriterThreadHelper(void * context) {
-                return ((Writer *)context)->WriterThread();
+            static void * writerThreadHelper(void * context) {
+                return ((Writer *)context)->writerThread();
             }
-            void RunThread(void);
+            void runThread(void);
 
-            virtual void writerHandler(DDSConditionSeq active_conditions_seq) = 0;// implemented by the concrete topic class
+            virtual void handler(const DDSConditionSeq active_conditions_seq) = 0;// implemented by the concrete topic class
 
             const char* getTopicName(void) { return this->topicName; };
-            void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
+            void setTopicTypeName(const char * type_name) { this->topicTypeName=(char *)type_name; };
             const char* getTopicTypeName(void) { return this->topicTypeName; };
 
-            void setStatusCondition(DDSStatusCondition * status_condition) { this->statusCondition=status_condition; };
+            void setStatusCondition(const DDSStatusCondition * status_condition) { 
+                this->statusCondition=(DDSStatusCondition *)status_condition; };
             DDSStatusCondition * getStatusCondition(void) { return this->statusCondition; };
             DDSWaitSet * getWaitset(void) { return this->waitset; };
 
@@ -87,30 +88,33 @@ namespace MODULE
     class Reader {
         public:
             Reader(
-                DDSDomainParticipant * participant,
-                DDSSubscriber * subscriber,
+                const DDSDomainParticipant * participant,
+                const DDSSubscriber * subscriber,
                 const char* topic_name, 
                 const char* reader_name);
             ~Reader(void){};
 
-            void * ReaderThread(void);
-            static void * ReaderThreadHelper(void * context) {
-                return ((Reader *)context)->ReaderThread();
+            void * readerThread(void);
+            static void * readerThreadHelper(void * context) {
+                return ((Reader *)context)->readerThread();
             };
-            void RunThread(void);
+            void runThread(void);
 
             const char* getTopicName(void) { return this->topicName; };
-            void setTopicTypeName(char * type_name) { this->topicTypeName=type_name; };
+            void setTopicTypeName(const char * type_name) { this->topicTypeName=(char*)type_name; };
             const char* getTopicTypeName(void) { return this->topicTypeName; };
-            void setReadCondition(DDSReadCondition * read_condition) { this->readCondition=read_condition; };
+
+            void setReadCondition(const DDSReadCondition * read_condition) {
+                 this->readCondition=(DDSReadCondition *)read_condition; };
             DDSReadCondition * getReadCondition(void) { return this->readCondition; }; 
-            void setStatusCondition(DDSStatusCondition * status_condition) { this->statusCondition=status_condition; };
+            void setStatusCondition(const DDSStatusCondition * status_condition) {
+                 this->statusCondition=(DDSStatusCondition *)status_condition; };
             DDSStatusCondition * getStatusCondition(void) { return this->statusCondition; };
             DDSWaitSet * getWaitset(void) { return this->waitset; };
 
             pthread_t getThreadId(void) { return this->tid; };
 
-            virtual void Handler(DDSConditionSeq active_conditions_seq) = 0; // default impl in Template class
+            virtual void Handler(const DDSConditionSeq active_conditions_seq) = 0; // default impl in Template class
 
         protected:
             DDSDomainParticipant * topicParticipant;
