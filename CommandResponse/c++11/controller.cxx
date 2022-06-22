@@ -41,8 +41,6 @@ void run_controller_application() {
     config_dev_writer.runThread();
     device_state_reader.runThread();
 
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
-
     while (!application::shutdown_requested) {
         //Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on

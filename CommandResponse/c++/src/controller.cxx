@@ -120,8 +120,6 @@ extern "C" int run_controller_application(int domain_id) {
     config_dev_writer.runThread(); // comment out to disable event monitoring on wtr
     device_state_reader.runThread();
 
-    NDDSUtility::sleep(wait_period); // let entities get up and running
-
     while (!application::shutdown_requested) {
         // Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on

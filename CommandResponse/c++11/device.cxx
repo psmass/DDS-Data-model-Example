@@ -34,13 +34,9 @@ void run_device_application() {
     DeviceStateWtr device_state_writer(participant);
     ConfigDevRdr config_dev_reader(participant); 
     config_dev_reader.setDevStateWtr(&device_state_writer);
-
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
  
     config_dev_reader.runThread();
     device_state_writer.runThread();
-
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
 
     // Install the deviceID and upate the filter for the config_dev_reader so we only get config
     // commands directed to our deviceID. It also loads the sample with static data (deviceID)

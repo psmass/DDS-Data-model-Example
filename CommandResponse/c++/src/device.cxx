@@ -132,8 +132,6 @@ extern "C" int run_device_application(int domain_id) {
     config_dev_reader.runThread();
     device_state_writer.runThread(); // comment out to disable event monitoring on wtr
 
-    NDDSUtility::sleep(wait_period); // let entities get up and running
-
     while (!application::shutdown_requested)  {
         //Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
