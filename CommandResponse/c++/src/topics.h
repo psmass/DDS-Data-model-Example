@@ -86,7 +86,7 @@ class DeviceStateRdr : public TopicRdr<
 
 class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> {
     public:
-        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, bool periodic=false, int period = 4 ) :
+        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, const bool periodic=false, const int period = 4 ) :
             TopicWtr(
                 participant, 
                 publisher,
@@ -173,7 +173,7 @@ class ConfigDevRdr : public TopicRdr<
 
 class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> {
     public:
-        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, bool periodic=false, int period=4) :
+        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, const bool periodic=false, const int period=4) :
             TopicWtr(
                 participant, 
                 publisher, 

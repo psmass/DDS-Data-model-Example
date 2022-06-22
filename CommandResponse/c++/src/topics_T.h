@@ -246,8 +246,8 @@ class TopicWtr : public Writer {
         TopicWtr(
             DDSDomainParticipant * participant,
             DDSPublisher * publisher, 
-            bool periodic,
-            int period,
+            const bool periodic,
+            const int period,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_wtr_name);
@@ -273,8 +273,8 @@ template<class T, class S, class W>
 TopicWtr<T,S,W>::TopicWtr(
     DDSDomainParticipant * participant, 
     DDSPublisher * publisher,
-    bool periodic,
-    int period,
+    const bool periodic,
+    const int period,
     const char* qos_profile,
     const char* topic_name,
     const char * topic_wtr_name) 

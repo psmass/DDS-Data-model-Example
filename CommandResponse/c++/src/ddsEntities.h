@@ -40,8 +40,8 @@ namespace MODULE
             Writer(
                 DDSDomainParticipant * participant,
                 DDSPublisher * publisher,
-                bool periodic,
-                int period,
+                const bool periodic,
+                const int period,
                 const char* topic_name,
                 const char* writer_name);
             ~Writer(void) {}; 

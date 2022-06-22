@@ -19,8 +19,8 @@ namespace MODULE
     Writer::Writer(
         DDSDomainParticipant * participant,
         DDSPublisher * publisher,
-        bool periodic,
-        int period,
+        const bool periodic,
+        const int period,
         const char* topic_name, 
         const char* writer_name) {
         // by setting period non-zero the topic will be a periodic topic
