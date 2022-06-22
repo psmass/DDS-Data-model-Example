@@ -82,7 +82,7 @@ class TopicRdr : public Reader {
 
         R* getThisReader(void) { return topicReader; };
 
-        void Handler(DDSConditionSeq active_conditions_seq);
+        void handler(DDSConditionSeq active_conditions_seq);
         // override for specific topic process_data 
         virtual void process_data(T * data) { // default prints the data
             S::print_data(data); 
@@ -182,7 +182,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
 }
 
 template<class T, class S, class R, class D>
-void TopicRdr<T,S,R,D>::Handler(DDSConditionSeq active_conditions_seq)
+void TopicRdr<T,S,R,D>::handler(DDSConditionSeq active_conditions_seq)
 {
         D data_seq;
         DDS_SampleInfoSeq info_seq;

@@ -114,7 +114,7 @@ namespace MODULE
 
             pthread_t getThreadId(void) { return this->tid; };
 
-            virtual void Handler(const DDSConditionSeq active_conditions_seq) = 0; // default impl in Template class
+            virtual void handler(const DDSConditionSeq active_conditions_seq) = 0; // default impl in Template class
 
         protected:
             DDSDomainParticipant * topicParticipant;

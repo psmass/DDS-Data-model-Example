@@ -105,7 +105,7 @@ namespace MODULE
                 throw std::invalid_argument("Reader handler: wait returned error ");
             }
 
-            this->Handler(active_conditions_seq); // call the topic specific Handler (Virtual)
+            this->handler(active_conditions_seq); // call the topic specific Handler (Virtual)
         }
         std::cout << this->topicName << " Reader thread shutting down" << std::endl;  
         return NULL;
