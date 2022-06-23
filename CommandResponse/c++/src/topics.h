@@ -73,7 +73,7 @@ class DeviceStateRdr : public TopicRdr<
 
         MODULE::DeviceState * getReadDevState(void) { return &read_topic; };
 
-        void process_data(MODULE::DeviceState * data);
+        void process_data(MODULE::DeviceState * data); // cannot be a const for some reason
 
     private:
         // Controller will track the devices state as well, note if there were more than one
@@ -124,10 +124,10 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
         // state and to durably publish the updated and latest state.
         enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
         enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
-        void setPrevState(enum MODULE::DeviceStateEnum new_state){
+        void setPrevState(const enum MODULE::DeviceStateEnum new_state){
             previousState=new_state; 
         }
-        void setCurrentState(enum MODULE::DeviceStateEnum new_state){
+        void setCurrentState(const enum MODULE::DeviceStateEnum new_state){
             if (new_state == ON) // c++98 does allow  MODULE::DeviceStateEnum::ON
                 std::cout << "Controller set Device state ON" << std::endl;
 
@@ -160,10 +160,10 @@ class ConfigDevRdr : public TopicRdr<
             {};
         ~ConfigDevRdr(void){};
 
-    void process_data(MODULE::ConfigureDevice * data);
+    void process_data(MODULE::ConfigureDevice * data); // cannot be a const for some reason
 
-    void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
-            { devicesDevStateWtrPtr = dev_state_writer_ptr; };
+    void setDevStateWtr (const DeviceStateWtr * dev_state_writer_ptr) 
+            { devicesDevStateWtrPtr = (DeviceStateWtr *)dev_state_writer_ptr; };
     
     DeviceStateWtr * getDevStateWtr (void) 
             { return this->devicesDevStateWtrPtr; };
@@ -196,8 +196,8 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
 
         void writeData(const enum MODULE::DeviceStateEnum configDevReq);
 
-        void setDevStateRdr (DeviceStateRdr * dev_state_reader_ptr) 
-            { devicesDevStateRdrPtr = dev_state_reader_ptr; };
+        void setDevStateRdr (const DeviceStateRdr * dev_state_reader_ptr) 
+            { devicesDevStateRdrPtr = (DeviceStateRdr *)dev_state_reader_ptr; };
         DeviceStateRdr * getDevStateRdr(void) { return devicesDevStateRdrPtr; };
 
         private:
