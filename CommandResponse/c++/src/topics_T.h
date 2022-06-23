@@ -84,7 +84,7 @@ class TopicRdr : public Reader {
 
         void handler(const DDSConditionSeq active_conditions_seq);
         // override for specific topic process_data 
-        virtual void process_data(T * data) { // default prints the data
+        virtual void process_data(const T * data) { // default prints the data
             S::print_data(data); 
         };
         

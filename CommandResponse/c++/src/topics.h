@@ -73,7 +73,7 @@ class DeviceStateRdr : public TopicRdr<
 
         MODULE::DeviceState * getReadDevState(void) { return &read_topic; };
 
-        void process_data(MODULE::DeviceState * data); // cannot be a const for some reason
+        void process_data(const MODULE::DeviceState * data); 
 
     private:
         // Controller will track the devices state as well, note if there were more than one
@@ -160,7 +160,7 @@ class ConfigDevRdr : public TopicRdr<
             {};
         ~ConfigDevRdr(void){};
 
-    void process_data(MODULE::ConfigureDevice * data); // cannot be a const for some reason
+    void process_data(const MODULE::ConfigureDevice * data); 
 
     void setDevStateWtr (const DeviceStateWtr * dev_state_writer_ptr) 
             { devicesDevStateWtrPtr = (DeviceStateWtr *)dev_state_writer_ptr; };
