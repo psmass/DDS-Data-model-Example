@@ -82,7 +82,7 @@ class TopicRdr : public Reader {
 
         R* getThisReader(void) { return topicReader; };
 
-        void handler(DDSConditionSeq active_conditions_seq);
+        void handler(const DDSConditionSeq active_conditions_seq);
         // override for specific topic process_data 
         virtual void process_data(T * data) { // default prints the data
             S::print_data(data); 
@@ -182,7 +182,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
 }
 
 template<class T, class S, class R, class D>
-void TopicRdr<T,S,R,D>::handler(DDSConditionSeq active_conditions_seq)
+void TopicRdr<T,S,R,D>::handler(const DDSConditionSeq active_conditions_seq)
 {
         D data_seq;
         DDS_SampleInfoSeq info_seq;
@@ -253,7 +253,7 @@ class TopicWtr : public Writer {
             const char* topic_wtr_name);
         ~TopicWtr(void){};
 
-        virtual void handler(DDSConditionSeq active_conditions_seq);
+        virtual void handler(const DDSConditionSeq active_conditions_seq);
 
         T * getTopicSample(void){ return this->topicSample; };
         W * getTopicWriter(void){ return this->topicWriter; };
@@ -345,7 +345,7 @@ TopicWtr<T,S,W>::TopicWtr(
 
 // Default Writer Event handler shows subscriber count
 template<class T, class S, class W> 
-void TopicWtr<T, S, W>::handler(DDSConditionSeq active_conditions_seq) {
+void TopicWtr<T, S, W>::handler(const DDSConditionSeq active_conditions_seq) {
         // uses this->topicWriter which is topic specific
         // Get the number of active conditions 
         int active_conditions = active_conditions_seq.length();
