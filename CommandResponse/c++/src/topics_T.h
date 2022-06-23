@@ -72,8 +72,8 @@ template<typename T, class S, typename R, typename D>
 class TopicRdr : public Reader {
     public:
         TopicRdr(
-            DDSDomainParticipant * participant,
-            DDSSubscriber * subscriber,
+            const DDSDomainParticipant * participant,
+            const DDSSubscriber * subscriber,
             Cft filter,
             const char* qos_profile,
             const char* topic_name,
@@ -95,8 +95,8 @@ class TopicRdr : public Reader {
 
 template<class T, class S, class R, class D>
 TopicRdr<T,S,R, D>::TopicRdr(
-            DDSDomainParticipant * participant,
-            DDSSubscriber * subscriber,
+            const DDSDomainParticipant * participant,
+            const DDSSubscriber * subscriber,
             Cft filter,
             const char* qos_profile,
             const char* topic_name,
@@ -111,13 +111,13 @@ TopicRdr<T,S,R, D>::TopicRdr(
         // type Reader/Writer. The remaining work is done in the base class
         this->topicTypeName=((char *)S::get_type_name());
         retcode =
-            S::register_type(participant, this->topicTypeName);
+            S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
         if (retcode != DDS_RETCODE_OK) {
             throw std::invalid_argument("Reader thread: type name error");
         }
 
         // Create a Topic with a name and a datatype
-        DDSTopic *topic = participant->create_topic(
+        DDSTopic *topic = ((DDSDomainParticipant *)participant)->create_topic(
             this->topicName,
             this->topicTypeName,
             DDS_TOPIC_QOS_DEFAULT,
@@ -130,13 +130,13 @@ TopicRdr<T,S,R, D>::TopicRdr(
         if (filter.filter ==true) { // create a filter topic
  
             DDSContentFilteredTopic *cft = NULL;
-            cft = participant->create_contentfilteredtopic(
+            cft = ((DDSDomainParticipant *)participant)->create_contentfilteredtopic(
                     "ContentFilteredTopic",
                     topic,
                     filter.filter_expression,
                     filter.parameters);
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
-            untyped_reader = subscriber->create_datareader_with_profile(
+            untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 cft,
                 MODULE::CMD_RSP_QOS_LIBRARY,
                 qos_profile,
@@ -144,7 +144,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
                 DDS_STATUS_MASK_NONE);
                         
         } else {
-            untyped_reader = subscriber->create_datareader_with_profile(
+            untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 topic,
                 MODULE::CMD_RSP_QOS_LIBRARY,
                 qos_profile,
@@ -244,8 +244,8 @@ template<class T, class S, class W>
 class TopicWtr : public Writer {
     public:
         TopicWtr(
-            DDSDomainParticipant * participant,
-            DDSPublisher * publisher, 
+            const DDSDomainParticipant * participant,
+            const DDSPublisher * publisher, 
             const bool periodic,
             const int period,
             const char* qos_profile,
@@ -271,8 +271,8 @@ class TopicWtr : public Writer {
 
 template<class T, class S, class W>
 TopicWtr<T,S,W>::TopicWtr(
-    DDSDomainParticipant * participant, 
-    DDSPublisher * publisher,
+    const DDSDomainParticipant * participant, 
+    const DDSPublisher * publisher,
     const bool periodic,
     const int period,
     const char* qos_profile,
@@ -284,13 +284,13 @@ TopicWtr<T,S,W>::TopicWtr(
         // type Reader/Writer. The remaining work is done in the base class
         this->topicTypeName=(char *)S::get_type_name();
         DDS_ReturnCode_t retcode =
-            S::register_type(participant, this->topicTypeName);
+            S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
         if (retcode != DDS_RETCODE_OK) {
             throw std::invalid_argument("Writer thread: type name error");
         }
 
         // Create a Topic with a name and a datatype
-        DDSTopic *topic = participant->create_topic(
+        DDSTopic *topic = ((DDSDomainParticipant *)participant)->create_topic(
             this->topicName,
             this->topicTypeName,
             DDS_TOPIC_QOS_DEFAULT,
@@ -301,7 +301,7 @@ TopicWtr<T,S,W>::TopicWtr(
         }
 
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = publisher->create_datawriter_with_profile(
+        DDSDataWriter *untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
             topic,
             MODULE::CMD_RSP_QOS_LIBRARY,
             qos_profile,
