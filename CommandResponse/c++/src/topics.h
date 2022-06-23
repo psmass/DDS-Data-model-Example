@@ -54,7 +54,7 @@ class DeviceStateRdr : public TopicRdr<
     MODULE::DeviceStateDataReader,
     MODULE::DeviceStateSeq> {
     public:
-        DeviceStateRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, Cft filter) :
+        DeviceStateRdr(const DDSDomainParticipant * participant, const DDSSubscriber * subscriber, const Cft filter) :
             TopicRdr(
                 participant, 
                 subscriber,
@@ -86,7 +86,10 @@ class DeviceStateRdr : public TopicRdr<
 
 class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateTypeSupport, MODULE::DeviceStateDataWriter> {
     public:
-        DeviceStateWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, const bool periodic=false, const int period = 4 ) :
+        DeviceStateWtr(const DDSDomainParticipant * participant, 
+                    const DDSPublisher * publisher,
+                    const bool periodic=false, 
+                    const int period = 4 ) :
             TopicWtr(
                 participant, 
                 publisher,
@@ -145,7 +148,7 @@ class ConfigDevRdr : public TopicRdr<
     MODULE::ConfigureDeviceDataReader,
     MODULE::ConfigureDeviceSeq> {
     public:
-        ConfigDevRdr(DDSDomainParticipant * participant, DDSSubscriber * subscriber, Cft filter) :
+        ConfigDevRdr(const DDSDomainParticipant * participant, const DDSSubscriber * subscriber, const Cft filter) :
             TopicRdr(
                 participant, 
                 subscriber,
@@ -173,7 +176,7 @@ class ConfigDevRdr : public TopicRdr<
 
 class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> {
     public:
-        ConfigDevWtr(DDSDomainParticipant * participant, DDSPublisher * publisher, const bool periodic=false, const int period=4) :
+        ConfigDevWtr(const DDSDomainParticipant * participant, const DDSPublisher * publisher, const bool periodic=false, const int period=4) :
             TopicWtr(
                 participant, 
                 publisher, 
