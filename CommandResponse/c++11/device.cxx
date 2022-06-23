@@ -38,11 +38,11 @@ void run_device_application() {
     config_dev_reader.runThread();
     device_state_writer.runThread();
 
-    // Install the deviceID and upate the filter for the config_dev_reader so we only get config
-    // commands directed to our deviceID. It also loads the sample with static data (deviceID)
+    // UPdate the deviceID for the config_dev_reader so we only get config
+    // commands directed to our device. It also loads the sample with static data (deviceID)
     // This must be done after the writer thread has run to as the deviceID is stored in the 
     // sample that must be created within the device_state_writer thread.
-    config_dev_reader.installIdCft();
+    config_dev_reader.updateIdCft();
 
     while (!application::shutdown_requested)  {
         // Device State Machine goes here;

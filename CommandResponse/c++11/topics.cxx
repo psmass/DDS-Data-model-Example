@@ -69,7 +69,7 @@ namespace MODULE
 
     };
 
-    void ConfigDevRdr::installIdCft(void) {
+    void ConfigDevRdr::updateIdCft(void) {
         // Device filters ConfigureDeviceRequests to it's deviceID, deviceID was "dug out of eeprom" and saved"
         // in the device_state_writer object sample data member. We need to retreive that and covert it to str.
         // XML app create file already installed a content filter w/ expression, but it's generic with

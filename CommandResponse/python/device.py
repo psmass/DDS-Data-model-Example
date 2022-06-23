@@ -40,11 +40,11 @@ def device_main(domain_id):
     device_dsw.start()  # writer thread can be optionally omitted
     device_cdr.start()
 
-    # Install the deviceID and upate the filter for the config_dev_reader so we only get config
-    # commands directed to our deviceID. It also loads the sample with static data (deviceID)
+    # Update the deviceID for the config_dev_reader so we only get config
+    # commands directed to our device. It also loads the sample with static data (deviceID)
     # This must be done after the writer thread has run to as the deviceID is stored in the
     # sample that must be created within the device_state_writer thread.
-    device_cdr.install_id_cft();
+    device_cdr.update_id_cft();
 
     while application.run_flag:
         # write the current state to the controller once anytime it changes
