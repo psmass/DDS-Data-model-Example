@@ -74,7 +74,7 @@ class TopicRdr : public Reader {
         TopicRdr(
             const DDSDomainParticipant * participant,
             const DDSSubscriber * subscriber,
-            Cft filter,
+            const Cft filter,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name);
@@ -97,7 +97,7 @@ template<class T, class S, class R, class D>
 TopicRdr<T,S,R, D>::TopicRdr(
             const DDSDomainParticipant * participant,
             const DDSSubscriber * subscriber,
-            Cft filter,
+            const Cft filter,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name) 
