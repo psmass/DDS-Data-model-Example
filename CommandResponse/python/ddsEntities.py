@@ -60,7 +60,7 @@ class Writer(threading.Thread):
                 status_mask = self._writer.status_changes
                 st = self._writer.publication_matched_status
                 if dds.StatusMask.PUBLICATION_MATCHED in status_mask:
-                    print("Writer Subs= {0} {1}".format(st.current_count, st.current_count_change))
+                    print("Writer Subs: {0} {1}".format(st.current_count, st.current_count_change))
             elif self._periodic:  # no active condition, check if periodic
                 print(self._periodic)
                 self.write()
@@ -98,6 +98,7 @@ class Writer(threading.Thread):
 class Reader(threading.Thread):
 
     def __init__(self, participant, topic_type_name, reader_name):
+        self._participant = participant
         self._topic_type_name = topic_type_name
         self._reader_name = reader_name
         qos_provider = dds.QosProvider(constants.QOS_URL)
@@ -127,7 +128,7 @@ class Reader(threading.Thread):
                 status_mask = self._reader.status_changes
                 st = self._reader.subscription_matched_status
                 if dds.StatusMask.SUBSCRIPTION_MATCHED in status_mask:
-                    print( "Reader Pubs:= {0} {1}".format(st.current_count, st.current_count_change))
+                    print( "Reader Pubs: {0} {1}".format(st.current_count, st.current_count_change))
 
             if self._read_condition in active:
                 for (data, info) in filter(lambda s: s.info.valid, self._reader.take()):

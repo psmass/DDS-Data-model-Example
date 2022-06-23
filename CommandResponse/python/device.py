@@ -44,7 +44,7 @@ def device_main(domain_id):
     # commands directed to our deviceID. It also loads the sample with static data (deviceID)
     # This must be done after the writer thread has run to as the deviceID is stored in the
     # sample that must be created within the device_state_writer thread.
-    device_cdr.install_id_cft(participant);
+    device_cdr.install_id_cft();
 
     while application.run_flag:
         # write the current state to the controller once anytime it changes
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     assert 0 <= args.domain < 233
 
-    # device_main(args.domain)  # uncomment for debug
+    device_main(args.domain)  # uncomment for debug
 
     try:
         device_main(args.domain)
