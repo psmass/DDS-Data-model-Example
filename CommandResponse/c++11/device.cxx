@@ -36,7 +36,8 @@ void run_device_application() {
     config_dev_reader.setDevStateWtr(&device_state_writer);
  
     config_dev_reader.runThread();
-    device_state_writer.runThread();
+    //device_state_writer.runThread();
+    device_state_writer.writerListener();
 
     // UPdate the deviceID for the config_dev_reader so we only get config
     // commands directed to our device. It also loads the sample with static data (deviceID)

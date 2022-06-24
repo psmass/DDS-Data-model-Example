@@ -16,6 +16,7 @@
 #include <iostream>
 #include <thread>
 #include <dds/dds.hpp>
+#include "dds/pub/DataWriterListener.hpp"
 #include <rti/domain/find.hpp>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
@@ -28,9 +29,25 @@ namespace MODULE
 {
     const std::string QOS_FILE = "../../model/CommandProject.xml";
 
+
+    class DefaultWriterListener : public dds::pub::NoOpDataWriterListener<dds::core::xtypes::DynamicData>
+    {
+    public:
+        DefaultWriterListener() {}
+    public:
+    void on_publication_matched(
+       dds::pub::DataWriter<dds::core::xtypes::DynamicData>&,
+       const dds::core::status::PublicationMatchedStatus &status)
+        {
+            std::cout << "Listener Callback On Publication Match " << std::endl;
+            std::cout << "Writer Subs: " << status.current_count()
+                        << " " << status.current_count_change() << std::endl;
+        }
+    };
+
     class Writer {
         public:
-            explicit Writer(
+            Writer(
                 const dds::domain::DomainParticipant participant,
                 const std::string topic_type,
                 const std::string writer_name,
@@ -42,8 +59,10 @@ namespace MODULE
             // override to write your specific data topic
             virtual void write(void) { std::cout << "DWH";}; // Default Writer Handler ;
 
-            void writerThread(void);
-            void runThread(void);
+            void writerListener(void); // attaches a listener to the writer
+
+            void writerThread(void); // configures a waitset for status conditions
+            void runThread(void);    // runs the event thread aboce
 
             dds::core::xtypes::DynamicData * getMyDataSample(void)
                 {return topicSample;};
@@ -54,6 +73,7 @@ namespace MODULE
         protected:
             dds::domain::DomainParticipant participant = {nullptr} ;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> topicWriter = {nullptr} ;
+            DefaultWriterListener * listener;
             std::string topicType;
             std::string writerName;
             dds::core::xtypes::DynamicData * topicSample; 

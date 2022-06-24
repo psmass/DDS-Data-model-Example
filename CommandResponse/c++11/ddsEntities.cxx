@@ -49,6 +49,12 @@ namespace MODULE
 
     Writer::~Writer() {
         delete this->topicSample;
+        delete this->listener;
+    }
+
+    void Writer::writerListener(){ 
+        this->listener = new DefaultWriterListener;
+        this->topicWriter.listener (this->listener, dds::core::status::StatusMask::all());
     }
 
     void Writer::writerThread() {
