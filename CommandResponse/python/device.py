@@ -37,7 +37,8 @@ def device_main(domain_id):
     # The ConfigureDevRdr object instance needs the corresponding DeviceStateWriter
     # object to obtain the devices DeviceID and state.
     device_cdr.set_device_state_writer(device_dsw)
-    device_dsw.start()  # writer thread can be optionally omitted
+    # device_dsw.start()  # writer thread can be optionally omitted
+    device_dsw.listener()
     device_cdr.start()
 
     # Update the deviceID for the config_dev_reader so we only get config
@@ -58,7 +59,7 @@ def device_main(domain_id):
 
     # shut down threads
     device_cdr.join()
-    device_dsw.join()
+    # device_dsw.join()
     print("Device Exiting")
 
 
