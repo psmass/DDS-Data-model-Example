@@ -18,7 +18,6 @@
  as needed.
 
 """
-
 import threading
 from datetime import time
 from time import sleep
@@ -27,6 +26,11 @@ import application
 import topics
 import rti.connextdds as dds
 
+
+class DefaultWriterListener(dds.DynamicData.NoOpDataWriterListener):
+    def on_publication_matched(self, writer, status):
+        print("Listener Callback On Publication Match ")
+        print("Writer Subs: {0} {1}".format(status.current_count, status.current_count_change))
 
 class Writer(threading.Thread):
 
@@ -48,6 +52,10 @@ class Writer(threading.Thread):
         print("Writer Topic {w_name} created".format(w_name=self._writer_name))
 
     # def __del__(self): # d'tor
+
+    # TODO: Take in a Listener object to be assigned to self._listener allowing user defined listener mfs
+    def listener(self):
+        self._writer.bind_listener(DefaultWriterListener(), dds.StatusMask.ALL)
 
     def run(self):  # Thread of execution Override to threading class
         print("Writer Thread running for {w_name}".format(w_name=self._writer_name))
