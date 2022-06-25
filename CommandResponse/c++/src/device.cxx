@@ -112,9 +112,11 @@ extern "C" int run_device_application(int domain_id) {
         return -1;
     }
 
+    // create a listener if we'd rather use vs. event waitset thread
+    DefaultDataWriterListener * default_writer_listener = new DefaultDataWriterListener();
 
     // create the device writer first since this devices ID is loaded in the c'tor
-    DeviceStateWtr device_state_writer(participant, publisher);
+    DeviceStateWtr device_state_writer(participant, publisher, default_writer_listener);
 
     // Device filters ConfigureDeviceRequests to it's deviceID
     std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
@@ -130,7 +132,7 @@ extern "C" int run_device_application(int domain_id) {
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
     config_dev_reader.runThread();
-    device_state_writer.runThread(); // comment out to disable event monitoring on wtr
+    //device_state_writer.runThread(); // comment out to disable event monitoring on wtr
 
     while (!application::shutdown_requested)  {
         //Device State Machine goes here;
@@ -147,9 +149,11 @@ extern "C" int run_device_application(int domain_id) {
     }
     
     pthread_cancel(config_dev_reader.Reader::getThreadId());
-    pthread_cancel(device_state_writer.Writer::getThreadId());
+    //pthread_cancel(device_state_writer.Writer::getThreadId());
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
+
+    delete default_writer_listener;
 
     /* Delete all entities */
     return participant_shutdown(participant);

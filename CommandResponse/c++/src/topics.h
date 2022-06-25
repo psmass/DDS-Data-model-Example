@@ -88,11 +88,13 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
     public:
         DeviceStateWtr(const DDSDomainParticipant * participant, 
                     const DDSPublisher * publisher,
+                    const DDSDataWriterListener * listener = NULL, 
                     const bool periodic=false, 
                     const int period = 4 ) :
             TopicWtr(
                 participant, 
                 publisher,
+                listener,
                 periodic,
                 period,
                 MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
@@ -176,10 +178,15 @@ class ConfigDevRdr : public TopicRdr<
 
 class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureDeviceTypeSupport, MODULE::ConfigureDeviceDataWriter> {
     public:
-        ConfigDevWtr(const DDSDomainParticipant * participant, const DDSPublisher * publisher, const bool periodic=false, const int period=4) :
+        ConfigDevWtr(const DDSDomainParticipant * participant,
+                    const DDSPublisher * publisher,
+                    const DDSDataWriterListener * listener = NULL,
+                    const bool periodic=false, 
+                    const int period=4) :
             TopicWtr(
                 participant, 
-                publisher, 
+                publisher,
+                listener, 
                 periodic,
                 period,
                 MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
