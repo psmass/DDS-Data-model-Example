@@ -46,15 +46,18 @@ namespace MODULE
                 this->participant,
                 this->writerName);
 
-        this->listener = new DefaultWriterListener; // create a listener incase we need one
     }
 
     Writer::~Writer() {
         delete this->topicSample;
-        delete this->listener;
+        if (this->listener != nullptr)
+            delete this->listener;
     }
 
+
+    // TODO: pass in the listener object and allow it to be overridden by the user
     void Writer::writerListener(){ 
+        this->listener = new DefaultWriterListener; 
         this->topicWriter.listener (this->listener, dds::core::status::StatusMask::all());
     }
 

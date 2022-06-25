@@ -37,8 +37,8 @@ void run_device_application() {
  
     config_dev_reader.runThread();
     // if use of Listener vs event thread, also comment out .Writer::getThreadHndl()->join() below
-    device_state_writer.runThread();  
-    //device_state_writer.writerListener();
+    //device_state_writer.runThread();  
+    device_state_writer.writerListener();
 
     // UPdate the deviceID for the config_dev_reader so we only get config
     // commands directed to our device. It also loads the sample with static data (deviceID)
@@ -60,7 +60,7 @@ void run_device_application() {
     }
 
     config_dev_reader.Reader::getThreadHndl()->join();
-    device_state_writer.Writer::getThreadHndl()->join();
+    //device_state_writer.Writer::getThreadHndl()->join();
     // give threads a second to shut down
     rti::util::sleep(dds::core::Duration(1));
     std::cout << "Device main thread shutting down" << std::endl;

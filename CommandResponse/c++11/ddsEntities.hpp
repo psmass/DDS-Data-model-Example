@@ -73,7 +73,7 @@ namespace MODULE
         protected:
             dds::domain::DomainParticipant participant = {nullptr} ;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> topicWriter = {nullptr} ;
-            DefaultWriterListener * listener;
+            DefaultWriterListener * listener = {nullptr};
             std::string topicType;
             std::string writerName;
             dds::core::xtypes::DynamicData * topicSample; 
