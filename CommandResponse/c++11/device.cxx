@@ -36,8 +36,9 @@ void run_device_application() {
     config_dev_reader.setDevStateWtr(&device_state_writer);
  
     config_dev_reader.runThread();
-    //device_state_writer.runThread();
-    device_state_writer.writerListener();
+    // if use of Listener vs event thread, also comment out .Writer::getThreadHndl()->join() below
+    device_state_writer.runThread();  
+    //device_state_writer.writerListener();
 
     // UPdate the deviceID for the config_dev_reader so we only get config
     // commands directed to our device. It also loads the sample with static data (deviceID)
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 
     // Releases the memory used by the participant factory.  Optional at
     // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
+    //dds::domain::DomainParticipant::finalize_participant_factory();
 
     return EXIT_SUCCESS;
 }

@@ -45,6 +45,8 @@ namespace MODULE
                 dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
                 this->participant,
                 this->writerName);
+
+        this->listener = new DefaultWriterListener; // create a listener incase we need one
     }
 
     Writer::~Writer() {
@@ -53,7 +55,6 @@ namespace MODULE
     }
 
     void Writer::writerListener(){ 
-        this->listener = new DefaultWriterListener;
         this->topicWriter.listener (this->listener, dds::core::status::StatusMask::all());
     }
 
