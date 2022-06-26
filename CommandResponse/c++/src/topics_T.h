@@ -57,56 +57,6 @@ class Cft {
 
 };
 
-// Used for optional Listener - Note Default Listener does not have access
-// to the narrow Writer and cannot show the topicName
-class DefaultDataWriterListener : public DDSDataWriterListener {
-public:
-    virtual void on_offered_deadline_missed(
-            DDSDataWriter * /*writer*/,
-            const DDS_OfferedDeadlineMissedStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_offered_deadline_missed()\n");
-    }
-
-    virtual void on_liveliness_lost(
-            DDSDataWriter * /*writer*/,
-            const DDS_LivelinessLostStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_liveliness_lost()\n");
-    }
-
-    virtual void on_offered_incompatible_qos(
-            DDSDataWriter * /*writer*/,
-            const DDS_OfferedIncompatibleQosStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_offered_incompatible_qos()\n");
-    }
-
-    virtual void on_publication_matched(
-            DDSDataWriter *writer,
-            const DDS_PublicationMatchedStatus &status)
-    {
-        std::cout << " Writer Subs: " << status.current_count 
-            << "  " << status.current_count_change << std::endl;
-    }
-
-    virtual void on_reliable_writer_cache_changed(
-            DDSDataWriter *writer,
-            const DDS_ReliableWriterCacheChangedStatus &status)
-    {
-        printf("DataWriterListener: on_reliable_writer_cache_changed()\n");
-    }
-
-    virtual void on_reliable_reader_activity_changed(
-            DDSDataWriter *writer,
-            const DDS_ReliableReaderActivityChangedStatus &status)
-    {
-        printf("DataWriterListener: on_reliable_reader_activity_changed()\n");
-    }
-};
-
-
-
 // These Class Templates are intended to replace the function templates below
 // This allows the user to have type specific classes by inheriting from these
 // TopicRdr and TopicWtr and exend them as wll as add specficic handlers or
@@ -295,7 +245,6 @@ class TopicWtr : public Writer {
         TopicWtr(
             const DDSDomainParticipant * participant,
             const DDSPublisher * publisher, 
-            const DDSDataWriterListener * listener,
             const bool periodic,
             const int period,
             const char* qos_profile,
@@ -304,6 +253,7 @@ class TopicWtr : public Writer {
         ~TopicWtr(void){};
 
         virtual void handler(const DDSConditionSeq active_conditions_seq);
+        DDSDataWriter * getMyDataWriter(void) { return this->untyped_writer; };
 
         T * getTopicSample(void){ return this->topicSample; };
         W * getTopicWriter(void){ return this->topicWriter; };
@@ -317,14 +267,13 @@ class TopicWtr : public Writer {
     protected:
         W * topicWriter;
         T * topicSample;
-        DDSDataWriterListener * listener;
+        DDSDataWriter * untyped_writer;
 };
 
 template<class T, class S, class W>
 TopicWtr<T,S,W>::TopicWtr(
     const DDSDomainParticipant * participant, 
     const DDSPublisher * publisher,
-    const DDSDataWriterListener * listener,
     const bool periodic,
     const int period,
     const char* qos_profile,
@@ -352,17 +301,13 @@ TopicWtr<T,S,W>::TopicWtr(
             throw std::invalid_argument("Writer thread: create topic error");
         }
 
-        DDS_StatusMask status_mask = DDS_STATUS_MASK_NONE;
-        if (listener != NULL)
-            status_mask = DDS_STATUS_MASK_ALL;
-
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
-        DDSDataWriter *untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
+        this->untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
             topic,
             MODULE::CMD_RSP_QOS_LIBRARY,
             qos_profile,
-            (DDSDataWriterListener *)listener,
-            status_mask);
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
         if (untyped_writer == NULL) {
             throw std::invalid_argument("Writer thread: create data writer error");
         }

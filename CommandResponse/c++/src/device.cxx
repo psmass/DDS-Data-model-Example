@@ -116,7 +116,10 @@ extern "C" int run_device_application(int domain_id) {
     DefaultDataWriterListener * default_writer_listener = new DefaultDataWriterListener();
 
     // create the device writer first since this devices ID is loaded in the c'tor
-    DeviceStateWtr device_state_writer(participant, publisher, default_writer_listener);
+    DeviceStateWtr device_state_writer(participant, publisher);
+
+    DefaultDataWriterListener * listener = new DefaultDataWriterListener();
+    device_state_writer.getMyDataWriter()->set_listener(listener);
 
     // Device filters ConfigureDeviceRequests to it's deviceID
     std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
@@ -150,6 +153,7 @@ extern "C" int run_device_application(int domain_id) {
     
     pthread_cancel(config_dev_reader.Reader::getThreadId());
     //pthread_cancel(device_state_writer.Writer::getThreadId());
+    delete listener;
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
 
