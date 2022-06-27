@@ -53,10 +53,6 @@ class Writer(threading.Thread):
 
     # def __del__(self): # d'tor
 
-    # TODO: Take in a Listener object to be assigned to self._listener allowing user defined listener mfs
-    def listener(self):
-        self._writer.bind_listener(DefaultWriterListener(), dds.StatusMask.ALL)
-
     def run(self):  # Thread of execution Override to threading class
         print("Writer Thread running for {w_name}".format(w_name=self._writer_name))
         # handler() is implemented by concrete topic class and should

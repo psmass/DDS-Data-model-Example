@@ -19,6 +19,7 @@ from time import sleep
 import rti.connextdds as dds
 import application
 import topics
+import ddsEntities
 
 filepath = osPath.dirname(osPath.realpath(__file__))
 
@@ -38,7 +39,7 @@ def device_main(domain_id):
     # object to obtain the devices DeviceID and state.
     device_cdr.set_device_state_writer(device_dsw)
     # device_dsw.start()  # writer thread can be optionally omitted
-    device_dsw.listener()
+    device_dsw._writer.bind_listener(ddsEntities.DefaultWriterListener(), dds.StatusMask.ALL)
     device_cdr.start()
 
     # Update the deviceID for the config_dev_reader so we only get config
