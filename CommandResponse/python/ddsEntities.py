@@ -74,7 +74,8 @@ class Writer(threading.Thread):
     def write(self):
         print("DEFAULT {w_name} WRITER - OVERRIDE WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
 
-    def get_writer_handle(self):
+    @property
+    def writer(self):
         return self._writer
 
     def join(self):
