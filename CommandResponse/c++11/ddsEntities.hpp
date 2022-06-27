@@ -34,15 +34,15 @@ namespace MODULE
     {
     public:
         DefaultWriterListener() {}
-    public:
-    void on_publication_matched(
-       dds::pub::DataWriter<dds::core::xtypes::DynamicData>&,
-       const dds::core::status::PublicationMatchedStatus &status)
-        {
-            std::cout << "Listener Callback On Publication Match " << std::endl;
-            std::cout << "Writer Subs: " << status.current_count()
-                        << " " << status.current_count_change() << std::endl;
-        }
+
+        void on_publication_matched(
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData>&,
+        const dds::core::status::PublicationMatchedStatus &status)
+            {
+                std::cout << "Listener Callback On Publication Match " << std::endl;
+                std::cout << "Writer Subs: " << status.current_count()
+                            << " " << status.current_count_change() << std::endl;
+            }
     };
 
     class Writer {
@@ -59,13 +59,13 @@ namespace MODULE
             // override to write your specific data topic
             virtual void write(void) { std::cout << "DWH";}; // Default Writer Handler ;
 
-            void writerListener(void); // attaches a listener to the writer
-
             void writerThread(void); // configures a waitset for status conditions
             void runThread(void);    // runs the event thread aboce
 
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData>  getMyDataWriter(void)
+                { return this->topicWriter; };
             dds::core::xtypes::DynamicData * getMyDataSample(void)
-                {return topicSample;};
+                { return this->topicSample; } ;
             std::thread* getThreadHndl(void) { return &myWtrThread; };
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
@@ -73,7 +73,6 @@ namespace MODULE
         protected:
             dds::domain::DomainParticipant participant = {nullptr} ;
             dds::pub::DataWriter<dds::core::xtypes::DynamicData> topicWriter = {nullptr} ;
-            DefaultWriterListener * listener = {nullptr};
             std::string topicType;
             std::string writerName;
             dds::core::xtypes::DynamicData * topicSample; 

@@ -50,16 +50,8 @@ namespace MODULE
 
     Writer::~Writer() {
         delete this->topicSample;
-        if (this->listener != nullptr)
-            delete this->listener;
     }
 
-
-    // TODO: pass in the listener object and allow it to be overridden by the user
-    void Writer::writerListener(){ 
-        this->listener = new DefaultWriterListener; 
-        this->topicWriter.listener (this->listener, dds::core::status::StatusMask::all());
-    }
 
     void Writer::writerThread() {
 
