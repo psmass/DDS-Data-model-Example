@@ -115,7 +115,9 @@ extern "C" int run_device_application(int domain_id) {
     // create the device writer first since this devices ID is loaded in the c'tor
     DeviceStateWtr device_state_writer(participant, publisher);
 
- // create a listener if we'd rather use vs. event waitset thread
+    // Create a listener if we'd rather use vs. event waitset thread.
+    // Here we use a Default listener we created, but you can create your own
+    // listener(s) (and as many as you need if topic specific)
     DefaultDataWriterListener * listener = new DefaultDataWriterListener();
     device_state_writer.getMyDataWriter()->set_listener(listener);
 
@@ -136,7 +138,7 @@ extern "C" int run_device_application(int domain_id) {
     //device_state_writer.runThread(); // comment out to disable event monitoring on wtr
 
     while (!application::shutdown_requested)  {
-        //Device State Machine goes here;
+        // Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
         
         if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {

@@ -48,55 +48,6 @@
 namespace MODULE
 {
 
-// Used for optional Listener - Replace it as you need. Note Default Listener does not have access
-// to the narrow Writer and cannot show the topicName 
-class DefaultDataWriterListener : public DDSDataWriterListener {
-public:
-    virtual void on_offered_deadline_missed(
-            DDSDataWriter * /*writer*/,
-            const DDS_OfferedDeadlineMissedStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_offered_deadline_missed()\n");
-    }
-
-    virtual void on_liveliness_lost(
-            DDSDataWriter * /*writer*/,
-            const DDS_LivelinessLostStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_liveliness_lost()\n");
-    }
-
-    virtual void on_offered_incompatible_qos(
-            DDSDataWriter * /*writer*/,
-            const DDS_OfferedIncompatibleQosStatus & /*status*/)
-    {
-        printf("DataWriterListener: on_offered_incompatible_qos()\n");
-    }
-
-    virtual void on_publication_matched(
-            DDSDataWriter *writer,
-            const DDS_PublicationMatchedStatus &status)
-    {
-        std::cout << " Writer Subs: " << status.current_count 
-            << "  " << status.current_count_change << std::endl;
-    }
-
-    virtual void on_reliable_writer_cache_changed(
-            DDSDataWriter *writer,
-            const DDS_ReliableWriterCacheChangedStatus &status)
-    {
-        printf("DataWriterListener: on_reliable_writer_cache_changed()\n");
-    }
-
-    virtual void on_reliable_reader_activity_changed(
-            DDSDataWriter *writer,
-            const DDS_ReliableReaderActivityChangedStatus &status)
-    {
-        printf("DataWriterListener: on_reliable_reader_activity_changed()\n");
-    }
-};
-
-
 class DeviceStateRdr : public TopicRdr<
     MODULE::DeviceState,
     MODULE::DeviceStateTypeSupport,
