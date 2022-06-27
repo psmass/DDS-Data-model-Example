@@ -112,12 +112,10 @@ extern "C" int run_device_application(int domain_id) {
         return -1;
     }
 
-    // create a listener if we'd rather use vs. event waitset thread
-    DefaultDataWriterListener * default_writer_listener = new DefaultDataWriterListener();
-
     // create the device writer first since this devices ID is loaded in the c'tor
     DeviceStateWtr device_state_writer(participant, publisher);
 
+ // create a listener if we'd rather use vs. event waitset thread
     DefaultDataWriterListener * listener = new DefaultDataWriterListener();
     device_state_writer.getMyDataWriter()->set_listener(listener);
 
@@ -156,8 +154,6 @@ extern "C" int run_device_application(int domain_id) {
     delete listener;
     // give threads a second to shut down
     NDDSUtility::sleep(wait_period); // give time for entities to shutdown
-
-    delete default_writer_listener;
 
     /* Delete all entities */
     return participant_shutdown(participant);
