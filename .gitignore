@@ -1,9 +1,6 @@
 ./.DS_Store
 
-Sensors/c++/src/objs
-Sensors/c++/src/.vs
-Sensors/c++/src/*.txt
-Sensors/.vs
+Sensors/c++/src/build
 Sensors/c++11/build
 
 CommandResponse/.DS_Store

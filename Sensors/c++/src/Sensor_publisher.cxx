@@ -19,6 +19,9 @@
 
 #include "Sensor.h"
 #include "SensorSupport.h"
+#include "Common.h"
+#include "CommonSupport.h"
+
 #include "ndds/ndds_cpp.h"
 #include "ndds/ndds_namespace_cpp.h"
 #include "application.h"
@@ -46,7 +49,7 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
      * need to run the example like this:
      * ./objs/<architecture>/Sensor_publisher.exe
      */
-    factory_qos.profile.url_profile[0] = DDS_String_dup("../xml/SensorQoS.xml");
+    factory_qos.profile.url_profile[0] = DDS_String_dup("../../xml/SensorQoS.xml");
     TheParticipantFactory->set_qos(factory_qos);
 
     // Start communicating in a domain, usually one participant per application
