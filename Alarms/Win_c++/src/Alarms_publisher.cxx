@@ -93,18 +93,26 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
             EXIT_FAILURE);
     }
 	//This creates separate memory for Instance #2 called data2
-	Alarms_IntrusionAlarm* data2 = Alarms_IntrusionAlarmTypeSupport::create_data();
-	if (data == NULL) {
+	Alarms_IntrusionAlarm *data2 = Alarms_IntrusionAlarmTypeSupport::create_data();
+	if (data2 == NULL) {
 		return shutdown_participant(
 			participant,
 			"Alarms_IntrusionAlarmTypeSupport::create_data error",
 			EXIT_FAILURE);
 	}
 
+/*  This section illustrates an efficient way of creating Instances.  Refer to the 
+documentation "Data Writers / Managing Instances")
+*/
+//Create a handle of each instance - this handle will always be used to write the instance.
+	DDS_InstanceHandle_t fl265Handle = typed_writer->register_instance(*data);   //efficient way
+	DDS_InstanceHandle_t fl265Handle2 = typed_writer->register_instance(*data2);   //efficient way
+
     // Main loop, write data
     for (unsigned int samples_written = 0;
     !shutdown_requested && samples_written < sample_count;
     ++samples_written) {
+
 
 // Modify the data to be written here
 //Instance #1 - popuating the content of this sample
@@ -125,19 +133,22 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
 		data2->null = Open;
 		data2->numericValue.number = (float)samples_written;
 		data2->numericValue.Units = Farenheit;
+
+
         std::cout << "Writing Alarms_IntrusionAlarm, count " << samples_written 
         << std::endl;
 
 		//Write Instance #1
-		retcode = typed_writer->write(*data, DDS_HANDLE_NIL);
-		if (retcode != DDS_RETCODE_OK) {
+
+//Write each instance using the handle created earlier.
+if (typed_writer->write(*data, fl265Handle) != DDS_RETCODE_OK) {
 			std::cerr << "write error " << retcode << std::endl;
 		}
-		//Write Instance #2
-		retcode = typed_writer->write(*data2, DDS_HANDLE_NIL);
-		if (retcode != DDS_RETCODE_OK) {
+if (typed_writer->write(*data2, fl265Handle2) != DDS_RETCODE_OK) {
 			std::cerr << "write error " << retcode << std::endl;
 		}
+
+
         // Send once every second
         DDS_Duration_t send_period = { 1, 0 };
         NDDSUtility::sleep(send_period);
