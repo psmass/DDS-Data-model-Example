@@ -92,21 +92,52 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
             "Alarms_IntrusionAlarmTypeSupport::create_data error",
             EXIT_FAILURE);
     }
+	//This creates separate memory for Instance #2 called data2
+	Alarms_IntrusionAlarm* data2 = Alarms_IntrusionAlarmTypeSupport::create_data();
+	if (data == NULL) {
+		return shutdown_participant(
+			participant,
+			"Alarms_IntrusionAlarmTypeSupport::create_data error",
+			EXIT_FAILURE);
+	}
 
     // Main loop, write data
     for (unsigned int samples_written = 0;
     !shutdown_requested && samples_written < sample_count;
     ++samples_written) {
 
-        // Modify the data to be written here
+// Modify the data to be written here
+//Instance #1 - popuating the content of this sample
+		char alarm_string[] = "alarm name";
+		data->sourceId.id = 1;  //note the keyed value is set to something unique
+		data->sourceId.resourceId = 10;  //note the keyed value is set to something unique
+		data->alarmTypeName = alarm_string;
+		data->severity = Critical;
+		data->null = Open;
+		data->numericValue.number = (float)samples_written;
+		data->numericValue.Units = Celcius;
 
+		//Instance #2 - populating the sample
+		data2->sourceId.id = 2;  //note the keyed value is set to something unique
+		data2->sourceId.resourceId = 20;  //note the keyed value is set to something unique
+		data2->alarmTypeName = alarm_string;
+		data2->severity = Critical;
+		data2->null = Open;
+		data2->numericValue.number = (float)samples_written;
+		data2->numericValue.Units = Farenheit;
         std::cout << "Writing Alarms_IntrusionAlarm, count " << samples_written 
         << std::endl;
-        retcode = typed_writer->write(*data, DDS_HANDLE_NIL);
-        if (retcode != DDS_RETCODE_OK) {
-            std::cerr << "write error " << retcode << std::endl;
-        }
 
+		//Write Instance #1
+		retcode = typed_writer->write(*data, DDS_HANDLE_NIL);
+		if (retcode != DDS_RETCODE_OK) {
+			std::cerr << "write error " << retcode << std::endl;
+		}
+		//Write Instance #2
+		retcode = typed_writer->write(*data2, DDS_HANDLE_NIL);
+		if (retcode != DDS_RETCODE_OK) {
+			std::cerr << "write error " << retcode << std::endl;
+		}
         // Send once every second
         DDS_Duration_t send_period = { 1, 0 };
         NDDSUtility::sleep(send_period);
@@ -118,7 +149,11 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         std::cerr << "Alarms_IntrusionAlarmTypeSupport::delete_data error " << retcode
         << std::endl;
     }
-
+	retcode = Alarms_IntrusionAlarmTypeSupport::delete_data(data2);
+	if (retcode != DDS_RETCODE_OK) {
+		std::cerr << "Alarms_IntrusionAlarmTypeSupport::delete_data error " << retcode
+			<< std::endl;
+	}
     // Delete all entities (DataWriter, Topic, Publisher, DomainParticipant)
     return shutdown_participant(participant, "Shutting down", EXIT_SUCCESS);
 }
