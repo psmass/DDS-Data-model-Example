@@ -16,10 +16,11 @@
 #include <iostream>
 #include <thread>
 #include <dds/dds.hpp>
+#include "dds/pub/DataWriterListener.hpp"
 #include <rti/domain/find.hpp>
 
 #define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
+#define MAX_FILTER_EXPRESSION_LEN 120
 namespace application {
     extern bool shutdown_requested;
 }
@@ -28,58 +29,81 @@ namespace MODULE
 {
     const std::string QOS_FILE = "../../model/CommandProject.xml";
 
+
+    class DefaultWriterListener : public dds::pub::NoOpDataWriterListener<dds::core::xtypes::DynamicData>
+    {
+    public:
+        DefaultWriterListener() {}
+
+        void on_publication_matched(
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData>&,
+        const dds::core::status::PublicationMatchedStatus &status)
+            {
+                std::cout << "Listener Callback On Publication Match " << std::endl;
+                std::cout << "Writer Subs: " << status.current_count()
+                            << " " << status.current_count_change() << std::endl;
+            }
+    };
+
     class Writer {
         public:
             Writer(
-                dds::domain::DomainParticipant participant,
-                const std::string topic_name,
-                const std::string writer_name);
-            ~Writer(void) {}; 
+                const dds::domain::DomainParticipant participant,
+                const std::string topic_type,
+                const std::string writer_name,
+                const bool periodic,
+                dds::core::Duration period);
+             
+            ~Writer(void); 
 
-            void WriterThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            // override to write your specific data topic
+            virtual void write(void) { std::cout << "DWH";}; // Default Writer Handler ;
 
-            virtual void Handler(void) 
-                { std::cout << "*** GENERIC WRITER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+            void writerThread(void); // configures a waitset for status conditions
+            void runThread(void);    // runs the event thread aboce
 
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>* getMyWriter(void)
-                 {return topicWriter;};  // needed for Requests to get the response writer
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData>  getMyDataWriter(void)
+                { return this->topicWriter; };
             dds::core::xtypes::DynamicData * getMyDataSample(void)
-                {return topicSample;};
-            std::thread* getThreadHndl(void) { return &writerThread; };
+                { return this->topicSample; } ;
+            std::thread* getThreadHndl(void) { return &myWtrThread; };
             void enable(void) { MODULE::Writer::enabled=true; };
             void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
-            std::string topicName;
+            dds::domain::DomainParticipant participant = {nullptr} ;
+            dds::pub::DataWriter<dds::core::xtypes::DynamicData> topicWriter = {nullptr} ;
+            std::string topicType;
             std::string writerName;
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData> * topicWriter;
             dds::core::xtypes::DynamicData * topicSample; 
             bool enabled;
-            int period;
-            std::thread writerThread;
+            bool periodic;
+            dds::core::Duration period;
+            std::thread myWtrThread;
     };
 
     class Reader {
         public:
             Reader(
-                dds::domain::DomainParticipant participant,
-                const std::string topic_name, 
+                const dds::domain::DomainParticipant participant,
+                const std::string topic_type, 
                 const std::string reader_name);
             ~Reader(void){};
 
-            void ReaderThread(dds::domain::DomainParticipant participant);
-            void RunThread(dds::domain::DomainParticipant participant);
+            void readerThread(void);
+            void runThread(void);
 
-            virtual void Handler(dds::core::xtypes::DynamicData& data)
-                { std::cout << "*** GENERIC READER HANDLER " << std::endl;}; // implemented by the intantiated derived topic
+            virtual void handler(dds::core::xtypes::DynamicData& data)
+                // Default Reader Handler - Needs to be overriden to parse out specific topic
+                { std::cout << "DRH";};
 
-            std::thread * getThreadHndl(void) { return &readerThread; };
+            std::thread * getThreadHndl(void) { return &myRdrThread; };
 
         protected:
-            std::string topicName;
+            dds::domain::DomainParticipant participant = {nullptr};
+            std::string topicType;
             std::string readerName;
-            std::thread readerThread;
+            std::thread myRdrThread;
 
     };
 

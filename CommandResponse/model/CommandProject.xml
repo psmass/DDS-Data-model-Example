@@ -1,39 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.0/rti_dds_profiles.xsd" version="6.1.0">
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.1.1/rti_dds_profiles.xsd" version="6.1.1">
     <types>
-      <!-- Commands below are 'short-lived' meaning they are responded to immediately and 
-	     don't require Objective State. 
-
-         This example will have a Controller and a Device (where there could be many devices).
-	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
-	     a QoS of Durable, then wait to be commanded.
-	     The Controller will recognize the device and issue a command to TURN_ON. 
-	     Controller will then periodically request status.  There is a one-to-one
-	     correspondence between Controller Commands and Device Responses. That is for 
-	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
-	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
-
-         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
-	     does not filter since it may expect key'd responses from many deviceIDs.
-
-         To keep things simple the device
-	     will not issue Alarms or any other non-requested topics except the intial DA.
-
-      -->
       <module name="ExCmdRsp">
         <!--Start_Header_File_Const-Block 
        These Constants are defined here as part of the system model and used to generate a header file where they can be used 
        from a .cxx file. Unfortunately they cannot also be used within this XML file itself
       -->
         <const name="MODULE_EX_CMD_RSP" type="string" value="ExCmdRsp"/>
-        <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ExCmdRsp::ConfigureDevice"/>
-        <const name="TOPIC_DEVICE_STATE" type="string" value="ExCmdRsp::DeviceState"/>
+        <const name="TYPE_CONFIGURE_DEVICE" type="string" value="ExCmdRsp::ConfigureDevice"/>
+        <const name="TOPIC_CONFIGURE_DEVICE" type="string" value="ConfigureDevice"/>
+        <const name="TOPIC_CONFIGURE_DEV_CFT" type="string" value="ConfigureDevice::MyFilter"/>
+        <const name="TYPE_DEVICE_STATE" type="string" value="ExCmdRsp::DeviceState"/>
+        <const name="TOPIC_DEVICE_STATE" type="string" value="DeviceState"/>
         <const name="CONTROLLER1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::ControllerParticipant1"/>
         <const name="DEVICE1_PARTICIPANT" type="string" value="CmdRspParticipantLibrary::DeviceParticipant1"/>
         <const name="DEVICE_STATE_WRITER" type="string" value="DevicePublisher::DeviceStateWriter"/>
         <const name="DEVICE_STATE_READER" type="string" value="ControllerSubscriber::DeviceStateReader"/>
         <const name="CONFIGURE_DEVICE_WRITER" type="string" value="ControllerPublisher::ConfigureDeviceWriter"/>
         <const name="CONFIGURE_DEVICE_READER" type="string" value="DeviceSubscriber::ConfigureDeviceReader"/>
+        <const name="CMD_RSP_QOS_LIBRARY" type="string" value="CmdRspQoSLibrary"/>
+        <const name="DEVICE_STATE_TOPIC_QOS_PROFILE" type="string" value="DeviceStateProfile"/>
+        <const name="CONFIG_DEV_TOPIC_QOS_PROFILE" type="string" value="ConfigDevProfile"/>
         <!--End_Header_File_Const_Block-->
         <const name="LEN_DEVICE_ID" type="uint32" value="32"/>
         <const name="LEN_STR_FOO" type="uint32" value="10"/>
@@ -67,6 +54,13 @@
       </module>
     </types>
 
+    <qos_library name="CmdRspQoSLibrary">
+      <qos_profile name="DeviceStateProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable.TransientLocal">
+      </qos_profile>
+      <qos_profile name="ConfigDevProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable">
+      </qos_profile>
+    </qos_library>
+
     <domain_library name="CmdRspDomainLibrary">
       <domain name="SystemDomain" domain_id="0">
         <register_type name="DeviceStateType" type_ref="ExCmdRsp::DeviceState"/>
@@ -79,17 +73,14 @@
     <domain_participant_library name="CmdRspParticipantLibrary">
       <domain_participant name="ControllerParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="ControllerPublisher">
-          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice"/>
+          <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice">
+            <datawriter_qos base_name="CmdRspQoSLibrary::ConfigDevProfile">
+            </datawriter_qos>
+          </data_writer>
         </publisher>
         <subscriber name="ControllerSubscriber">
           <data_reader name="DeviceStateReader" topic_ref="DeviceState">
-            <datareader_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspQoSLibrary::DeviceStateProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>
@@ -97,25 +88,20 @@
       <domain_participant name="DeviceParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
         <publisher name="DevicePublisher">
           <data_writer name="DeviceStateWriter" topic_ref="DeviceState">
-            <datawriter_qos>
-              <durability>
-                <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-              </durability>
+            <datawriter_qos base_name="CmdRspQoSLibrary::DeviceStateProfile">
             </datawriter_qos>
           </data_writer>
         </publisher>
         <subscriber name="DeviceSubscriber">
           <data_reader name="ConfigureDeviceReader" topic_ref="ConfigureDevice">
             <content_filter name="MyFilter" kind="builtin.sql">
-              <expression>targetDeviceId.id=%0</expression>
+              <expression>targetDeviceId.resourceId = %0, targetDeviceId.id=%1</expression>
               <expression_parameters>
-                <element>20</element>
+                <element>0</element>
+                <element>0</element>
               </expression_parameters>
             </content_filter>
-            <datareader_qos>
-              <reliability>
-                <kind>RELIABLE_RELIABILITY_QOS</kind>
-              </reliability>
+            <datareader_qos base_name="CmdRspQoSLibrary::ConfigDevProfile">
             </datareader_qos>
           </data_reader>
         </subscriber>

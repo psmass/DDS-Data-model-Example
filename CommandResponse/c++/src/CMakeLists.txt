@@ -25,7 +25,24 @@ find_package(
 		core
 )
 
+set(CONTROLLER_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespPlugin.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespSupport.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandResp.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
+)
+
+# Main application
+add_executable(Controller
+   ${CONTROLLER_CPP_SOURCES}
+)
+
 set(DEVICE_CPP_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespPlugin.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandRespSupport.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CommandResp.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/device.cxx"
@@ -34,17 +51,6 @@ set(DEVICE_CPP_SOURCES
 # Main application
 add_executable(Device
     ${DEVICE_CPP_SOURCES}
-)
-
-set(CONTROLLER_CPP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/topics.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ddsEntities.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/controller.cxx"
-)
-
-# Main application
-add_executable(Controller
-    ${CONTROLLER_CPP_SOURCES}
 )
 
 target_link_libraries(Device

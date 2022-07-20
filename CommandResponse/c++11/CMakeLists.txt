@@ -19,7 +19,7 @@ set(LINKER_FLAGS "-v")
 Set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 find_package(
-    RTIConnextDDS "6.1.0"
+    RTIConnextDDS "6.1.1"
     REQUIRED
     COMPONENTS
 		core

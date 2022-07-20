@@ -18,8 +18,6 @@
 #include "CommandResp.hpp"
 
 
-const std::string _TOPIC_CONFIGURE_DEV_CFT = "DeviceSubscriber::ConfigureDeviceReader::MyFilter";
-
 namespace MODULE
 {
 
@@ -35,6 +33,7 @@ namespace MODULE
 
     The Topic specific Writer member functions. 
 
+    Topic Writer have the topic specific 
     Specific Writer Handlers have two parts, the Initial Setup and the Handler Loop.
     The user may want add code  in the Initial Setup (prior to the Handler Loop) to
     statically set the source ID (in the case of a device) or any other static data. 
@@ -52,13 +51,12 @@ class DeviceStateRdr : public Reader {
         DeviceStateRdr(const dds::domain::DomainParticipant participant);
         ~DeviceStateRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
+        void handler(dds::core::xtypes::DynamicData& data);
 
-        enum MODULE::DeviceStateEnum getPrevState(void) {return previousState; };
-        enum MODULE::DeviceStateEnum getCurrentState(void) {return currentState; };
-        void setPrevState(enum MODULE::DeviceStateEnum new_state){
-            previousState=new_state; 
-        }
+        int32_t getDeviceResourceId(void) { return this->resourceId; };
+        int32_t getDeviceId(void) { return this->id; };
+
+        enum MODULE::DeviceStateEnum getCurrentState(void) {return this->currentState; };
         void setCurrentState(enum MODULE::DeviceStateEnum new_state){
             currentState=new_state; 
         }
@@ -68,16 +66,24 @@ class DeviceStateRdr : public Reader {
         // device we should keep an array of state per deviceID
         // initialize the same, but something other than UNITITIALIZED as that is the first
         // state sent when a devie announces itself.
-        enum MODULE::DeviceStateEnum previousState {MODULE::DeviceStateEnum::ERROR}; 
-        enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::ERROR}; 
+        int32_t resourceId;
+        int32_t id;
+        enum MODULE::DeviceStateEnum currentState {MODULE::DeviceStateEnum::ERROR};
+
 };
 
 class DeviceStateWtr : public Writer {
     public:
-        DeviceStateWtr(const dds::domain::DomainParticipant participant);
+        DeviceStateWtr(
+            const dds::domain::DomainParticipant participant,
+            bool periodic = false,
+            dds::core::Duration period =std::chrono::seconds(4));
         ~DeviceStateWtr(void){};
 
-        void Handler(void);
+        // write() is effectively a runtime down cast for periodic data
+        void write() {
+            this->writeData(this->getCurrentState());
+        }
 
         // Device State is writen when ever it changes. The writeData member function
         // is provided to allow the main loop of the device to recognize a change in
@@ -107,25 +113,33 @@ class DeviceStateWtr : public Writer {
 
 class ConfigDevRdr : public Reader {
     public:
-        ConfigDevRdr(const dds::domain::DomainParticipant participant, const std::string filter_name);
+        ConfigDevRdr(const dds::domain::DomainParticipant participant);
         ~ConfigDevRdr(void){};
 
-        void Handler(dds::core::xtypes::DynamicData& data);
-        void setDevStateWtr (DeviceStateWtr * dev_state_writer_ptr) 
-            { devicesDevStateWtrPtr = dev_state_writer_ptr; };
+        void handler(dds::core::xtypes::DynamicData& data);
+        void setDevStateWtr (DeviceStateWtr * dev_state_writer) 
+            { this->devicesDevStateWtr = dev_state_writer; };
+
+        void updateIdCft(void);  //ConfigDevRdr is on the device and only needs commands directed to it.
 
     private:
         // will need the associated devStateWtr when receive a new config command and have
-        // to change the state of the device
-        DeviceStateWtr * devicesDevStateWtrPtr;  // holds the currentState of the device
+        // to change the state of the device as it gets updated
+        DeviceStateWtr * devicesDevStateWtr;  
 };
 
 class ConfigDevWtr : public Writer {
     public:
-        ConfigDevWtr(const dds::domain::DomainParticipant participant);
+        ConfigDevWtr(
+            const dds::domain::DomainParticipant participant,
+            bool periodic = false,
+            dds::core::Duration period = std::chrono::seconds(4));
         ~ConfigDevWtr(void){};
 
-        void Handler(void);
+        // write() is effectively a runtime down cast for periodic data
+        void write() {
+            this->writeData(this->deviceDevStateRdr->getCurrentState());
+        }
 
         // Configure Device is writen when by the controller as it demand (i.e. intitial and
         // changing conditions require it). The writeData member function
@@ -133,7 +147,15 @@ class ConfigDevWtr : public Writer {
         // change request to the evice.
         void writeData(enum MODULE::DeviceStateEnum configReq); 
 
+        void setDevStateRdr(DeviceStateRdr * device_state_reader) {
+            this->deviceDevStateRdr = device_state_reader;
+        };
+
     private:
+        // will need the associated devStateRdr since we keep the deviceId and state
+        // associated with that topic as the controller reads it in.
+        // The ConfigDevWriter needs this information to target the device
+        DeviceStateRdr * deviceDevStateRdr; 
 };
 
 } // namespace MODULE

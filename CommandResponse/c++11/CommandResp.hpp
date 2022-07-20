@@ -4,14 +4,14 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.1.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandResp_2073433895_hpp
-#define CommandResp_2073433895_hpp
+#ifndef CommandResp_2073433213_hpp
+#define CommandResp_2073433213_hpp
 
 #include <iosfwd>
 
@@ -61,7 +61,13 @@ namespace ExCmdRsp {
 
     static const std::string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
+    static const std::string TYPE_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
+
     static const std::string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
+
+    static const std::string TOPIC_CONFIGURE_DEV_CFT = "ConfigureDevice::MyFilter";
+
+    static const std::string TYPE_DEVICE_STATE = "ExCmdRsp::DeviceState";
 
     static const std::string TOPIC_DEVICE_STATE = "DeviceState";
 
@@ -76,6 +82,12 @@ namespace ExCmdRsp {
     static const std::string CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter";
 
     static const std::string CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
+
+    static const std::string CMD_RSP_QOS_LIBRARY = "CmdRspQoSLibrary";
+
+    static const std::string DEVICE_STATE_TOPIC_QOS_PROFILE = "DeviceStateProfile";
+
+    static const std::string CONFIG_DEV_TOPIC_QOS_PROFILE = "ConfigDevProfile";
 
     static const uint32_t LEN_DEVICE_ID = 32UL;
 
@@ -631,5 +643,5 @@ namespace rti {
 #define NDDSUSERDllExport
 #endif
 
-#endif // CommandResp_2073433895_hpp
+#endif // CommandResp_2073433213_hpp
 

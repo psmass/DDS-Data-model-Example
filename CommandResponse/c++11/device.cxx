@@ -31,18 +31,24 @@ void run_device_application() {
         qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
     DeviceStateWtr device_state_writer(participant);
-    config_dev_reader.RunThread(participant);
-    device_state_writer.RunThread(participant);
-
-    // config_dev_reader needs the devices state writer to update the currentState
+    ConfigDevRdr config_dev_reader(participant); 
     config_dev_reader.setDevStateWtr(&device_state_writer);
+ 
+    config_dev_reader.runThread();
+    // if use of Listener vs event thread, also comment out .Writer::getThreadHndl()->join() below
+    //device_state_writer.runThread();  
+    DefaultWriterListener * listener = new DefaultWriterListener; 
+    device_state_writer.getMyDataWriter().listener (listener, dds::core::status::StatusMask::all());
 
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+    // UPdate the deviceID for the config_dev_reader so we only get config
+    // commands directed to our device. It also loads the sample with static data (deviceID)
+    // This must be done after the writer thread has run to as the deviceID is stored in the 
+    // sample that must be created within the device_state_writer thread.
+    config_dev_reader.updateIdCft();
 
     while (!application::shutdown_requested)  {
-        //Device State Machine goes here;
+        // Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
         if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
             device_state_writer.writeData(device_state_writer.getCurrentState());
@@ -50,12 +56,12 @@ void run_device_application() {
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
         }
         std::cout << "." << std::flush;        
-        //device_state_writer.writeData(device_state_writer.getCurrentState());
+
         rti::util::sleep(dds::core::Duration(1));
     }
 
     config_dev_reader.Reader::getThreadHndl()->join();
-    device_state_writer.Writer::getThreadHndl()->join();
+    //device_state_writer.Writer::getThreadHndl()->join();
     // give threads a second to shut down
     rti::util::sleep(dds::core::Duration(1));
     std::cout << "Device main thread shutting down" << std::endl;
@@ -82,7 +88,7 @@ int main(int argc, char *argv[])
 
     // Releases the memory used by the participant factory.  Optional at
     // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
+    //dds::domain::DomainParticipant::finalize_participant_factory();
 
     return EXIT_SUCCESS;
 }

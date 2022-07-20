@@ -1,22 +1,3 @@
-/*  Commands below are 'short-lived' meaning they are responded to immediately and 
-	     don't require Objective State. 
-
-         This example will have a Controller and a Device (where there could be many devices).
-	     The Device will announce itself with a Device Announcement (DA) topic. It will  use
-	     a QoS of Durable, then wait to be commanded.
-	     The Controller will recognize the device and issue a command to TURN_ON. 
-	     Controller will then periodically request status.  There is a one-to-one
-	     correspondence between Controller Commands and Device Responses. That is for 
-	     these two commands, TOPIC_REQUEST_CONFIGURE_DEVICE, and TOPIC_REQUEST_DEVICE_STATUS,
-	     the Device will respond with TOPIC_DEVICE_CONFIGURATON_REPLY and TOPIC_DEVICE_STATUS_REPLY.
-
-         The Device will filter for "myCommands" (i.e., on targetDeviceID), the Controller
-	     does not filter since it may expect key'd responses from many deviceIDs.
-
-         To keep things simple the device
-	     will not issue Alarms or any other non-requested topics except the intial DA.
-
-       */
 module ExCmdRsp {
   /* Start_Header_File_Const-Block 
        These Constants are defined here as part of the system model and used to generate a header file where they can be used 
@@ -24,9 +5,15 @@ module ExCmdRsp {
        */
   const string MODULE_EX_CMD_RSP = "ExCmdRsp";
 
-  const string TOPIC_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
+  const string TYPE_CONFIGURE_DEVICE = "ExCmdRsp::ConfigureDevice";
 
-  const string TOPIC_DEVICE_STATE = "ExCmdRsp::DeviceState";
+  const string TOPIC_CONFIGURE_DEVICE = "ConfigureDevice";
+
+  const string TOPIC_CONFIGURE_DEV_CFT = "ConfigureDevice::MyFilter";
+
+  const string TYPE_DEVICE_STATE = "ExCmdRsp::DeviceState";
+
+  const string TOPIC_DEVICE_STATE = "DeviceState";
 
   const string CONTROLLER1_PARTICIPANT = "CmdRspParticipantLibrary::ControllerParticipant1";
 
@@ -39,6 +26,12 @@ module ExCmdRsp {
   const string CONFIGURE_DEVICE_WRITER = "ControllerPublisher::ConfigureDeviceWriter";
 
   const string CONFIGURE_DEVICE_READER = "DeviceSubscriber::ConfigureDeviceReader";
+
+  const string CMD_RSP_QOS_LIBRARY = "CmdRspQoSLibrary";
+
+  const string DEVICE_STATE_TOPIC_QOS_PROFILE = "DeviceStateProfile";
+
+  const string CONFIG_DEV_TOPIC_QOS_PROFILE = "ConfigDevProfile";
 
   /* End_Header_File_Const_Block */
   const uint32 LEN_DEVICE_ID = 32;

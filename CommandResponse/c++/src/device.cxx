@@ -11,11 +11,9 @@
  */
 
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <ndds/ndds_cpp.h>
-#include <rti/util/util.h> // for sleep()
 #include "CommandResp.h"   // rti generated file from idl to use model const Topics
+#include "CommandRespSupport.h"
 #include "ddsEntities.h"
 #include "topics.h"
 #include "application.h"
@@ -24,43 +22,143 @@
 namespace MODULE
 {
 
-//https://thispointer.com/c-how-to-pass-class-member-function-to-pthread_create/
-typedef void * (*THREADFUNCPTR)(void *participant); // used to cast to a non-static member func  
+// Path relative to build directory in CommandResponse c++ example
+const char* QOS_FILE = "../../../model/CommandProject.xml";
 
-void run_device_application() {  
+/* Delete all entities */
+static int participant_shutdown(DDSDomainParticipant *participant)
+{
+    DDS_ReturnCode_t retcode;
+    int status = 0;
+
+    if (participant != NULL) {
+        retcode = participant->delete_contained_entities();
+        if (retcode != DDS_RETCODE_OK) {
+            std::cout <<  "delete_contained_entities error: " << retcode << std::endl;
+            status = -1;
+        }
+
+        retcode = DDSTheParticipantFactory->delete_participant(participant);
+        if (retcode != DDS_RETCODE_OK) {
+            std::cout <<  "delete_participant error: " << retcode << std::endl;
+            status = -1;
+        }
+    }
+
+    /* RTI Connext provides finalize_instance() method on
+       domain participant factory for people who want to release memory used
+       by the participant factory. Uncomment the following block of code for
+       clean destruction of the singleton. */
+
+    /*
+    retcode = DDSDomainParticipantFactory::finalize_instance();
+    if (retcode != DDS_RETCODE_OK) {
+        std::cout << "finalize_instance error" << retcode << std::endl;
+        status = -1;
+    }
+    */
+
+    return status;
+}
+
+extern "C" int run_device_application(int domain_id) {  
     // Create the participant
-    dds::core::QosProvider qos_provider({ MODULE::QOS_FILE });
-    DDSDomainParticipant * participant =
-        qos_provider->create_participant_from_config(MODULE::DEVICE1_PARTICIPANT);
+    const char *url_profiles[1] = { QOS_FILE }; 
+    DDS_Duration_t wait_period = {2,0};
+    DDS_ReturnCode_t retcode;
+
+    // https://community.rti.com/static/documentation/connext-dds/5.3.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/Content/UsersManual/PROFILE_QosPolicy__DDS_Extension__.htm
+    // for doing this, but I like the way the Sensor Example uses 
+    // TheParticipantFactory too load my_custom_qos_profiles.xml,we need
+    // to modify the factory_qos profile
+    DDS_DomainParticipantFactoryQos factory_qos;
+    DDSTheParticipantFactory->get_qos(factory_qos);
+
+    // We are only going to add one XML file to the url_profile sequence
+    factory_qos.profile.url_profile.from_array(url_profiles, 1);
+    DDSTheParticipantFactory->set_qos(factory_qos);
+
+    // create DDS containser entities: Participant, Publisher and Subscriber
+    // (with default QoS Profiles, we'll put the  QoS on the Readers and Writers)
+     DDSDomainParticipant * participant = 
+        DDSTheParticipantFactory->create_participant(
+            domain_id,
+            DDS_PARTICIPANT_QOS_DEFAULT,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+    if (participant == NULL) {
+        std::cout << "create_participant error" << std::endl;
+        participant_shutdown(participant);
+        return -1;
+    }
+
+    DDSSubscriber * subscriber = participant->create_subscriber(
+            DDS_SUBSCRIBER_QOS_DEFAULT,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+    if (subscriber == NULL) {
+        std::cout << "create_subscriber error" << std::endl;
+        participant_shutdown(participant);
+        return -1;
+    }
+
+    DDSPublisher * publisher = participant->create_publisher(
+            DDS_PUBLISHER_QOS_DEFAULT,
+            NULL /* listener */,
+            DDS_STATUS_MASK_NONE);
+    if (publisher == NULL) {
+        std::cout << "create_publisher error" << std::endl;
+        participant_shutdown(participant);
+        return -1;
+    }
+
+    // create the device writer first since this devices ID is loaded in the c'tor
+    DeviceStateWtr device_state_writer(participant, publisher);
+
+    // Create a listener if we'd rather use vs. event waitset thread.
+    // Here we use a Default listener we created, but you can create your own
+    // listener(s) (and as many as you need if topic specific)
+    DefaultDataWriterListener * listener = new DefaultDataWriterListener();
+    device_state_writer.getMyDataWriter()->set_listener(listener);
+
+    // Device filters ConfigureDeviceRequests to it's deviceID
+    std::string s1 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.resourceId);
+    std::string s2 = std::to_string(device_state_writer.getTopicSample()->myDeviceId.id);
+    const char *param_list[] = { s1.c_str(), s2.c_str(), NULL };
+    // std::cout << "****** " << param_list << " " << sizeof(param_list) << " " << sizeof(param_list[0]) << std::endl;
+
+    Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, _TOPIC_CONFIGURE_DEV_CFT); 
-    DeviceStateWtr device_state_writer(participant);
-    config_dev_reader.RunThread(participant);
-    pthread_create(&(device_state_writer.getPthreadId()), NULL, (THREADFUNCPTR) &Writer::WriterThread, (void *) participant);
+    ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
-
-    rti::util::sleep(dds::core::Duration(2)); // let entities get up and running
+    config_dev_reader.runThread();
+    //device_state_writer.runThread(); // comment out to disable event monitoring on wtr
 
     while (!application::shutdown_requested)  {
-        //Device State Machine goes here;
+        // Device State Machine goes here;
         // In this case, we simply publish current deviceState upon change.
+        
         if (device_state_writer.getCurrentState() != device_state_writer.getPrevState()) {
             device_state_writer.writeData(device_state_writer.getCurrentState());
             // then set them equal.
             device_state_writer.setPrevState(device_state_writer.getCurrentState());
         }
+        
         std::cout << "." << std::flush;        
-        //device_state_writer.writeData(device_state_writer.getCurrentState());
-        rti::util::sleep(dds::core::Duration(1));
+        NDDSUtility::sleep(wait_period); // let entities get up and running
     }
-
-    config_dev_reader.Reader::getThreadHndl()->join();
-    device_state_writer.Writer::getThreadHndl()->join();
+    
+    pthread_cancel(config_dev_reader.Reader::getThreadId());
+    //pthread_cancel(device_state_writer.Writer::getThreadId());
+    delete listener;
     // give threads a second to shut down
-    rti::util::sleep(dds::core::Duration(1));
+    NDDSUtility::sleep(wait_period); // give time for entities to shutdown
+
+    /* Delete all entities */
+    return participant_shutdown(participant);
     std::cout << "Device main thread shutting down" << std::endl;
 }
 } // namespace MODULE
@@ -71,10 +169,12 @@ int main(int argc, char *argv[])
 
     using namespace application;
 
+    int domain_id = 0;
+
     setup_signal_handlers();
 
     try  {
-        MODULE::run_device_application();
+        return MODULE::run_device_application(domain_id);
     }
     catch (const std::exception &ex)  {
         // This will catch DDS exceptions
@@ -83,11 +183,5 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Releases the memory used by the participant factory.  Optional at
-    // application exit
-    dds::domain::DomainParticipant::finalize_participant_factory();
-
     return EXIT_SUCCESS;
 }
-
-
