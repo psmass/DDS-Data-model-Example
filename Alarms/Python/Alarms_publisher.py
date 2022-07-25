@@ -30,15 +30,15 @@ class Alarms_IntrusionAlarmPublisher:
         # This DataWriter will write data on Topic "Example Alarms_IntrusionAlarm"
         # DataWriter QoS is configured in USER_QOS_PROFILES.xml
         writer = dds.DataWriter(participant.implicit_publisher, topic)
-        data1 = Alarms_IntrusionAlarm()
-        data2 = Alarms_IntrusionAlarm()
+        data1 = Alarms_IntrusionAlarm()  #Creating the data structure to hold values for 
+        data2 = Alarms_IntrusionAlarm()  #the 2 instances crated 
 
-        instance1 = dds.InstanceHandle()
-        instance2 = dds.InstanceHandle()
-
+        instance1 = dds.InstanceHandle()  #Creation of the handle memory such that it does not 
+        instance2 = dds.InstanceHandle()  #have to be created on every "send" 
+        #Populate the keyed fields once
         data1.sourceId.id = 1  # note the keyed value is set to something unique
         data1.sourceId.resourceId = 10  # note the keyed value is set to something unique
-        instance1 = writer.register_instance(data1)
+        instance1 = writer.register_instance(data1) # Fill the handle with the instance info
 
         data2.sourceId.id = 2  # note the keyed value is set to something unique
         data2.sourceId.resourceId = 10  # note the keyed value is set to something unique
@@ -61,7 +61,7 @@ class Alarms_IntrusionAlarmPublisher:
                 data2.numericValue.Units = Common_UnitType.Celcius
                 
                 print(f"Writing Alarms_IntrusionAlarm, count {count}")
-                writer.write(data1,instance1)
+                writer.write(data1,instance1) 
                 writer.write(data2,instance2)
                 time.sleep(1)
             except KeyboardInterrupt:
