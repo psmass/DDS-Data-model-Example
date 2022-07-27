@@ -1,7 +1,0 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (.\objs\x64Win64VS2017\) contains files shared from another project (Alarms_publisher.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Alarms_subscriber.cxx
-  AlarmsPlugin.cxx
-  Alarms.cxx
-  AlarmsSupport.cxx
-  Generating Code...
-  Alarms_subscriber-x64Win64VS2017.vcxproj -> C:\Users\bsenese\Documents\Alarms\Win_c++\src\.\objs\x64Win64VS2017\Alarms_subscriber.exe

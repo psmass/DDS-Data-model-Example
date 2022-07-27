@@ -62,35 +62,35 @@ add_custom_target(
 )
 
 # Publisher application
-add_executable(Publisher
+add_executable(alarms_publisher
     "${CMAKE_CURRENT_SOURCE_DIR}/Alarms_publisher.cxx"
     ${ALARMS_IDL_GEN_SOURCES} 
 )
 
-add_dependencies(Publisher generated_code copy_config_files)
+add_dependencies(alarms_publisher generated_code copy_config_files)
 
-target_include_directories(Publisher
+target_include_directories(alarms_publisher
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/gen"
 )
 
-target_link_libraries(Publisher
+target_link_libraries(alarms_publisher
 	RTIConnextDDS::cpp_api
     ${CONNEXTDDS_EXTERNAL_LIBS}
 )
 
 # Subscriber application
-add_executable(Subscriber
+add_executable(alarms_subscriber
     "${CMAKE_CURRENT_SOURCE_DIR}/Alarms_subscriber.cxx"
     ${ALARMS_IDL_GEN_SOURCES} 
 )
 
-add_dependencies(Subscriber generated_code copy_config_files)
+add_dependencies(alarms_subscriber generated_code copy_config_files)
 
-target_include_directories(Subscriber
+target_include_directories(alarms_subscriber
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/gen"
 )
 
-target_link_libraries(Subscriber
+target_link_libraries(alarms_subscriber
 	RTIConnextDDS::cpp_api
     ${CONNEXTDDS_EXTERNAL_LIBS}
 )
