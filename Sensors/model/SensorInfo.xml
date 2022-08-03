@@ -25,7 +25,7 @@
           <member name="secs" type="int64"/>
           <member name="nsecs" type="int64"/>
         </struct>
-        <struct name="MetaData_t" extensibility="mutable" nested="true">
+        <struct name="MetaData_t" nested="true">
           <member name="timeOfGeneration" type="nonBasic" nonBasicTypeName="Common::DateTime_t"/>
         </struct>
       </module>
@@ -43,7 +43,7 @@
           <const name="BEST_EFFORT_QOS_PROFILE" type="string" value="&quot;BestEffortQosProfile&quot;"/>
         </module>
         <!-- Sensor Types -->
-        <struct name="BaseSensor" nested="true">
+        <struct name="BaseSensor" extensibility="appendable" nested="true">
           <member name="sourceId" type="nonBasic" nonBasicTypeName="Common::IdentifierType_t" key="true"/>
           <member name="sensorTypeName" type="nonBasic" nonBasicTypeName="Common::Descriptor_t"/>
           <member name="metaData" type="nonBasic" nonBasicTypeName="Common::MetaData_t"/>

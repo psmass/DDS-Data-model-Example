@@ -6,7 +6,7 @@
 
 1. Three example implementations of a simple Controller/Responder model using the Objective State pattern. 
  	 - C++11 (modern C++) w/XML Application Creation & Dynamic Data
- 	 - C++98 (Traditional C++) with Programatic Entitiy creation and Compiled typed data (non-XML Application Creation)
+ 	 - C++98 (Traditional C++) with Programatic Entity creation and Compiled typed data (non-XML Application Creation)
  	 - Python w/SML Application Creation & Dynamic Data	
 2. Discussion
 	 - Objective State pattern.
