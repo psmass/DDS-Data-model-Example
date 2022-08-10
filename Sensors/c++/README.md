@@ -13,7 +13,7 @@ In order to build this example the Connext environment must be set up since the 
     %NDDSHOME%\bin\rtiddsgen.bat -convertToIdl -d idl ..\model\SensorInfo.xml
     ```
 
-- src - Contains the Sensor_publisher.cxx and Sensor_subscriber.cxx were originally generated as examples but have been modified and therefore should not be deleted.
+- src - Contains the sensor_publisher.cxx and sensor_subscriber.cxx were originally generated as examples but have been modified and therefore should not be deleted.
 
 - src/generated - Contains the type files generated from the IDL.
 
@@ -27,7 +27,6 @@ In order to build this example the Connext environment must be set up since the 
     ```
     cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Win64VS2017 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 16 2019" -A x64 ..
     ```
-
 3. The project can be build from Visual Studio or from the command line.
 
     In Visual Studio open Alarms.sln and select Debug build configuration and build with the optional --verbose argument.
@@ -35,7 +34,6 @@ In order to build this example the Connext environment must be set up since the 
     ```
     cmake --build . --config Debug <--verbose>
     ```
-
 4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using the relative path.
 
 ```.\Debug\sensor_subscriber.exe```
@@ -50,7 +48,6 @@ In order to build this example the Connext environment must be set up since the 
     ```
     cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Linux4gcc7.3.0 -DCMAKE_BUILD_TYPE=Debug  ..
     ```
-
 3. Build the executables
 
     ```

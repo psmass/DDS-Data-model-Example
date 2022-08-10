@@ -20,35 +20,35 @@ find_package(
 )
 
 set(PUBLISHER_CPP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/publisher.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sensor_publisher.cxx"
 )
 
 # Main application
-add_executable(Publisher
+add_executable(sensor_publisher
     ${PUBLISHER_CPP_SOURCES}
 )
 
 set(SUBSCRIBER_CPP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/subscriber.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sensor_subscriber.cxx"
 )
 
 # Main application
-add_executable(Subscriber
+add_executable(sensor_subscriber
     ${SUBSCRIBER_CPP_SOURCES}
 )
 
-target_link_libraries(Publisher
+target_link_libraries(sensor_publisher
 	RTIConnextDDS::cpp2_api
 )
 
-target_link_libraries(Subscriber
+target_link_libraries(sensor_subscriber
 	RTIConnextDDS::cpp2_api
 )
 
 # The COMPILE_FLAGS property sets additional compiler flags used to build sources within the target.
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
-    set_target_properties(Publisher PROPERTIES COMPILE_FLAGS -std=c++11)
-    set_target_properties(Subscriber PROPERTIES COMPILE_FLAGS -std=c++11)
+    set_target_properties(sensor_publisher PROPERTIES COMPILE_FLAGS -std=c++11)
+    set_target_properties(sensor_subscriber PROPERTIES COMPILE_FLAGS -std=c++11)
 endif()
 
 

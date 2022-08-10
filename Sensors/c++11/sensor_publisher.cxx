@@ -14,6 +14,7 @@
 #include <chrono>
 #include <dds/dds.hpp>
 #include <rti/util/util.hpp> // for sleep()
+#include "rti/domain/DomainParticipantConfigParams.hpp"
 #include "application.hpp"   // for ctrl-c
 
 const std::string QOS_FILE = "../../model/SensorInfo.xml";
