@@ -22,27 +22,46 @@ The example code was built with the following environment.
 
 - xml - Contains the SensorQoS.xml file extracted from ..\model\SensorInfo.xml and used by Sensor_publisher.cxx and Sensor_subscriber.cxx.  
 
-## Building Debug executable:
+## Building Windows Debug executable:
 
-1. Build the solution from Visual Studio or type
-    ```
-    create a src/build directory and cd to the build directory
-    ```
+1. Create a src/build directory and cd to the build directory
 
-2. From build for Visual Studio 19 type the following.
+2. To build for Visual Studio 19 type the following.
     ```
     cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Win64VS2017 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 16 2019" -A x64 ..
     ```
+
 3. The project can be build from Visual Studio or from the command line.
 
-    In Visual Studio open sensors.sln and select Debug build configuration and build with the optional --verbose argument.
+    In Visual Studio open Alarms.sln and select Debug build configuration and build with the optional --verbose argument.
     Or type the following command.
     ```
     cmake --build . --config Debug <--verbose>
     ```
-## Running Example:
-Publisher and subscriber must be executed from the build directory.
+
+4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using a relative path.
 
 ```.\Debug\Sensor_subscriber.exe```
 
 ```.\Debug\Sensor_publisher.exe```
+
+# Building Linux Debug executable
+
+1. Create a src/build directory and cd to the build directory
+
+2. To build for Linux type the following.
+    ```
+    cmake -DBUILD_SHARED_LIBS=ON -DCONNEXTDDS_ARCH=x64Linux4gcc7.3.0 -DCMAKE_BUILD_TYPE=Debug  ..
+    ```
+
+3. Build the executables
+
+    ```
+    cmake --build . --config Debug <--verbose>
+    ```
+4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using a relative path
+
+    ```./subscriber```
+
+    ```./publisher```
+
