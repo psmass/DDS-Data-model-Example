@@ -2,10 +2,7 @@
 The example generates code using two IDL files ..\model\Sensor.idl and ..\model\Common.idl
 
 ## Environment
-The example code was built with the following environment.
-
-* Windows 10 (x64)
-* Connext DDS Professional 6.1.0 with x64Win64VS2019
+In order to build this example the Connext environment must be set up since the build process relies on $NDDSHOME.
 
 ## Directories
 
@@ -39,11 +36,11 @@ The example code was built with the following environment.
     cmake --build . --config Debug <--verbose>
     ```
 
-4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using a relative path.
+4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using the relative path.
 
-```.\Debug\Sensor_subscriber.exe```
+```.\Debug\sensor_subscriber.exe```
 
-```.\Debug\Sensor_publisher.exe```
+```.\Debug\sensor_publisher.exe```
 
 # Building Linux Debug executable
 
@@ -59,9 +56,9 @@ The example code was built with the following environment.
     ```
     cmake --build . --config Debug <--verbose>
     ```
-4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using a relative path
+4. Publisher and subscriber must be executed from the build directory since the source code references the QoS file "../../xml/SensorQoS.xml" using the relative path.
 
-    ```./subscriber```
+    ```./sensor_subscriber```
 
-    ```./publisher```
+    ```./sensor_publisher```
 
