@@ -61,38 +61,38 @@ add_custom_target(
             ${SENSOR_IDL_GEN_SOURCES}
 )
 
-# Publisher application
-add_executable(Publisher
-    "${CMAKE_CURRENT_SOURCE_DIR}/Sensor_publisher.cxx"
+# sensor_publisher application
+add_executable(sensor_publisher
+    "${CMAKE_CURRENT_SOURCE_DIR}/sensor_publisher.cxx"
     ${COMMON_IDL_GEN_SOURCES} 
     ${SENSOR_IDL_GEN_SOURCES}
 )
 
-add_dependencies(Publisher generated_code)
+add_dependencies(sensor_publisher generated_code)
 
-target_include_directories(Publisher
+target_include_directories(sensor_publisher
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/gen"
 )
 
-target_link_libraries(Publisher
+target_link_libraries(sensor_publisher
 	RTIConnextDDS::cpp_api
     ${CONNEXTDDS_EXTERNAL_LIBS}
 )
 
-# Subscriber application
-add_executable(Subscriber
-    "${CMAKE_CURRENT_SOURCE_DIR}/Sensor_subscriber.cxx"
+# sensor_subscriber application
+add_executable(sensor_subscriber
+    "${CMAKE_CURRENT_SOURCE_DIR}/sensor_subscriber.cxx"
     ${COMMON_IDL_GEN_SOURCES} 
     ${SENSOR_IDL_GEN_SOURCES}
 )
 
-add_dependencies(Subscriber generated_code)
+add_dependencies(sensor_subscriber generated_code)
 
-target_include_directories(Subscriber
+target_include_directories(sensor_subscriber
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/gen"
 )
 
-target_link_libraries(Subscriber
+target_link_libraries(sensor_subscriber
 	RTIConnextDDS::cpp_api
     ${CONNEXTDDS_EXTERNAL_LIBS}
 )
