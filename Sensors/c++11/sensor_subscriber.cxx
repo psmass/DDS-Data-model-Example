@@ -50,6 +50,8 @@ void run_subscriber_application()
     dds::domain::DomainParticipant participant =
         qos_provider->create_participant_from_config(PARTICIPANT_NAME);
 
+    std::cout << "*** Starting Sensor Subscriber on Domain " << participant.domain_id() << ". CTRL-C to exit. ***" << std::endl;
+
     // Lookup the specific Sensor type as defined in the xml file.
     // This will be needed to read/take samples of the correct type
     const dds::core::xtypes::DynamicType &sensorType =
