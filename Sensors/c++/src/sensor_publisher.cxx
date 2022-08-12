@@ -116,9 +116,9 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         return shutdown_participant(participant, "DataWriter narrow error", EXIT_FAILURE);
     }
 
-    // Create data for writing, allocating all members
-    Sensor::HumiditySensor *data = Sensor::HumiditySensorTypeSupport::create_data();
-    if (data == NULL)
+    // Create sample for writing, allocating all members
+    Sensor::HumiditySensor *sample = Sensor::HumiditySensorTypeSupport::create_data();
+    if (sample == NULL)
     {
         return shutdown_participant(
             participant,
@@ -126,9 +126,16 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
             EXIT_FAILURE);
     }
 
-    data->sourceId.resourceId = 3;
-    data->sourceId.id = 30;
-    snprintf(data->sensorTypeName, Common::MIN_LEN, "Initech Humidity Sensor Model sr7928");
+    sample->sourceId.resourceId = 3;
+    sample->sourceId.id = 30;
+    snprintf(sample->sensorTypeName, Common::MIN_LEN, "Initech Humidity Sensor Model sr7928");
+
+    // register_instance() states the intent of the DataWriter to write values of the 
+    // data - instance that matches a specified key. Improves the performance of 
+    // subsequent writes to the instance. (Useful for keyed data types only.)
+    // sourceId is the key which is needed to 
+    DDS_InstanceHandle_t s_handle = typed_writer->register_instance(*sample);
+
     // Main loop, write data
     for (unsigned int samples_written = 0;
          !shutdown_requested && samples_written < sample_count;
@@ -140,20 +147,21 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
 
         auto percent = 43.11f;
         // Modify the data to be written here
-        data->metaData.timeOfGeneration.secs = nanoseconds / 1000000000;
-        data->metaData.timeOfGeneration.nsecs = nanoseconds % 1000000000;
-        data->relativeHumidity = percent;
+        sample->metaData.timeOfGeneration.secs = nanoseconds / 1000000000;
+        sample->metaData.timeOfGeneration.nsecs = nanoseconds % 1000000000;
+        sample->relativeHumidity = percent;
 
-        std::cout
-            << "{'sourceId': {'resourceId': " << data->sourceId.resourceId
-            << ", 'id': " << data->sourceId.id << "}"
-            << ", 'sensorTypeName': '" << data->sensorTypeName << "'"
-            << ", 'metaData': {'timeOfGeneration': {'secs': " << data->metaData.timeOfGeneration.secs
-            << ", 'nsecs': " << data->metaData.timeOfGeneration.nsecs << "}}"
-            << ", 'relativeHumidity': " << data->relativeHumidity << "}"
-            << std::endl;
+        std::cout << ":\n   sourceId:" <<
+        "\n      resourceId: " << sample->sourceId.resourceId <<
+        "\n      id:" << sample->sourceId.id <<
+        "\n   sensorTypeName: " << sample->sensorTypeName <<
+        "\n   metaData:" <<
+        "\n      timeOfGeneration : " <<
+        "\n         secs: " << sample->metaData.timeOfGeneration.secs <<
+        "\n         nsecs: " << sample->metaData.timeOfGeneration.secs <<
+        "\n   relativeHumidity: " << sample->relativeHumidity << std::endl;
 
-        retcode = typed_writer->write(*data, HANDLE_NIL);
+        retcode = typed_writer->write(*sample, s_handle);
         if (retcode != RETCODE_OK)
         {
             std::cerr << "write error " << retcode << std::endl;
@@ -164,8 +172,17 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         NDDSUtility::sleep(send_period);
     }
 
+    // Relinquishes the ownership of the instance. (Useful for keyed data types only.)
+    // Informs DataReaders that the DataWriter is no longer updating the instance.
+    // Tells Connext DDS that the DataWriter has no more information on this instance; 
+    // thus, it does not intend to modify that instance anymore, allowing Connext DDS 
+    // to recover any resources it allocated for the instance.
+    if (typed_writer->unregister_instance(*sample, s_handle) != DDS_RETCODE_OK) {
+        std::cerr << "unregister_instance error " << retcode << std::endl;
+    }
+
     // Delete previously allocated Sensor::HumiditySensor, including all contained elements
-    retcode = Sensor::HumiditySensorTypeSupport::delete_data(data);
+    retcode = Sensor::HumiditySensorTypeSupport::delete_data(sample);
     if (retcode != RETCODE_OK)
     {
         std::cerr << "Sensor::HumiditySensorTypeSupport::delete_data error " << retcode

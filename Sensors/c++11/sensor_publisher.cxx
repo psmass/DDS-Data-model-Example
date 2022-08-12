@@ -61,7 +61,7 @@ void run_publisher_application()
     // data - instance that matches a specified key. Improves the performance of 
     // subsequent writes to the instance. (Useful for keyed data types only.)
     // sourceId is the key which is needed to 
-    dds::core::InstanceHandle handle = writer.register_instance(sample);
+    dds::core::InstanceHandle s_handle = writer.register_instance(sample);
 
     while (!application::shutdown_requested)
     {
@@ -74,9 +74,9 @@ void run_publisher_application()
         sample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
         sample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
         sample.value<float_t>("relativeHumidity", percent);
-        writer.write(sample, handle);
+        writer.write(sample, s_handle);
 
-        std::cout << sample;
+        std::cout << sample << std::endl;
 
         // Send once every second
         rti::util::sleep(dds::core::Duration(1));
@@ -87,7 +87,7 @@ void run_publisher_application()
     // Tells Connext DDS that the DataWriter has no more information on this instance; 
     // thus, it does not intend to modify that instance anymore, allowing Connext DDS 
     // to recover any resources it allocated for the instance.
-    writer.unregister_instance(handle);
+    writer.unregister_instance(s_handle);
 }
 
 int main(int argc, char *argv[])
