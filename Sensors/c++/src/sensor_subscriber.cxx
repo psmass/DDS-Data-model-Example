@@ -61,7 +61,8 @@ unsigned int process_data(Sensor::HumiditySensorDataReader *typed_reader)
             samples_read++;
         }
         else
-        { // This is an instance lifecycle event with no data payload.
+        { 
+            // This is an instance lifecycle event with no data payload.
             std::cout << "Received instance state notification" << std::endl;
         }
     }

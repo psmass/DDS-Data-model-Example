@@ -29,8 +29,8 @@ void run_publisher_application()
     // config_file == "/the/path/to/your/xml/configuration.xml"
     provider_params.url_profile({ QOS_FILE });
     rti::core::default_qos_provider_params(provider_params);
- 
-     // Create the participant
+
+    // Create the participant
     auto qos_provider = dds::core::QosProvider::Default();
     dds::domain::DomainParticipant participant =
         qos_provider->create_participant_from_config(PARTICIPANT_NAME);
@@ -39,24 +39,30 @@ void run_publisher_application()
 
     // Lookup the specific Sensor type as defined in the xml file.
     // This will be needed to create samples of the correct type
-    const dds::core::xtypes::DynamicType &sensorType =
+    const dds::core::xtypes::DynamicType& sensorType =
         qos_provider->type(SENSOR_TYPE_NAME);
 
     // Find the DataWriter defined in the xml by using the participant and the
     // publisher::writer pair as the datawriter name.
     dds::pub::DataWriter<dds::core::xtypes::DynamicData> writer =
         rti::pub::find_datawriter_by_name<
-            dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
+        dds::pub::DataWriter<dds::core::xtypes::DynamicData>>(
             participant,
             WRITER_NAME);
 
     // Create one sample from the specified type and populate the id field.
     // This sample will be used repeatedly in the loop below.
     dds::core::xtypes::DynamicData sample(sensorType);
-
-    sample.value<int32_t>("sourceId.resourceId", 2);
-    sample.value<int32_t>("sourceId.id", 20);
+    sample.value<int32_t>("sourceId.id", 20);           // needed to register_instance
+    sample.value<int32_t>("sourceId.resourceId", 2);    // needed to register_instance
     sample.value<std::string>("sensorTypeName", "FlexSensor Humidity Sensor Model hl7c32a");
+
+    // register_instance() states the intent of the DataWriter to write values of the 
+    // data - instance that matches a specified key. Improves the performance of 
+    // subsequent writes to the instance. (Useful for keyed data types only.)
+    // sourceId is the key which is needed to 
+    dds::core::InstanceHandle handle = writer.register_instance(sample);
+
     while (!application::shutdown_requested)
     {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -68,20 +74,20 @@ void run_publisher_application()
         sample.value<int64_t>("metaData.timeOfGeneration.secs", nanoseconds / 1000000000);
         sample.value<int64_t>("metaData.timeOfGeneration.nsecs", nanoseconds % 1000000000);
         sample.value<float_t>("relativeHumidity", percent);
-        writer.write(sample);
+        writer.write(sample, handle);
 
-        std::cout 
-            << "{'sourceId': {'resourceId': " << sample.value<int32_t>("sourceId.resourceId") 
-            << ", 'id': " << sample.value<int32_t>("sourceId.id") << "}"
-            << ", 'sensorTypeName': '" << sample.value<std::string>("sensorTypeName") << "'"
-            << ", 'metaData': {'timeOfGeneration': {'secs': " << sample.value<int64_t>("metaData.timeOfGeneration.secs")
-            << ", 'nsecs': " << sample.value<int64_t>("metaData.timeOfGeneration.nsecs") << "}}"
-            << ", 'relativeHumidity': " << sample.value<float_t>("relativeHumidity") << "}"
-            << std::endl;
+        std::cout << sample;
 
         // Send once every second
         rti::util::sleep(dds::core::Duration(1));
     }
+
+    // Relinquishes the ownership of the instance. (Useful for keyed data types only.)
+    // Informs DataReaders that the DataWriter is no longer updating the instance.
+    // Tells Connext DDS that the DataWriter has no more information on this instance; 
+    // thus, it does not intend to modify that instance anymore, allowing Connext DDS 
+    // to recover any resources it allocated for the instance.
+    writer.unregister_instance(handle);
 }
 
 int main(int argc, char *argv[])
