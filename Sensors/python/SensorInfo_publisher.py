@@ -12,31 +12,52 @@
 import time
 import rti.connextdds as dds
 from SensorInfo import Sensor_GasSensor
+from SensorInfo import Sensor_Constants_SENSOR_QOS_LIBRARY
+from SensorInfo import Sensor_Constants_RELIABLE_QOS_PROFILE
+
 
 class Sensor_GasSensorPublisher:
 
     @staticmethod
     def run_publisher(domain_id: int, sample_count: int):
 
+        reliable_profile = Sensor_Constants_SENSOR_QOS_LIBRARY + "::" + Sensor_Constants_RELIABLE_QOS_PROFILE
+
+        # Even though the SensorInfo.xml contains domain information, it is not used. 
+        # The application only needs the file for setting QoS.
+        qos_provider = dds.QosProvider("../model/SensorInfo.xml")
+
         # A DomainParticipant allows an application to begin communicating in
         # a DDS domain. Typically there is one DomainParticipant per application.
-        # DomainParticipant QoS is configured in USER_QOS_PROFILES.xml
-        participant = dds.DomainParticipant(domain_id)
+        # DomainParticipant QoS is configured SensorInfo.xml.
+        participant = dds.DomainParticipant(domain_id, qos_provider.participant_qos_from_profile(reliable_profile))
 
         # A Topic has a name and a datatype.
-        topic = dds.Topic(participant, "Example Sensor_GasSensor", Sensor_GasSensor)
+        topic = dds.Topic(participant, "Gas Sensor", Sensor_GasSensor)
 
         # This DataWriter will write data on Topic "Example Sensor_GasSensor"
-        # DataWriter QoS is configured in USER_QOS_PROFILES.xml
-        writer = dds.DataWriter(participant.implicit_publisher, topic)
+        # DataWriter QoS is configured in SensorInfo.xml.
+        writer = dds.DataWriter(participant.implicit_publisher, topic, qos_provider.datawriter_qos_from_profile(reliable_profile))
         sample = Sensor_GasSensor()
+
+        sample.sourceId.resourceId = 247
+        sample.sourceId.id = 21
+        sample. sensorTypeName = "Tyrell Corp. Gas Sensor - Model 8317VAC-15"
 
         for count in range(sample_count):
             # Catch control-C interrupt
             try:
                 # Modify the data to be sent here
-                
-                print(f"Writing Sensor_GasSensor, count {count}")
+                percent = 30.32
+                time_nanosec = time.time_ns()
+
+                sample.metaData.timeOfGeneration.secs = time_nanosec // 1000000000
+                sample.metaData.timeOfGeneration.nsecs = time_nanosec % 1000000000
+                sample.concetration = percent
+    
+                print(f"\nWriting Gas Sensor, count {count}")
+                print(sample)
+
                 writer.write(sample)
                 time.sleep(1)
             except KeyboardInterrupt:

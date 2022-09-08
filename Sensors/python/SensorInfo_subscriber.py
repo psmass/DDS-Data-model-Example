@@ -12,6 +12,8 @@
 import time
 import rti.connextdds as dds
 from SensorInfo import Sensor_GasSensor
+from SensorInfo import Sensor_Constants_SENSOR_QOS_LIBRARY
+from SensorInfo import Sensor_Constants_RELIABLE_QOS_PROFILE
 
 class Sensor_GasSensorSubscriber:
 
@@ -22,24 +24,30 @@ class Sensor_GasSensorSubscriber:
         # To not remove the data from the reader, use read_data() or read().
         samples = reader.take_data()
         for sample in samples:
-            print(f"Received: {sample}")
+            print(f"Received: {sample}\n")
     
         return len(samples)
 
     @staticmethod
     def run_subscriber(domain_id: int, sample_count: int):
 
+        reliable_profile = Sensor_Constants_SENSOR_QOS_LIBRARY + "::" + Sensor_Constants_RELIABLE_QOS_PROFILE
+
+        # Even though the SensorInfo.xml contains domain information, it is not used. 
+        # The application only needs the file for setting QoS.
+        qos_provider = dds.QosProvider("../model/SensorInfo.xml")
+
         # A DomainParticipant allows an application to begin communicating in
         # a DDS domain. Typically there is one DomainParticipant per application.
-        # DomainParticipant QoS is configured in USER_QOS_PROFILES.xml
-        participant = dds.DomainParticipant(domain_id)
+        # DomainParticipant QoS is configured in SensorInfo.xml.
+        participant = dds.DomainParticipant(domain_id, qos_provider.participant_qos_from_profile(reliable_profile))
 
         # A Topic has a name and a datatype.
-        topic = dds.Topic(participant, 'Example Sensor_GasSensor', Sensor_GasSensor)
+        topic = dds.Topic(participant, 'Gas Sensor', Sensor_GasSensor)
 
         # This DataReader reads data on Topic "Example Sensor_GasSensor".
-        # DataReader QoS is configured in USER_QOS_PROFILES.xml
-        reader = dds.DataReader(participant.implicit_subscriber, topic)
+        # DataReader QoS is configured in SensorInfo.xml.
+        reader = dds.DataReader(participant.implicit_subscriber, topic, qos_provider.datareader_qos_from_profile(reliable_profile))
 
         # Initialize samples_read to zero
         samples_read = 0
@@ -68,7 +76,6 @@ class Sensor_GasSensorSubscriber:
             try:
                 # Dispatch will call the handlers associated to the WaitSet conditions
                 # when they activate
-                print("Hello World subscriber sleeping for 1 seconds...")
 
                 waitset.dispatch(dds.Duration(1))  # Wait up to 1s each time
             except KeyboardInterrupt:

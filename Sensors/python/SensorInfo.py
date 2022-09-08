@@ -91,9 +91,7 @@ class Common_DateTime_t:
 
 Common.DateTime_t = Common_DateTime_t
 
-@idl.struct(
-    type_annotations = [idl.mutable, ],
-)
+@idl.struct
 class Common_MetaData_t:
     timeOfGeneration: Common.DateTime_t = field(default_factory = Common.DateTime_t)
 
