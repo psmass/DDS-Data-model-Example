@@ -95,7 +95,7 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
     }
 //This creates separate memory for Instance #2 called data2
     Alarms_IntrusionAlarm *data2 = Alarms_IntrusionAlarmTypeSupport::create_data();
-    if (data == NULL) {
+    if (data2 == NULL) {
         return shutdown_participant(
             participant,
             "Alarms_IntrusionAlarmTypeSupport::create_data error",
