@@ -95,22 +95,17 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
     }
 //This creates separate memory for Instance #2 called data2
     Alarms_IntrusionAlarm *data2 = Alarms_IntrusionAlarmTypeSupport::create_data();
-    if (data2 == NULL) {
+    if (data == NULL) {
         return shutdown_participant(
             participant,
             "Alarms_IntrusionAlarmTypeSupport::create_data error",
             EXIT_FAILURE);
     }
 
-//Optional use of having an Instance handle permanently generated
-	DDS_InstanceHandle_t fl265Handle = typed_writer->register_instance(*data);
-	DDS_InstanceHandle_t fl265Handle2 = typed_writer->register_instance(*data2);
-
     // Main loop, write data
     for (unsigned int samples_written = 0;
     !shutdown_requested && samples_written < sample_count;
     ++samples_written) {
-
 
         // Modify the data to be written here
 //Instance #1 - populating the content of this sample
@@ -135,12 +130,12 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         std::cout << "Writing Alarms_IntrusionAlarm, count " << samples_written 
         << std::endl;
 //Write Instance #1
-        retcode = typed_writer->write(*data, fl265Handle);
+        retcode = typed_writer->write(*data, DDS_HANDLE_NIL);
         if (retcode != DDS_RETCODE_OK) {
             std::cerr << "write error " << retcode << std::endl;
         }
 //Write Instance #2
-        retcode = typed_writer->write(*data2, fl265Handle2);
+        retcode = typed_writer->write(*data2, DDS_HANDLE_NIL);
         if (retcode != DDS_RETCODE_OK) {
             std::cerr << "write error " << retcode << std::endl;
         }
@@ -149,16 +144,6 @@ int run_publisher_application(unsigned int domain_id, unsigned int sample_count)
         DDS_Duration_t send_period = { 1, 0 };
         NDDSUtility::sleep(send_period);
     }
-	//  Unregister Instances - indicating they will no longer be updated
-
-	if (typed_writer->unregister_instance(*data, fl265Handle) != DDS_RETCODE_OK) {
-		std::cerr << "Alarms_IntrusionAlarmTypeSupport::Instance 1 unregistration error " << retcode
-			<< std::endl;
-	}
-	if (typed_writer->unregister_instance(*data2, fl265Handle2) != DDS_RETCODE_OK) {
-		std::cerr << "Alarms_IntrusionAlarmTypeSupport::Instance 2 unregistration error " << retcode
-			<< std::endl;
-	}
 
     // Delete previously allocated Alarms_IntrusionAlarm, including all contained elements
     retcode = Alarms_IntrusionAlarmTypeSupport::delete_data(data);
