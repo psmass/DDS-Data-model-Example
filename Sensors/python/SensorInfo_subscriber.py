@@ -14,6 +14,7 @@ import rti.connextdds as dds
 from SensorInfo import Sensor_GasSensor
 from SensorInfo import Sensor_Constants_SENSOR_QOS_LIBRARY
 from SensorInfo import Sensor_Constants_RELIABLE_QOS_PROFILE
+from SensorInfo import Sensor_Constants_GAS_TOPIC
 
 class Sensor_GasSensorSubscriber:
 
@@ -43,7 +44,7 @@ class Sensor_GasSensorSubscriber:
         participant = dds.DomainParticipant(domain_id, qos_provider.participant_qos_from_profile(reliable_profile))
 
         # A Topic has a name and a datatype.
-        topic = dds.Topic(participant, 'Gas Sensor', Sensor_GasSensor)
+        topic = dds.Topic(participant, Sensor_Constants_GAS_TOPIC, Sensor_GasSensor)
 
         # This DataReader reads data on Topic "Example Sensor_GasSensor".
         # DataReader QoS is configured in SensorInfo.xml.

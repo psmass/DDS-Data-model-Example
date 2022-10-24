@@ -14,6 +14,7 @@ import rti.connextdds as dds
 from SensorInfo import Sensor_GasSensor
 from SensorInfo import Sensor_Constants_SENSOR_QOS_LIBRARY
 from SensorInfo import Sensor_Constants_RELIABLE_QOS_PROFILE
+from SensorInfo import Sensor_Constants_GAS_TOPIC
 
 
 class Sensor_GasSensorPublisher:
@@ -33,7 +34,7 @@ class Sensor_GasSensorPublisher:
         participant = dds.DomainParticipant(domain_id, qos_provider.participant_qos_from_profile(reliable_profile))
 
         # A Topic has a name and a datatype.
-        topic = dds.Topic(participant, "Gas Sensor", Sensor_GasSensor)
+        topic = dds.Topic(participant, Sensor_Constants_GAS_TOPIC, Sensor_GasSensor)
 
         # This DataWriter will write data on Topic "Example Sensor_GasSensor"
         # DataWriter QoS is configured in SensorInfo.xml.
@@ -55,7 +56,7 @@ class Sensor_GasSensorPublisher:
                 sample.metaData.timeOfGeneration.nsecs = time_nanosec % 1000000000
                 sample.concetration = percent
     
-                print(f"\nWriting Gas Sensor, count {count}")
+                print(f"\nWriting {Sensor_Constants_GAS_TOPIC} Sensor, count {count}")
                 print(sample)
 
                 writer.write(sample)
