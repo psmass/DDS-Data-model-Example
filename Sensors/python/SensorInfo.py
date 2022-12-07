@@ -7,12 +7,10 @@
 # For more information, type 'rtiddsgen -help' at a command shell
 # or consult the Code Generator User's Manual.
 
-import sys
-import types
 from dataclasses import field
 from typing import Union, Sequence, Optional
 import rti.idl as idl
-from enum import IntEnum, auto
+from enum import IntEnum
 
 
 Common = idl.get_module("Common")
@@ -62,7 +60,7 @@ Common_ConcentrationInMolesPerCubicMetre_t = idl.float32
 Common.ConcentrationInMolesPerCubicMetre_t = Common_ConcentrationInMolesPerCubicMetre_t
 
 @idl.alias(
-    annotations = [idl.array([Common.MAX_LEN])]
+    annotations = [idl.array([Common.MAX_LEN]),]
 )
 class Common_BinaryData_t:
     value: Sequence[idl.int16] = field(default_factory = idl.array_factory(idl.int16, [Common.MAX_LEN]))
@@ -77,7 +75,7 @@ class Common_IdentifierType_t:
 Common.IdentifierType_t = Common_IdentifierType_t
 
 @idl.alias(
-    annotations = [idl.bound(Common.MAX_LEN)]
+    annotations = [idl.bound(Common.MAX_LEN),]
 )
 class Common_IdentifierList_t:
     value: Sequence[Common.IdentifierType_t] = field(default_factory = list)
@@ -133,8 +131,8 @@ Sensor.Constants.BEST_EFFORT_QOS_PROFILE = Sensor_Constants_BEST_EFFORT_QOS_PROF
 
 @idl.struct(
     member_annotations = {
-        'sourceId': [idl.key,],
-        'sensorTypeName': [idl.bound(Common.MIN_LEN),],
+        'sourceId': [idl.key, ],
+        'sensorTypeName': [idl.bound(Common.MIN_LEN)],
     }
 )
 class Sensor_BaseSensor:
