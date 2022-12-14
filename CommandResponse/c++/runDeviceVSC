@@ -1,6 +1,6 @@
 # Statically set PROJECT_TOP_LEVEL_REPO for VSC (comment/uncomment to set with ENV var)
 export PROJECT_TOP_LEVEL_REPO=~/Github/DDS-Data-model-Example/CommandResponse
-if [[ -z "${TMS_TOP_LEVEL_REPO}" ]];
+if [[ -z "${PROJECT_TOP_LEVEL_REPO}" ]];
 then
      echo "Error:  Env variable PROJECT_TOP_LEVEL_REPO: must be set to the top level DDS-Data-model/CommandResponse directory (where example has been cloned) "
      exit

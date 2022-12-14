@@ -36,3 +36,9 @@ OR simply:
 
 ## Running Example:
 Device and Controller must be executed from the build directory.
+e.g. ./Device  ./Controller
+
+
+## Issues
+RUN Scripts in toplevel dir broken
+Not sure if Connext 7.0 would work - likely
