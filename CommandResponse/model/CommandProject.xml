@@ -54,6 +54,27 @@
       </module>
     </types>
 
+
+    <qos_library name="ControllerParticipantQosLibrary">
+      <qos_profile name="DefaultProfile">
+	<domain_participant_qos>
+	  <participant_name>
+		<name>CONTROLLER</name>
+	  </participant_name>
+	</domain_participant_qos>
+      </qos_profile>
+    </qos_library>
+
+     <qos_library name="DeviceParticipantQosLibrary">
+      <qos_profile name="DefaultProfile">
+	<domain_participant_qos>
+	  <participant_name>
+		<name>DEVICE</name>
+	  </participant_name>
+	</domain_participant_qos>
+      </qos_profile>
+       </qos_library>
+       
     <qos_library name="CmdRspQoSLibrary">
       <qos_profile name="DeviceStateProfile" base_name="BuiltinQosLib::Generic.KeepLastReliable.TransientLocal">
       </qos_profile>
@@ -72,6 +93,9 @@
 
     <domain_participant_library name="CmdRspParticipantLibrary">
       <domain_participant name="ControllerParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
+	<domain_participant_qos base_name="ControllerParticipantQosLibrary::DefaultProfile">
+	</domain_participant_qos>
+	    
         <publisher name="ControllerPublisher">
           <data_writer name="ConfigureDeviceWriter" topic_ref="ConfigureDevice">
             <datawriter_qos base_name="CmdRspQoSLibrary::ConfigDevProfile">
@@ -86,6 +110,8 @@
         </subscriber>
       </domain_participant>
       <domain_participant name="DeviceParticipant1" domain_ref="CmdRspDomainLibrary::SystemDomain">
+	<domain_participant_qos base_name="DeviceParticipantQosLibrary::DefaultProfile">
+	</domain_participant_qos>
         <publisher name="DevicePublisher">
           <data_writer name="DeviceStateWriter" topic_ref="DeviceState">
             <datawriter_qos base_name="CmdRspQoSLibrary::DeviceStateProfile">
