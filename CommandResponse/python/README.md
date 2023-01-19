@@ -23,13 +23,12 @@ Perform the simple build and install outlined in the documentation:
 ## Environment
 The example code was built with the following environment.
 
-* MacOS Darwin (x64)
-* UBUNTU 20.0.4
-* Connext DDS Professional 7.0.0
+* MacOS Darwin (x64) w/ Connext DDS Professional 7.0.0
+* UBUNTU 20.0.4 w/Connext DDS Professional 6.1.1
 
 ## Running Example:
 
-source /Applications/rti_connextdds-7.0.0/resource/scripts/rtisetenv_x64Darwin17clang.9.0.bash
+source /Applications/rti_connext_dds-7.0.0/resource/scripts/rtisetenv_x64Darwin17clang.9.0.bash
 
 Device and Controller must be executed from the build directory.
 > python Device or python3 device
