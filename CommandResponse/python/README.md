@@ -28,6 +28,9 @@ The example code was built with the following environment.
 * Connext DDS Professional 7.0.0
 
 ## Running Example:
+
+source /Applications/rti_connextdds-7.0.0/resource/scripts/rtisetenv_x64Darwin17clang.9.0.bash
+
 Device and Controller must be executed from the build directory.
 > python Device or python3 device
 > python Controller or python3 controller
