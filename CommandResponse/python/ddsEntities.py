@@ -29,7 +29,7 @@ import rti.connextdds as dds
 
 class DefaultWriterListener(dds.DynamicData.NoOpDataWriterListener):
     def on_publication_matched(self, writer, status):
-        print("Listener Callback On Publication Match ")
+        print(writer.topic_name, "Listener Callback On Publication Match ")
         print("Writer Subs: {0} {1}".format(status.current_count, status.current_count_change))
 
 class Writer(threading.Thread):
@@ -66,14 +66,13 @@ class Writer(threading.Thread):
                 if dds.StatusMask.PUBLICATION_MATCHED in status_mask:
                     print("Writer Subs: {0} {1}".format(st.current_count, st.current_count_change))
             elif self._periodic:  # no active condition, check if periodic
-                print(self._periodic)
                 self.write()
-
-
-    # ********* MUST OVERRIDE TO SET CONCRETE TOPIC CLASS WRITER **********
+    
+    # Optionally overload write specific topic
     def write(self):
-        print("DEFAULT {w_name} WRITER - OVERRIDE WITH TOPIC SPECIFIC write()".format(w_name=self._writer_name))
-
+        # print("Writing (Default Writer) - ", self._topic_type_name) 
+        self._writer.write(self._sample)
+        
     @property
     def writer(self):
         return self._writer
@@ -146,9 +145,9 @@ class Reader(threading.Thread):
 
     # ********* MUST OVERRIDE TO HANDLE CONCRETE TOPIC CLASS READER SAMPLE DATA  **********
     def handler(self, data):
-        # print("DEFAULT READER HANDLER FOR {r_name} NOT SET ".format(r_name=self._reader_name))
-        # print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
-        print("DRH", end='', flush=True)
+        print("DEFAULT READER HANDLER FOR {r_name}  ".format(r_name=self._reader_name))
+        print("*** OVERRIDE TO READ SPECIFIC TOPIC VALUES")
+        print(data, end='', flush=True)
 
     def get_reader_handle(self):
         return self._reader
