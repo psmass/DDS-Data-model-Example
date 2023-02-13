@@ -51,7 +51,7 @@ def device_main(domain_id):
     while application.run_flag:
         # write the current state to the controller once anytime it changes
         if device_dsw.get_current_state() != device_dsw.get_previous_state():
-            device_dsw.write_data(device_dsw.get_current_state())
+            device_dsw.write(device_dsw.get_current_state())
             # then set them equal.
             device_dsw.set_previous_state(device_dsw.get_current_state())
         # print a background idle '.'
