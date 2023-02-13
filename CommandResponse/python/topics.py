@@ -110,7 +110,6 @@ class DeviceStateWtr(ddsEntities.Writer):
         self._sample["myDeviceId.resourceId"] = 2
         self._sample["myDeviceId.id"] = 20
 
-    # write() is effectively a runtime down cast for periodic data
     def write(self, state):
         print("Writing DeviceState Sample")
         self._sample["state"] = state
