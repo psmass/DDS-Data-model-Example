@@ -25,7 +25,7 @@ extern bool application::shutdown_requested;
 namespace MODULE
 {
 
-    void DeviceStateRdr::process_data(const MODULE::DeviceState * data) {
+    void DeviceStateRdr::handler(const MODULE::DeviceState * data) {
         //myReaderThreadInfo->dataSeqIndx = i;
         // std::cout << "Recieved: " << MY_READER_TOPIC_NAME << std::endl; //
 
@@ -68,7 +68,7 @@ namespace MODULE
     }
 
 
-    void ConfigDevRdr::process_data(const MODULE::ConfigureDevice * data) {
+    void ConfigDevRdr::handler(const MODULE::ConfigureDevice * data) {
             if (this->getDevStateWtr()!=NULL) {
                 this->getDevStateWtr()->setCurrentState((enum MODULE::DeviceStateEnum)data->deviceConfig.stateReq);
                 std::cout << "ConfigureDevice Command Received:" << std::endl;

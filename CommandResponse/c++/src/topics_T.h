@@ -81,9 +81,9 @@ class TopicRdr : public Reader {
 
         R* getThisReader(void) { return topicReader; };
 
-        void handler(const DDSConditionSeq active_conditions_seq);
+        void process_data(const DDSConditionSeq active_conditions_seq);
         // override for specific topic process_data 
-        virtual void process_data(const T * data) { // default prints the data
+        virtual void handler(const T * data) { // default prints the data
             S::print_data(data); 
         };
         
@@ -181,7 +181,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
 }
 
 template<class T, class S, class R, class D>
-void TopicRdr<T,S,R,D>::handler(const DDSConditionSeq active_conditions_seq)
+void TopicRdr<T,S,R,D>::process_data(const DDSConditionSeq active_conditions_seq)
 {
         D data_seq;
         DDS_SampleInfoSeq info_seq;
@@ -219,7 +219,7 @@ void TopicRdr<T,S,R,D>::handler(const DDSConditionSeq active_conditions_seq)
                     // result of a request or other internal event.
                     for (int i = 0; i < data_seq.length(); ++i) {
                         if (info_seq[i].valid_data) {  
-                            this->process_data(&data_seq[i]);
+                            this->handler(&data_seq[i]);
                         }
                     }
                 } else if (retcode == DDS_RETCODE_NO_DATA) {
