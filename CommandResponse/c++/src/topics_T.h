@@ -252,6 +252,11 @@ class TopicWtr : public Writer {
             const char* topic_wtr_name);
         ~TopicWtr(void){};
 
+
+        // Default write() will write the topic as is
+        // Override in Topics.h/cxx to modify data prior to write.
+        void write(void) {this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);}
+	  
         virtual void handler(const DDSConditionSeq active_conditions_seq);
         DDSDataWriter * getMyDataWriter(void) { return this->untyped_writer; };
 
