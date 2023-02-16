@@ -257,12 +257,6 @@ class TopicWtr : public Writer {
 
         T * getTopicSample(void){ return this->topicSample; };
         W * getTopicWriter(void){ return this->topicWriter; };
-
-        // Configure Device is writen when by the controller as it demand (i.e. intitial and
-        // changing conditions require it). The writeData member function
-        // is provided to allow the main loop of the controller reliably publish a configuration
-        // change request to the evice.
-        void writeData(T topic); 
         
     protected:
         W * topicWriter;
