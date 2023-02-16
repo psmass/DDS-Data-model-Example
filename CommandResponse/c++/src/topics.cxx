@@ -63,7 +63,7 @@ namespace MODULE
         // need to use get'rs for things in the template or derived class
         this->getTopicSample()->state=current_state; 
         //MODULE::DeviceStateTypeSupport::print_data(this->getTopicSample()); 
-        this->getTopicWriter()->write(*this->getTopicSample(), DDS_HANDLE_NIL);
+        this->write();
     
     }
 
@@ -86,7 +86,7 @@ namespace MODULE
         this->topicSample->targetDeviceId.id = this->getDevStateRdr()->getReadDevState()->myDeviceId.id;
         this->topicSample->targetDeviceId.resourceId = this->getDevStateRdr()->getReadDevState()->myDeviceId.resourceId;
         this->topicSample->deviceConfig.stateReq=state_req; // per state requested
-        this->topicWriter->write(*this->topicSample, DDS_HANDLE_NIL);
+        this->write();
     }   
 
 } // namespace
