@@ -110,13 +110,7 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
             };
 
         ~DeviceStateWtr(void){};
-
-        // write() is effectively a runtime down cast for periodic data
-        void write(void) {
-            this->writeData(this->currentState);
-        }
-
-       
+    
         void writeData(const enum MODULE::DeviceStateEnum current_state); 
 
         // Device State is writen when ever it changes. The writeData member function
@@ -191,11 +185,6 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
                 )
             { };
         ~ConfigDevWtr(void){};
-
-        // write() is effectively a runtime down cast for periodic data
-        void write(void) {
-            this->writeData(this->devicesDevStateRdrPtr->getCurrentState());
-        }
 
         void writeData(const enum MODULE::DeviceStateEnum configDevReq);
 

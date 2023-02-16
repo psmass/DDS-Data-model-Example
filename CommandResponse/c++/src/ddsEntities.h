@@ -46,7 +46,9 @@ namespace MODULE
                 const char* writer_name);
             ~Writer(void) {}; 
 
-            // override to write your specific data topic
+            // override to write your specific data periodic topic
+            // or your application is able to change the sample
+            // asynchronously
             virtual void write(void) { std::cout << "DWH"; };
 
             void * writerThread(void);
