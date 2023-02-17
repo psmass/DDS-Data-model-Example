@@ -76,7 +76,7 @@ extern "C" int run_controller_application(int domain_id) {
     factory_qos.profile.url_profile.from_array(url_profiles, 1);
     DDSTheParticipantFactory->set_qos(factory_qos);
 
-    // create DDS containser entities: Participant, Publisher and Subscriber
+    // create DDS container entities: Participant, Publisher and Subscriber
     // (with default QoS Profiles, we'll put the  QoS on the Readers and Writers)
      DDSDomainParticipant * participant = 
         DDSTheParticipantFactory->create_participant(

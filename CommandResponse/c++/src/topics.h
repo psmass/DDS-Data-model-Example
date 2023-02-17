@@ -27,7 +27,7 @@
  needs to see all status and responses from a device unless there are multiple controllers
  where some topic field values are used to load balance.
 
- If you don't which to run writer threads for event or a periodic topics you may omit
+ If you don't wish to run writer threads for event or a periodic topics you may omit
  calling the writer.start(). If you would prefer to use a listener to montior events
  you will need to modify the ddsEntities.py infrastructure file.
 
