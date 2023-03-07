@@ -4,7 +4,7 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl 
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.2.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
@@ -1542,10 +1542,6 @@ namespace ExCmdRsp {
         const DeviceConfiguration* src)
     {
         try {
-
-            if (dst == NULL || src == NULL) {
-                return RTI_FALSE;
-            }
 
             if (!ExCmdRsp::DeviceConfigurationStuct_copy(
                 dst,(const ExCmdRsp::DeviceConfigurationStuct*)src)) {

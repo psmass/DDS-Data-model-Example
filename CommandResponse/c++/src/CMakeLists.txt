@@ -49,11 +49,11 @@ set(DEVICE_CPP_SOURCES
 )
 
 # Main application
-add_executable(Device
+add_executable(GenDevice
     ${DEVICE_CPP_SOURCES}
 )
 
-target_link_libraries(Device
+target_link_libraries(GenDevice
 	RTIConnextDDS::cpp2_api
 )
 

@@ -5,12 +5,12 @@ then
      echo "Error:  Env variable PROJECT_TOP_LEVEL_REPO: must be set to the top level DDS-Data-model/CommandResponse directory (where example has been cloned) "
      exit
 fi
-if [ `ps axw | grep 'device' | wc -l` -eq 2 ];
+if [ `ps axw | grep 'GenDevice' | wc -l` -eq 2 ];
 then
     echo "It looks like the process is already runing:"
-    echo "      kill `ps axw|grep 'device'| awk '{$1=$1}1'|cut -d ' ' -f 1 | head -n 1`"
+    echo "      kill `ps axw|grep 'GenDevice'| awk '{$1=$1}1'|cut -d ' ' -f 1 | head -n 1`"
     exit
 fi
-export NDDS_QOS_PROFILES=file://$PROJECT_TOP_LEVEL_REPO/model/CommandProject.xml
+#export NDDS_QOS_PROFILES=file://$PROJECT_TOP_LEVEL_REPO/model/CommandProject.xml
 echo "Script kicking off Example Device"
-./objs/x64Darwin17clang9.0/device
+./src/build/GenDevice

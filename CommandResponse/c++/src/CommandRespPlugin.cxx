@@ -3,7 +3,7 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.2.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
@@ -129,12 +129,25 @@ namespace ExCmdRsp {
     {
         DeviceId *sample = NULL;
 
-        sample = new (std::nothrow) DeviceId ;
+        if (alloc_params == NULL) {
+            return NULL;
+        }
+
+        sample = new (std::nothrow) DeviceId();
         if (sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceId_initialize_w_params(sample,alloc_params)) {
+            struct DDS_TypeDeallocationParams_t deallocParams =
+            DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
+            deallocParams.delete_pointers = alloc_params->allocate_pointers;
+            deallocParams.delete_optional_members = alloc_params->allocate_pointers;
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            allocation fails. But if the allocation fails then sample == null and
+            the method will return before reach this point.*/
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceId_finalize_w_params(sample, &deallocParams);
             delete  sample;
             sample=NULL;
         }
@@ -146,13 +159,18 @@ namespace ExCmdRsp {
     {
         DeviceId *sample = NULL;
 
-        sample = new (std::nothrow) DeviceId ;
+        sample = new (std::nothrow) DeviceId();
 
         if(sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceId_initialize_ex(sample,allocate_pointers, RTI_TRUE)) {
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            new fails. But if new fails then sample == null and the method will
+            return before reach this point. */
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceId_finalize_ex(sample, RTI_TRUE);
             delete  sample;
             sample=NULL;
         }
@@ -383,7 +401,7 @@ namespace ExCmdRsp {
     DDS_ReturnCode_t
     DeviceIdPlugin_data_to_string(
         const DeviceId *sample,
-        char *str,
+        char *_str,
         DDS_UnsignedLong *str_size, 
         const struct DDS_PrintFormatProperty *property)
     {
@@ -449,7 +467,7 @@ namespace ExCmdRsp {
 
         retCode = DDS_DynamicDataFormatter_to_string_w_format(
             data, 
-            str,
+            _str,
             str_size, 
             &printFormat);
         if (retCode != DDS_RETCODE_OK) {
@@ -581,12 +599,25 @@ namespace ExCmdRsp {
     {
         DeviceConfigurationStuct *sample = NULL;
 
-        sample = new (std::nothrow) DeviceConfigurationStuct ;
+        if (alloc_params == NULL) {
+            return NULL;
+        }
+
+        sample = new (std::nothrow) DeviceConfigurationStuct();
         if (sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceConfigurationStuct_initialize_w_params(sample,alloc_params)) {
+            struct DDS_TypeDeallocationParams_t deallocParams =
+            DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
+            deallocParams.delete_pointers = alloc_params->allocate_pointers;
+            deallocParams.delete_optional_members = alloc_params->allocate_pointers;
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            allocation fails. But if the allocation fails then sample == null and
+            the method will return before reach this point.*/
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceConfigurationStuct_finalize_w_params(sample, &deallocParams);
             delete  sample;
             sample=NULL;
         }
@@ -598,13 +629,18 @@ namespace ExCmdRsp {
     {
         DeviceConfigurationStuct *sample = NULL;
 
-        sample = new (std::nothrow) DeviceConfigurationStuct ;
+        sample = new (std::nothrow) DeviceConfigurationStuct();
 
         if(sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceConfigurationStuct_initialize_ex(sample,allocate_pointers, RTI_TRUE)) {
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            new fails. But if new fails then sample == null and the method will
+            return before reach this point. */
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceConfigurationStuct_finalize_ex(sample, RTI_TRUE);
             delete  sample;
             sample=NULL;
         }
@@ -854,7 +890,7 @@ namespace ExCmdRsp {
     DDS_ReturnCode_t
     DeviceConfigurationStuctPlugin_data_to_string(
         const DeviceConfigurationStuct *sample,
-        char *str,
+        char *_str,
         DDS_UnsignedLong *str_size, 
         const struct DDS_PrintFormatProperty *property)
     {
@@ -920,7 +956,7 @@ namespace ExCmdRsp {
 
         retCode = DDS_DynamicDataFormatter_to_string_w_format(
             data, 
-            str,
+            _str,
             str_size, 
             &printFormat);
         if (retCode != DDS_RETCODE_OK) {
@@ -1052,12 +1088,25 @@ namespace ExCmdRsp {
     {
         DeviceConfiguration *sample = NULL;
 
-        sample = new (std::nothrow) DeviceConfiguration ;
+        if (alloc_params == NULL) {
+            return NULL;
+        }
+
+        sample = new (std::nothrow) DeviceConfiguration();
         if (sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceConfiguration_initialize_w_params(sample,alloc_params)) {
+            struct DDS_TypeDeallocationParams_t deallocParams =
+            DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
+            deallocParams.delete_pointers = alloc_params->allocate_pointers;
+            deallocParams.delete_optional_members = alloc_params->allocate_pointers;
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            allocation fails. But if the allocation fails then sample == null and
+            the method will return before reach this point.*/
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceConfiguration_finalize_w_params(sample, &deallocParams);
             delete  sample;
             sample=NULL;
         }
@@ -1069,13 +1118,18 @@ namespace ExCmdRsp {
     {
         DeviceConfiguration *sample = NULL;
 
-        sample = new (std::nothrow) DeviceConfiguration ;
+        sample = new (std::nothrow) DeviceConfiguration();
 
         if(sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceConfiguration_initialize_ex(sample,allocate_pointers, RTI_TRUE)) {
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            new fails. But if new fails then sample == null and the method will
+            return before reach this point. */
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceConfiguration_finalize_ex(sample, RTI_TRUE);
             delete  sample;
             sample=NULL;
         }
@@ -1257,12 +1311,25 @@ namespace ExCmdRsp {
     {
         ConfigureDevice *sample = NULL;
 
-        sample = new (std::nothrow) ConfigureDevice ;
+        if (alloc_params == NULL) {
+            return NULL;
+        }
+
+        sample = new (std::nothrow) ConfigureDevice();
         if (sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::ConfigureDevice_initialize_w_params(sample,alloc_params)) {
+            struct DDS_TypeDeallocationParams_t deallocParams =
+            DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
+            deallocParams.delete_pointers = alloc_params->allocate_pointers;
+            deallocParams.delete_optional_members = alloc_params->allocate_pointers;
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            allocation fails. But if the allocation fails then sample == null and
+            the method will return before reach this point.*/
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::ConfigureDevice_finalize_w_params(sample, &deallocParams);
             delete  sample;
             sample=NULL;
         }
@@ -1274,13 +1341,18 @@ namespace ExCmdRsp {
     {
         ConfigureDevice *sample = NULL;
 
-        sample = new (std::nothrow) ConfigureDevice ;
+        sample = new (std::nothrow) ConfigureDevice();
 
         if(sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::ConfigureDevice_initialize_ex(sample,allocate_pointers, RTI_TRUE)) {
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            new fails. But if new fails then sample == null and the method will
+            return before reach this point. */
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::ConfigureDevice_finalize_ex(sample, RTI_TRUE);
             delete  sample;
             sample=NULL;
         }
@@ -1643,7 +1715,7 @@ namespace ExCmdRsp {
     DDS_ReturnCode_t
     ConfigureDevicePlugin_data_to_string(
         const ConfigureDevice *sample,
-        char *str,
+        char *_str,
         DDS_UnsignedLong *str_size, 
         const struct DDS_PrintFormatProperty *property)
     {
@@ -1709,7 +1781,7 @@ namespace ExCmdRsp {
 
         retCode = DDS_DynamicDataFormatter_to_string_w_format(
             data, 
-            str,
+            _str,
             str_size, 
             &printFormat);
         if (retCode != DDS_RETCODE_OK) {
@@ -1953,12 +2025,25 @@ namespace ExCmdRsp {
     {
         DeviceState *sample = NULL;
 
-        sample = new (std::nothrow) DeviceState ;
+        if (alloc_params == NULL) {
+            return NULL;
+        }
+
+        sample = new (std::nothrow) DeviceState();
         if (sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceState_initialize_w_params(sample,alloc_params)) {
+            struct DDS_TypeDeallocationParams_t deallocParams =
+            DDS_TYPE_DEALLOCATION_PARAMS_DEFAULT;
+            deallocParams.delete_pointers = alloc_params->allocate_pointers;
+            deallocParams.delete_optional_members = alloc_params->allocate_pointers;
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            allocation fails. But if the allocation fails then sample == null and
+            the method will return before reach this point.*/
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceState_finalize_w_params(sample, &deallocParams);
             delete  sample;
             sample=NULL;
         }
@@ -1970,13 +2055,18 @@ namespace ExCmdRsp {
     {
         DeviceState *sample = NULL;
 
-        sample = new (std::nothrow) DeviceState ;
+        sample = new (std::nothrow) DeviceState();
 
         if(sample == NULL) {
             return NULL;
         }
 
         if (!ExCmdRsp::DeviceState_initialize_ex(sample,allocate_pointers, RTI_TRUE)) {
+            /* Coverity reports a possible uninit_use_in_call that will happen if the
+            new fails. But if new fails then sample == null and the method will
+            return before reach this point. */
+            /* coverity[uninit_use_in_call : FALSE] */
+            ExCmdRsp::DeviceState_finalize_ex(sample, RTI_TRUE);
             delete  sample;
             sample=NULL;
         }
@@ -2055,7 +2145,7 @@ namespace ExCmdRsp {
     DeviceStatePluginSupport_create_key_ex(RTIBool allocate_pointers){
         DeviceState *key = NULL;
 
-        key = new (std::nothrow) DeviceStateKeyHolder ;
+        key = new (std::nothrow) DeviceStateKeyHolder();
 
         ExCmdRsp::DeviceState_initialize_ex(key,allocate_pointers, RTI_TRUE);
 
@@ -2395,7 +2485,7 @@ namespace ExCmdRsp {
     DDS_ReturnCode_t
     DeviceStatePlugin_data_to_string(
         const DeviceState *sample,
-        char *str,
+        char *_str,
         DDS_UnsignedLong *str_size, 
         const struct DDS_PrintFormatProperty *property)
     {
@@ -2461,7 +2551,7 @@ namespace ExCmdRsp {
 
         retCode = DDS_DynamicDataFormatter_to_string_w_format(
             data, 
-            str,
+            _str,
             str_size, 
             &printFormat);
         if (retCode != DDS_RETCODE_OK) {

@@ -35,10 +35,12 @@ OR simply:
 
 
 ## Running Example:
-Device and Controller must be executed from the build directory.
-e.g. ./Device  ./Controller
+Device and Controller MUST be executed from ../DDS-Data_model-Example/CommandResponse/c++ directory
+e.g. .src/build/GenDevice  .src/build/Controller
 
+or ./runGenDevice
+   ./runController
 
 ## Issues
-RUN Scripts in toplevel dir broken
+
 Not sure if Connext 7.0 would work - likely

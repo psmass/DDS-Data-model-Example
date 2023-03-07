@@ -4,14 +4,14 @@
 WARNING: THIS FILE IS AUTO-GENERATED. DO NOT MODIFY.
 
 This file was generated from CommandResp.idl
-using RTI Code Generator (rtiddsgen) version 3.1.0.
+using RTI Code Generator (rtiddsgen) version 3.1.2.
 The rtiddsgen tool is part of the RTI Connext DDS distribution.
 For more information, type 'rtiddsgen -help' at a command shell
 or consult the Code Generator User's Manual.
 */
 
-#ifndef CommandRespPlugin_2073433127_h
-#define CommandRespPlugin_2073433127_h
+#ifndef CommandRespPlugin_2073433213_h
+#define CommandRespPlugin_2073433213_h
 
 #include "CommandResp.h"
 
@@ -790,5 +790,5 @@ namespace ExCmdRsp {
 #define NDDSUSERDllExport
 #endif
 
-#endif /* CommandRespPlugin_2073433127_h */
+#endif /* CommandRespPlugin_2073433213_h */
 

@@ -23,7 +23,7 @@ namespace MODULE
 {
 
 // Path relative to build directory in CommandResponse c++ example
-const char* QOS_FILE = "../../../model/CommandProject.xml";
+const char* QOS_FILE = "../model/CommandProject.xml";
 
 /* Delete all entities */
 static int participant_shutdown(DDSDomainParticipant *participant)
