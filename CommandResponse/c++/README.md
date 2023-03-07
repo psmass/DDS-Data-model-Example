@@ -46,4 +46,5 @@ or ./runGenDevice
 
 ## Issues
 
-Not sure if Connext 7.0 would work - likely
+6.1.2 does not appear to work
+
