@@ -127,7 +127,7 @@ extern "C" int run_device_application(int domain_id) {
     const char *param_list[] = { s1.c_str(), s2.c_str(), NULL };
     // std::cout << "****** " << param_list << " " << sizeof(param_list) << " " << sizeof(param_list[0]) << std::endl;
 
-    Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0, targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
+    Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0 and targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
 
     // Instantiate Topic Readers and Writers w/threads
     ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 

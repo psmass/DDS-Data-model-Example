@@ -6,9 +6,12 @@ The example code was built with the following environment.
 
 * MacOS Darwin (x64)
 * Ubuntu 20.04 gcc 9.4.0
-* Connext DDS Professional 6.1.0 / 6.1.1
+* Connext DDS Professional 6.1.0 
 
 ## Building Debug executable:
+1. Use rtiCodeGenerator to build the Serializer files (CommmandResp.h/cxx, CommandRespPlugIn.h/cxx, CommandRespSupport.h/cxx (disable example, makefile, - create Typefiles only in src dir) use Traditional C++(namespace)
+
+/Applications/rti_connext_dds-6.1.0/bin/rtiddsgen" /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/model/CommandResp.idl -ppDisable -d /Users/pschmitt/GitHub/DDS-Data-model-Example/CommandResponse/c++/src -language C++ -namespace -create typefiles
 
 1. Create build directory. 
 
