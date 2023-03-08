@@ -22,9 +22,11 @@
 #define TOPICS_T_H
 
 #include <ndds/ndds_cpp.h>
+#include "ddsEntities.h"
+
 
 #define MAX_FILTER_EXPRESSION_LEN 120
-namespace MODULE
+namespace topics
 {
 
 // Content Filter Class
@@ -68,7 +70,7 @@ class Cft {
 // R is the Reader for the specific topic - e.g. DeviceStateReader
 // D is the Topic - Topic Data Sequence e.g. DeviceStateSeq
 template<typename T, class S, typename R, typename D>
-class TopicRdr : public Reader {
+class TopicRdr : public entities::Reader {
     public:
         TopicRdr(
             const DDSDomainParticipant * participant,
@@ -137,7 +139,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
             untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 cft,
-                MODULE::CMD_RSP_QOS_LIBRARY,
+                ExCmdRsp::CMD_RSP_QOS_LIBRARY,
                 qos_profile,
                 NULL,  // listener 
                 DDS_STATUS_MASK_NONE);
@@ -145,7 +147,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
         } else {
             untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 topic,
-                MODULE::CMD_RSP_QOS_LIBRARY,
+                ExCmdRsp::CMD_RSP_QOS_LIBRARY,
                 qos_profile,
                 NULL, // listener 
                 DDS_STATUS_MASK_NONE);
@@ -240,7 +242,7 @@ void TopicRdr<T,S,R,D>::process_data(const DDSConditionSeq active_conditions_seq
 // S is the TopicSupport type e.g. DeviceStatusTypeSupport
 // W is the Writer for the specific topic - e.g. DeviceStateReader
 template<class T, class S, class W>
-class TopicWtr : public Writer {
+class TopicWtr : public entities::Writer {
     public:
         TopicWtr(
             const DDSDomainParticipant * participant,
@@ -304,7 +306,7 @@ TopicWtr<T,S,W>::TopicWtr(
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
         this->untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
             topic,
-            MODULE::CMD_RSP_QOS_LIBRARY,
+            ExCmdRsp::CMD_RSP_QOS_LIBRARY,
             qos_profile,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);
@@ -370,7 +372,7 @@ void TopicWtr<T, S, W>::handler(const DDSConditionSeq active_conditions_seq) {
         }
 }
 
-} // namespace MODULE
+} // namespace topics
 
 
 #endif // TOPICS_T_H

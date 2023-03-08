@@ -19,7 +19,7 @@
 #include "application.h"
 
 
-namespace MODULE
+namespace device
 {
 
 // Path relative to build directory in CommandResponse c++ example
@@ -113,12 +113,12 @@ extern "C" int run_device_application(int domain_id) {
     }
 
     // create the device writer first since this devices ID is loaded in the c'tor
-    DeviceStateWtr device_state_writer(participant, publisher);
+    topics::DeviceStateWtr device_state_writer(participant, publisher);
 
     // Create a listener if we'd rather use vs. event waitset thread.
     // Here we use a Default listener we created, but you can create your own
     // listener(s) (and as many as you need if topic specific)
-    DefaultDataWriterListener * listener = new DefaultDataWriterListener();
+    entities::DefaultDataWriterListener * listener = new entities::DefaultDataWriterListener();
     device_state_writer.getMyDataWriter()->set_listener(listener);
 
     // Device filters ConfigureDeviceRequests to it's deviceID
@@ -127,10 +127,10 @@ extern "C" int run_device_application(int domain_id) {
     const char *param_list[] = { s1.c_str(), s2.c_str(), NULL };
     // std::cout << "****** " << param_list << " " << sizeof(param_list) << " " << sizeof(param_list[0]) << std::endl;
 
-    Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0 and targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
+    topics::Cft cdr_cft(param_list, "targetDeviceId.resourceId = %0 and targetDeviceId.id=%1" ); // create a filter for the ConfigureDeviceReader
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
+    topics::ConfigDevRdr config_dev_reader(participant, subscriber, cdr_cft); 
 
     // config_dev_reader needs the devices state writer to update the currentState
     config_dev_reader.setDevStateWtr(&device_state_writer);
@@ -161,7 +161,7 @@ extern "C" int run_device_application(int domain_id) {
     return participant_shutdown(participant);
     std::cout << "Device main thread shutting down" << std::endl;
 }
-} // namespace MODULE
+} // namespace device
 
 
 int main(int argc, char *argv[])
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     setup_signal_handlers();
 
     try  {
-        return MODULE::run_device_application(domain_id);
+        return device::run_device_application(domain_id);
     }
     catch (const std::exception &ex)  {
         // This will catch DDS exceptions

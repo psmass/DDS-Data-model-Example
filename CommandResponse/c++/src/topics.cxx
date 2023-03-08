@@ -22,8 +22,8 @@
 
 extern bool application::shutdown_requested;
 
-namespace MODULE
-{
+using namespace topics;
+
 
     void DeviceStateRdr::handler(const MODULE::DeviceState * data) {
         //myReaderThreadInfo->dataSeqIndx = i;
@@ -36,16 +36,16 @@ namespace MODULE
 
         std::cout << "Controller Tracking Device Current state to: ";
         switch(this->read_topic.state) {
-            case UNINITIALIZED:     // aka MODULE::DeviceStateEnum::UNINITIALIZED:
+	    case MODULE::UNINITIALIZED:     // aka MODULE::DeviceStateEnum::UNINITIALIZED:
                 std::cout << "UNITIALIZED";
                 break;
-            case OFF:
+	    case MODULE::OFF:
                 std::cout << "OFF";
                 break;
-            case ON:
+	    case MODULE::ON:
                 std::cout << "ON";
                 break;
-            case ERROR:
+	    case MODULE::ERROR:
                 std::cout << "ERROR";
                 break;
             default: std::cout << "OOPS - not a valid value";
@@ -89,4 +89,4 @@ namespace MODULE
         this->write();
     }   
 
-} // namespace
+

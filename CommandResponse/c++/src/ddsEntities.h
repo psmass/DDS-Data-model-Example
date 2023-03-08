@@ -28,12 +28,10 @@
 #include <pthread.h>
 #include <ndds/ndds_cpp.h>
 
-#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
-
 namespace application {
     extern bool shutdown_requested;
 }
-namespace MODULE
+namespace entities
 {
     class Writer {
         public:
@@ -70,8 +68,6 @@ namespace MODULE
             DDSWaitSet * getWaitset(void) { return this->waitset; };
 
             pthread_t getThreadId(void) {return this->tid;};
-            void enable(void) { MODULE::Writer::enabled=true; };
-            void disable(void) { MODULE::Writer::enabled=false; };
         
         protected:
             DDSDomainParticipant * topicParticipant;
@@ -180,7 +176,7 @@ namespace MODULE
         }
     };
 
-} // namespace MODULE
+} // namespace entities
 
 
 #endif // DDS_ENTITIES_H

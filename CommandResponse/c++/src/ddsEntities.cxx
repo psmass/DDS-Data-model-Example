@@ -14,8 +14,8 @@
 #include <pthread.h>
 
 extern bool application::shutdown_requested;
-namespace MODULE
-{
+using namespace entities;
+
     Writer::Writer(
         const DDSDomainParticipant * participant,
         const DDSPublisher * publisher,
@@ -116,6 +116,6 @@ namespace MODULE
     }
 
 
-} // NAMESPACE MODULE
+
 
 

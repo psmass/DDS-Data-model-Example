@@ -44,11 +44,12 @@
 #include "CommandRespSupport.h"
 #include "topics_T.h"
 
+#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
 
-namespace MODULE
+namespace topics
 {
 
-class DeviceStateRdr : public TopicRdr<
+  class DeviceStateRdr : public TopicRdr<
     MODULE::DeviceState,
     MODULE::DeviceStateTypeSupport,
     MODULE::DeviceStateDataReader,
@@ -65,7 +66,7 @@ class DeviceStateRdr : public TopicRdr<
                 )
             { // Keep state in the DevStateReader for each devie, init to ERROR so we
               // wait until we get the first state from the device before we initialize
-              this->read_topic.state = ERROR;
+              this->read_topic.state = MODULE::ERROR;
             }
         ~DeviceStateRdr(void){};
 
@@ -101,8 +102,8 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
                 )
             // initialize previousState and current state different so device will publish on startup
             // Set currentState to UNINITIALIZED so Controller will 'see' a new device
-            { this->previousState =  ERROR; //aka MODULE::DeviceStateEnum::ERROR
-              this->currentState = UNINITIALIZED;
+              { this->previousState =  MODULE::ERROR; //aka MODULE::DeviceStateEnum::ERROR
+		this->currentState = MODULE::UNINITIALIZED;
               // not sure why I need to use the get vs. direct access as it's protected
               // crash results if I don't
               this->getTopicSample()->myDeviceId.resourceId=2;
@@ -122,7 +123,7 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
             previousState=new_state; 
         }
         void setCurrentState(const enum MODULE::DeviceStateEnum new_state){
-            if (new_state == ON) // c++98 does allow  MODULE::DeviceStateEnum::ON
+	    if (new_state == MODULE::ON) // c++98 does allow  MODULE::DeviceStateEnum::ON
                 std::cout << "Controller set Device state ON" << std::endl;
 
             currentState=new_state; 
@@ -198,7 +199,7 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
         DeviceStateRdr * devicesDevStateRdrPtr; 
 };
 
-} // namespace MODULE
+} // namespace topics
 
 
 #endif // TOPICS_H

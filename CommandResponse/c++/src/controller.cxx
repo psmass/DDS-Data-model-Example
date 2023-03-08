@@ -19,7 +19,7 @@
 #include "topics.h"
 #include "application.h"
 
-namespace MODULE
+namespace controller
 {
 
 // Path relative to build directory in CommandResponse c++ example
@@ -111,11 +111,11 @@ extern "C" int run_controller_application(int domain_id) {
     }
 
     // Reader API take a filter, but controller does not need one
-    Cft dsr_cft;        // create a disabled filter for the DeviceStatus Rdr
+    topics::Cft dsr_cft;        // create a disabled filter for the DeviceStatus Rdr
 
     // Instantiate Topic Readers and Writers w/threads
-    ConfigDevWtr config_dev_writer(participant, publisher); 
-    DeviceStateRdr device_state_reader(participant, subscriber, dsr_cft);
+    topics::ConfigDevWtr config_dev_writer(participant, publisher); 
+    topics::DeviceStateRdr device_state_reader(participant, subscriber, dsr_cft);
     config_dev_writer.setDevStateRdr(&device_state_reader);
     config_dev_writer.runThread(); // comment out to disable event monitoring on wtr
     device_state_reader.runThread();
@@ -124,9 +124,9 @@ extern "C" int run_controller_application(int domain_id) {
         // Controller State Machine goes here;
         // If a devices device_state is UNITIALIZED then turn it on
         // A controller would likely track multiple devices and keep them in a vector
-        if (device_state_reader.getCurrentState() == UNINITIALIZED) {
+        if (device_state_reader.getCurrentState() == MODULE::UNINITIALIZED) {
             // turn it on once we recieve a device state of UNINITIALIZED
-            config_dev_writer.writeData (ON);
+	    config_dev_writer.writeData (MODULE::ON);
         }
         std::cout << "." << std::flush;                 
         NDDSUtility::sleep(wait_period);
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     setup_signal_handlers();
 
     try {
-        return MODULE::run_controller_application(domain_id);
+        return controller::run_controller_application(domain_id);
     }
     catch (const std::exception &ex) {
         // This will catch DDS exceptions
