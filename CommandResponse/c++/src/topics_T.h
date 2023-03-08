@@ -24,7 +24,6 @@
 #include <ndds/ndds_cpp.h>
 #include "ddsEntities.h"
 
-
 #define MAX_FILTER_EXPRESSION_LEN 120
 namespace topics
 {
@@ -76,6 +75,7 @@ class TopicRdr : public entities::Reader {
             const DDSDomainParticipant * participant,
             const DDSSubscriber * subscriber,
             const Cft filter,
+	    const char* qos_library,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name);
@@ -99,6 +99,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
             const DDSDomainParticipant * participant,
             const DDSSubscriber * subscriber,
             const Cft filter,
+	    const char* qos_library,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_rdr_name) 
@@ -139,7 +140,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
                     // This DataReader reads data on "Example MODULE_DeviceState" Topic
             untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 cft,
-                ExCmdRsp::CMD_RSP_QOS_LIBRARY,
+                qos_library,
                 qos_profile,
                 NULL,  // listener 
                 DDS_STATUS_MASK_NONE);
@@ -147,7 +148,7 @@ TopicRdr<T,S,R, D>::TopicRdr(
         } else {
             untyped_reader = ((DDSSubscriber *)subscriber)->create_datareader_with_profile(
                 topic,
-                ExCmdRsp::CMD_RSP_QOS_LIBRARY,
+                qos_library,
                 qos_profile,
                 NULL, // listener 
                 DDS_STATUS_MASK_NONE);
@@ -249,6 +250,7 @@ class TopicWtr : public entities::Writer {
             const DDSPublisher * publisher, 
             const bool periodic,
             const int period,
+	    const char* qos_library,
             const char* qos_profile,
             const char* topic_name,
             const char* topic_wtr_name);
@@ -278,6 +280,7 @@ TopicWtr<T,S,W>::TopicWtr(
     const DDSPublisher * publisher,
     const bool periodic,
     const int period,
+    const char* qos_library,
     const char* qos_profile,
     const char* topic_name,
     const char * topic_wtr_name) 
@@ -306,7 +309,7 @@ TopicWtr<T,S,W>::TopicWtr(
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
         this->untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
             topic,
-            ExCmdRsp::CMD_RSP_QOS_LIBRARY,
+            qos_library,
             qos_profile,
             NULL /* listener */,
             DDS_STATUS_MASK_NONE);

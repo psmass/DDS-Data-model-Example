@@ -44,7 +44,7 @@
 #include "CommandRespSupport.h"
 #include "topics_T.h"
 
-#define MODULE ExCmdRsp  // Same as MODULE_NAMESPACE defined in the idl file. Need w/o Quotes
+#define MODULE ExCmdRsp // Name space in xml file for constants
 
 namespace topics
 {
@@ -60,6 +60,7 @@ namespace topics
                 participant, 
                 subscriber,
                 filter,
+		MODULE::CMD_RSP_QOS_LIBRARY,
                 MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_DEVICE_STATE,
                 MODULE::DEVICE_STATE_READER
@@ -96,6 +97,7 @@ class DeviceStateWtr : public TopicWtr<MODULE::DeviceState, MODULE::DeviceStateT
                 publisher,
                 periodic,
                 period,
+		MODULE::CMD_RSP_QOS_LIBRARY,
                 MODULE::DEVICE_STATE_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_DEVICE_STATE,
                 MODULE::DEVICE_STATE_WRITER
@@ -148,6 +150,7 @@ class ConfigDevRdr : public TopicRdr<
                 participant, 
                 subscriber,
                 filter,
+		MODULE::CMD_RSP_QOS_LIBRARY,
                 MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_CONFIGURE_DEVICE,
                 MODULE::CONFIGURE_DEVICE_READER
@@ -180,6 +183,7 @@ class ConfigDevWtr : public TopicWtr<MODULE::ConfigureDevice, MODULE::ConfigureD
                 publisher,
                 periodic,
                 period,
+		MODULE::CMD_RSP_QOS_LIBRARY,
                 MODULE::CONFIG_DEV_TOPIC_QOS_PROFILE,
                 MODULE::TOPIC_CONFIGURE_DEVICE,
                 MODULE::CONFIGURE_DEVICE_WRITER
