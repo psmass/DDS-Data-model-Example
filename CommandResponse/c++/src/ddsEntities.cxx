@@ -31,7 +31,8 @@ using namespace entities;
         this->period.sec = period;
         this->topicName = (char *) topic_name;
         this->writerName = writer_name;
-        this->waitset = new DDSWaitSet();;
+        this->waitset = new DDSWaitSet();
+	this->thread_running=false;
     }
 
     void * Writer::writerThread() {
@@ -65,6 +66,7 @@ using namespace entities;
 
     void Writer::runThread(){
         pthread_create(&this->tid, NULL, &Writer::writerThreadHelper, this);
+	this->thread_running = true;
     }
 
 

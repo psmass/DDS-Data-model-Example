@@ -68,8 +68,10 @@ namespace entities
             DDSWaitSet * getWaitset(void) { return this->waitset; };
 
             pthread_t getThreadId(void) {return this->tid;};
-        
-        protected:
+      
+            bool threadRunning(void) { return this->thread_running; };
+
+         protected:
             DDSDomainParticipant * topicParticipant;
             DDSPublisher * topicPublisher;
             bool periodic;
@@ -81,6 +83,7 @@ namespace entities
             std::string writerName;
             pthread_t tid;
             bool enabled;
+            bool thread_running;
     };
 
     class Reader {
