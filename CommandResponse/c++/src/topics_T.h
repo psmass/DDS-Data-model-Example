@@ -108,26 +108,37 @@ TopicRdr<T,S,R, D>::TopicRdr(
         DDS_ReturnCode_t retcode, retcode1, retcode2;
         DDSDataReader *untyped_reader; 
 
-        // Register the specific datatype to use when creating the Topic
-        // this calls a type specific type, so is required to be done in the specific
-        // type Reader/Writer. The remaining work is done in the base class
-        this->topicTypeName=((char *)S::get_type_name());
-        retcode =
-            S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Reader thread: type name error");
-        }
-
-        // Create a Topic with a name and a datatype
-        DDSTopic *topic = ((DDSDomainParticipant *)participant)->create_topic(
-            this->topicName,
-            this->topicTypeName,
-            DDS_TOPIC_QOS_DEFAULT,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (topic == NULL) {
-            throw std::invalid_argument("Reader thread: create topic error");
-        }
+        // We can only create a topic once, so for applications that may be writing
+        // and reading the same topic, we first need to see if the topic has been
+        // created and, if so, avoid attempting to create it again
+        DDS_Duration_t t = DDS_TIME_ZERO;
+        DDSTopic * topic = ((DDSDomainParticipant *)participant)->find_topic(
+	     this->topicName,  
+	     t);
+	
+        this->topicTypeName=(char *)S::get_type_name();
+	if (topic == NULL) { // topic does not exist
+	
+             // Register the specific datatype to use when creating the Topic
+             // this calls a type specific type, so is required to be done in the specific
+             // type Reader/Writer. The remaining work is done in the base class
+             retcode =
+                  S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
+             if (retcode != DDS_RETCODE_OK) {
+                  throw std::invalid_argument("Writer thread: type name error");
+              }
+	
+             // Create a Topic with a name and a datatype
+             topic = ((DDSDomainParticipant *)participant)->create_topic(
+                 this->topicName,
+                 this->topicTypeName,
+                 DDS_TOPIC_QOS_DEFAULT,
+                 NULL /* listener */,
+                 DDS_STATUS_MASK_NONE);
+             if (topic == NULL) {
+                 throw std::invalid_argument("Reader thread: create topic error");
+             }
+	}
 
         if (filter.filter ==true) { // create a filter topic
  
@@ -285,26 +296,40 @@ TopicWtr<T,S,W>::TopicWtr(
     const char* topic_name,
     const char * topic_wtr_name) 
         : Writer(participant, publisher, periodic, period, topic_name, topic_wtr_name) {
-        // Register the specific datatype to use when creating the Topic
-        // this calls a type specific type, so is required to be done in the specific
-        // type Reader/Writer. The remaining work is done in the base class
-        this->topicTypeName=(char *)S::get_type_name();
-        DDS_ReturnCode_t retcode =
-            S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
-        if (retcode != DDS_RETCODE_OK) {
-            throw std::invalid_argument("Writer thread: type name error");
-        }
 
-        // Create a Topic with a name and a datatype
-        DDSTopic *topic = ((DDSDomainParticipant *)participant)->create_topic(
-            this->topicName,
-            this->topicTypeName,
-            DDS_TOPIC_QOS_DEFAULT,
-            NULL /* listener */,
-            DDS_STATUS_MASK_NONE);
-        if (topic == NULL) {
-            throw std::invalid_argument("Writer thread: create topic error");
-        }
+        // We can only create a topic once, so for applications that may be writing
+        // and reading the same topic, we first need to see if the topic has been
+        // created and, if so, avoid attempting to create it again
+        DDS_Duration_t t = DDS_TIME_ZERO;
+        DDSTopic * topic = ((DDSDomainParticipant *)participant)->find_topic(
+	     this->topicName,  
+	     t);
+
+        DDS_ReturnCode_t retcode;
+	
+        this->topicTypeName=(char *)S::get_type_name();
+	if (topic == NULL) { // topic does not exist
+	
+             // Register the specific datatype to use when creating the Topic
+             // this calls a type specific type, so is required to be done in the specific
+             // type Reader/Writer. The remaining work is done in the base class
+             retcode =
+                  S::register_type((DDSDomainParticipant *)participant, this->topicTypeName);
+             if (retcode != DDS_RETCODE_OK) {
+                  throw std::invalid_argument("Writer thread: type name error");
+              }
+	
+             // Create a Topic with a name and a datatype
+             topic = ((DDSDomainParticipant *)participant)->create_topic(
+                 this->topicName,
+                 this->topicTypeName,
+                 DDS_TOPIC_QOS_DEFAULT,
+                 NULL /* listener */,
+                 DDS_STATUS_MASK_NONE);
+             if (topic == NULL) {
+                 throw std::invalid_argument("Writer thread: create topic error");
+             }
+	}
 
         // This DataWriter writes data on "Example MODULE_DeviceState" Topic
         this->untyped_writer = ((DDSPublisher *)publisher)->create_datawriter_with_profile(
