@@ -19,7 +19,7 @@ set(LINKER_FLAGS "-v")
 Set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 find_package(
-    RTIConnextDDS "6.1.0"
+    RTIConnextDDS "7.0.0"
     REQUIRED
     COMPONENTS
 		core
@@ -54,11 +54,11 @@ add_executable(GenDevice
 )
 
 target_link_libraries(GenDevice
-	RTIConnextDDS::cpp2_api
+	RTIConnextDDS::cpp_api
 )
 
 target_link_libraries(Controller
-	RTIConnextDDS::cpp2_api
+	RTIConnextDDS::cpp_api
 )
 
 
