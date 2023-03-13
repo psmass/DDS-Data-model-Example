@@ -6,7 +6,7 @@ The example code was built with the following environment.
 
 * MacOS Darwin (x64)
 * Ubuntu 20.04 gcc 9.4.0
-* Connext DDS Professional 6.1.0 
+* Connext DDS Professional 7.0.0 
 
 ## Building Debug executable:
 1. Use rtiCodeGenerator to build the Serializer files (CommmandResp.h/cxx, CommandRespPlugIn.h/cxx, CommandRespSupport.h/cxx (disable example, makefile, - create Typefiles only in src dir) use Traditional C++(namespace)
@@ -44,7 +44,5 @@ e.g. .src/build/GenDevice  .src/build/Controller
 or ./runGenDevice
    ./runController
 
-## Issues
 
-6.1.2 does not appear to work
 
