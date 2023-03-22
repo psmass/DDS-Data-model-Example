@@ -21,7 +21,7 @@ Typedefs are used with primitive types to make the model more explicit when sett
 ### Constants
 - Constants define the lengths of MIN, MED and MAX strings.
 
-- Constants are used to define topic names since these will be generated in source code and can referenced when creating topics programatically. Unfortunately these constants cannot be referenced when defining the Domain topics in XML.
+- Constants are used to define topic names since these will be generated in source code and can referenced when creating topics programmatically. Unfortunately these constants cannot be referenced when defining the Domain topics in XML.
 
 - Constants define QoS libraries and profiles. These will be generated in source code and can be used when setting QoS libraries and profiles programatically. Unfortunately these constants cannot be referenced when setting the Domain entities QoS in XML.
 
