@@ -19,7 +19,8 @@ module Common {
   typedef float ConcentrationInMolesPerCubicMetre_t;
   typedef int16 BinaryData_t[Common::MAX_LEN];
 
- struct IdentifierType_t {
+  @nested	
+  struct IdentifierType_t {
         int32 resourceId;
         int32 id;
   };
