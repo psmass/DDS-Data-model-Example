@@ -25,5 +25,7 @@ Typedefs are used with primitive types to make the model more explicit when sett
 
 - Constants define QoS libraries and profiles. These will be generated in source code and can be used when setting QoS libraries and profiles programatically. Unfortunately these constants cannot be referenced when setting the Domain entities QoS in XML.
 
+- All variable length types are bounded with the use of constants.  
+
 ### Quality of Service (QoS)
 It is considered a best practice to not have a default Quality of Service profile. Having one could cause issues if the default profile is changed without the user's knowledge. It is better to have users specify the profile when creating entities.
