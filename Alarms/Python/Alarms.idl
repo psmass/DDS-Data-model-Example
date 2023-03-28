@@ -99,7 +99,7 @@ module Alarms {
     Common::IdentifierType_t sourceId;
     Common::Descriptor_t alarmTypeName;
     Alarms::Severities severity;
-    Alarms::State null;
+    Alarms::State alarmState;
     Alarms::ValueDefinition numericValue;
   };
 
